@@ -19,7 +19,9 @@ case class FhirConf(url: String)
 
 case class KeycloakConf(realm: String, url: String, clientKey: String, clientSecret: String, audience: String)
 
-case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf)
+case class IdServerConf(endpoint: String, username: String, password: String)
+
+case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf)
 
 object Conf {
 

@@ -1,15 +1,17 @@
 package bio.ferlab.cqdg.etl.models
 
-case class Participant (
-                    study_id: String,
-                    submitter_participant_id: String,
-                    age_at_recruitment: String,
-                    gender: String,
-                    ethnicity: String,
-                    vital_status: String,
-                    cause_of_death: Option[String],
-                    age_of_death: Option[String],
-                  ) extends Resource {
+import org.apache.commons.codec.digest.DigestUtils
+
+case class RawParticipant(
+                           study_id: String,
+                           submitter_participant_id: String,
+                           age_at_recruitment: String,
+                           gender: String,
+                           ethnicity: String,
+                           vital_status: String,
+                           cause_of_death: Option[String],
+                           age_of_death: Option[String],
+                         ) extends Resource {
 
 
   override def toString: String = {
@@ -22,15 +24,19 @@ case class Participant (
       s"cause_of_death=$cause_of_death|" +
       s"age_of_death=$age_of_death"
   }
+
+  override def getHash: String = {
+    DigestUtils.sha1Hex(submitter_participant_id)
+  }
 }
 
-object Participant {
+object RawParticipant {
   val FILENAME = "participant"
 
-  def apply(s: String, header: String): Participant = {
+  def apply(s: String, header: String): RawParticipant = {
     val line = s.split("\\t", -1)
     val splitHeader = header.split("\\t+")
-    Participant(
+    RawParticipant(
       line(splitHeader.indexOf("study_id")),
       line(splitHeader.indexOf("submitter_participant_id")),
       line(splitHeader.indexOf("age_at_recruitment")),

@@ -1,5 +1,9 @@
 package bio.ferlab.cqdg.etl.models
 
+import org.apache.commons.codec.digest.DigestUtils
+
+import java.security.MessageDigest
+
 case class Study (
                     study_id: String,
                     name: String,
@@ -24,6 +28,12 @@ case class Study (
 //      s"cause_of_death=$cause_of_death|" +
 //      s"age_of_death=$age_of_death"
 //  }
+
+  override def getHash: String = {
+    val digest = MessageDigest.getInstance("SHA-1")
+    val bites = digest.digest(study_id.getBytes)
+    bites.toString
+  }
 }
 
 object Study {
