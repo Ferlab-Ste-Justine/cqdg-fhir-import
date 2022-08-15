@@ -43,30 +43,4 @@ package object etl {
     }
   }
 
-
-//    def withReport[T](inputBucket: String, inputPrefix: String)(b: String => ValidationResult[T])(implicit s3Client: AmazonS3Client): ValidationResult[T] = {
-//    val dateTimePart = LocalDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-//    val reportPath = s"$inputPrefix/logs/$dateTimePart"
-//
-//    val errorFilePath = s"$reportPath/error.txt"
-//    try {
-//      val result = b(reportPath)
-//      result match {
-//        case Invalid(NonEmptyList(h, t)) =>
-//
-//          S3Utils.writeContent(inputBucket, errorFilePath, (h :: t).mkString("\n"))
-//        case Validated.Valid(_) =>
-//          val successFilePath = s"$reportPath/success.txt"
-//          S3Utils.writeContent(inputBucket, successFilePath, "SUCCESS!")
-//      }
-//      result
-//    }
-//    catch {
-//      case e: Exception =>
-//        S3Utils.writeContent(inputBucket, errorFilePath, ExceptionUtils.getStackTrace(e))
-//        throw e
-//    }
-//
-//  }
-
 }

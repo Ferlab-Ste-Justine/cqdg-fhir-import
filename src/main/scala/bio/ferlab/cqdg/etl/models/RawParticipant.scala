@@ -11,7 +11,7 @@ case class RawParticipant(
                            vital_status: String,
                            cause_of_death: Option[String],
                            age_of_death: Option[String],
-                         ) extends Resource {
+                         ) extends RawResource {
 
 
   override def toString: String = {
@@ -26,7 +26,7 @@ case class RawParticipant(
   }
 
   override def getHash: String = {
-    DigestUtils.sha1Hex(submitter_participant_id)
+    DigestUtils.sha1Hex(List(study_id, submitter_participant_id, age_at_recruitment, gender, ethnicity).mkString("-"))
   }
 }
 

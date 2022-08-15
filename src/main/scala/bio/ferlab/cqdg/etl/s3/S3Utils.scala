@@ -1,7 +1,7 @@
 package bio.ferlab.cqdg.etl.s3
 
 import bio.ferlab.cqdg.etl.conf.AWSConf
-import bio.ferlab.cqdg.etl.models.{RawParticipant, Study}
+import bio.ferlab.cqdg.etl.models.{RawParticipant, RawStudy}
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.Regions
@@ -66,12 +66,12 @@ object S3Utils {
     participants.toList
   }
 
-  def getStudies(obj: S3Object)(implicit s3Client: AmazonS3): List[Study] = {
+  def getStudies(obj: S3Object)(implicit s3Client: AmazonS3): List[RawStudy] = {
     val myData = Source.fromInputStream(obj.getObjectContent).getLines()
     val header = myData.next()
-    val studies = new ListBuffer[Study]()
+    val studies = new ListBuffer[RawStudy]()
     while (myData.hasNext) {
-      studies += Study(myData.next(), header)
+      studies += RawStudy(myData.next(), header)
     }
     studies.toList
   }

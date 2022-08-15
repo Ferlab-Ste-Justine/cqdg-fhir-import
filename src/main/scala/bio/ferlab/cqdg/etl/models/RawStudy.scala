@@ -2,57 +2,61 @@ package bio.ferlab.cqdg.etl.models
 
 import org.apache.commons.codec.digest.DigestUtils
 
-import java.security.MessageDigest
-
-case class Study (
+case class RawStudy(
                     study_id: String,
                     name: String,
                     description: String,
                     keyword: List[String] = Nil,
-                    access_authority: String,
-                    domain: String,
-                    population: String,
+                    access_authority: Option[String] = None,
+                    domain: List[String] = Nil,
+                    population: List[String] = Nil,
                     access_limitations: List[String] = Nil,
                     access_requirements: List[String] = Nil,
-                    biospecimen_access: String
-                  ) extends Resource {
+                    biospecimen_access: Boolean
+                  ) extends RawResource {
 
 
-//  override def toString: String = {
-//    s"study_id=$study_id|" +
-//      s"submitter_participant_id=$submitter_participant_id|" +
-//      s"age_at_recruitment=$age_at_recruitment|" +
-//      s"gender=$gender|" +
-//      s"ethnicity=$ethnicity|" +
-//      s"vital_status=$vital_status|" +
-//      s"cause_of_death=$cause_of_death|" +
-//      s"age_of_death=$age_of_death"
-//  }
+  override def toString: String = {
+    s"study_id=$study_id|" +
+      s"name=$name|" +
+      s"description=$description|" +
+      s"keyword=${keyword.mkString(";")}|" +
+      s"access_authority=$access_authority|" +
+      s"domain=${domain.mkString(";")}|" +
+      s"population=${population.mkString(";")}|" +
+      s"biospecimen_access=$biospecimen_access"
+  }
 
   override def getHash: String = {
-    val digest = MessageDigest.getInstance("SHA-1")
-    val bites = digest.digest(study_id.getBytes)
-    bites.toString
+    DigestUtils.sha1Hex(study_id)
   }
 }
 
-object Study {
+object RawStudy {
   val FILENAME = "study"
 
-  def apply(s: String, header: String): Study = {
+  def apply(s: String, header: String): RawStudy = {
     val line = s.split("\\t", -1)
     val splitHeader = header.split("\\t+")
-    Study(
+
+    RawStudy(
       study_id = line(splitHeader.indexOf("study_id")),
       name = line(splitHeader.indexOf("name")),
       description = line(splitHeader.indexOf("description")),
       keyword = line(splitHeader.indexOf("keyword")).split(";").toList,
-      access_authority = line(splitHeader.indexOf("access_authority")),
-      domain = line(splitHeader.indexOf("domain")),
-      population = line(splitHeader.indexOf("population")),
+      access_authority = splitHeader.indexOf("access_authority") match {
+        case -1 => None
+        case v => Some(line(v))
+      },
+      domain = line(splitHeader.indexOf("domain")).split("|").toList,
+      population = line(splitHeader.indexOf("population")).split("|").toList,
       access_limitations = line(splitHeader.indexOf("access_limitations")).split(";").toList,
       access_requirements = line(splitHeader.indexOf("access_requirements")).split(";").toList,
-      biospecimen_access = line(splitHeader.indexOf("biospecimen_access")),
+      biospecimen_access = line(splitHeader.indexOf("biospecimen_access")).toLowerCase().trim match {
+        case "true"|"1" => true
+        case "false"|"0" => false
+        case _ => throw new IllegalArgumentException(s"Invalid biospecimen_access type:${splitHeader.indexOf("biospecimen_access")}")
+      },
     )
   }
 }

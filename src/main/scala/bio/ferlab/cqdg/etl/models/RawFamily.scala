@@ -9,7 +9,7 @@ case class RawFamily(
                     family_type: String,
                     is_a_proband: String,
                     relationship_to_proband: String
-                  ) extends Resource {
+                  ) extends RawResource {
 
 
   override def toString: String = {
