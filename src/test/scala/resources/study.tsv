@@ -1,0 +1,2 @@
+study_id	name	description	keyword	access_authority	domain	population	access_limitations	access_requirements	biospecimen_access
+cag	CARTaGENE	CARTaGENE is a public research platform of the CHU Sainte-Justine created to accelerate health research. CARTaGENE consists of both biological samples and health data from 43,000 Québec residents aged between 40 to 69 years.	genomics; chronic conditions; population-based cohort; survey data;	https://sdas.cartagene.qc.ca	General health	Adult	DUO:0000005	DUO:0000019; DUO:0000021; DUO:0000025;  DUO:0000026; DUO:0000027; DUO:0000029	1

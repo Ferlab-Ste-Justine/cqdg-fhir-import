@@ -12,8 +12,6 @@ import org.hl7.fhir.r4.model.Bundle
 
 object FihrImport extends App {
 
-  val RESOURCES = List("Patient", "Study")
-
   val prefix = args(0)
   val bucket = args(1)
   val version = args(2)
@@ -47,13 +45,12 @@ object FihrImport extends App {
 
     val participantsR = createParticipants(rawResources(RawParticipant.FILENAME).asInstanceOf[Seq[RawParticipant]])
     val studiesR = createStudies(rawResources(RawStudy.FILENAME).asInstanceOf[Seq[RawStudy]])
-    val listEC = SimpleBuildBundle.createResources("Patient", participantsR)
-    val tt = SimpleBuildBundle.createResources("ResearchStudy", studiesR)
 
-    listEC.foreach(bundle.addEntry)
+    val bundlePatient = SimpleBuildBundle.createResources("Patient", participantsR)
+    val bundleStory = SimpleBuildBundle.createResources("ResearchStudy", studiesR)
 
-    val tBunble = TBundle(listEC)
-    tBunble.save()
+    val tBundle = TBundle(bundlePatient ++ bundleStory)
+    tBundle.save()
   }
 
   private def extractResources()(implicit s3: AmazonS3): Map[String, Seq[RawResource]] ={

@@ -31,7 +31,7 @@ object SimpleBuildBundle {
       be.setFullUrl(s"$resourceType/${s.getId}")
         .setResource(s)
         .getRequest
-        .setIfNoneExist(s"identifier=https://fhir.qa.cqdg.ferlab.bio/fhir/Patient|${s.getId}")
+        .setIfNoneExist(s"identifier=https://fhir.qa.cqdg.ferlab.bio/fhir/Patient|${s.getId}") //FIXME for add resources
         .setMethod(Bundle.HTTPVerb.PUT)
         .setUrl(s"$resourceType/${s.getId}")
       be

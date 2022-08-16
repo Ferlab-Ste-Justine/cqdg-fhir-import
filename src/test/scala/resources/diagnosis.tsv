@@ -1,0 +1,4 @@
+study_id	submitter_participant_id	diagnosis_source_text	diagnosis_ICD_code	diagnosis_mondo_code	age_at_diagnosis_y	age_at_diagnosis	is_cancer	is_cancer_primary
+cag	35849430470	Hypercholesterolemia	E78.3		40	1460	0	Unknown
+cag	35849419216	Tinnitus	H93.19		69	20075	0	Unknown
+cag	35849409716	Eczema	L20.9	MONDO:0004980	55	0	0	Unknown

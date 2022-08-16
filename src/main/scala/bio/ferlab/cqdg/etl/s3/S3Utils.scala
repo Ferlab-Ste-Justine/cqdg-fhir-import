@@ -56,7 +56,7 @@ object S3Utils {
         false
     }
 
-  def getParticipants(obj: S3Object)(implicit s3Client: AmazonS3): List[RawParticipant] = {
+  def getParticipants(obj: S3Object): List[RawParticipant] = {
     val myData = Source.fromInputStream(obj.getObjectContent).getLines()
     val header = myData.next()
     val participants = new ListBuffer[RawParticipant]()
@@ -66,7 +66,7 @@ object S3Utils {
     participants.toList
   }
 
-  def getStudies(obj: S3Object)(implicit s3Client: AmazonS3): List[RawStudy] = {
+  def getStudies(obj: S3Object): List[RawStudy] = {
     val myData = Source.fromInputStream(obj.getObjectContent).getLines()
     val header = myData.next()
     val studies = new ListBuffer[RawStudy]()

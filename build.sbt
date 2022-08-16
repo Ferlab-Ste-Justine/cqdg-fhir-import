@@ -14,6 +14,9 @@ lazy val root = (project in file("."))
     libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.12.275",
     libraryDependencies += "org.keycloak" % "keycloak-authz-client" % "12.0.3",
     libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
+    libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test,
+    libraryDependencies += "org.testcontainers" % "localstack" % "1.15.2" % Test,
+    libraryDependencies += "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.38.8" % Test,
 
     libraryDependencies += "com.softwaremill.sttp.client3" %% "core" % "3.1.0",
 
