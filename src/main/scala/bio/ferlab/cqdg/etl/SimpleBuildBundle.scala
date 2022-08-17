@@ -1,6 +1,6 @@
 package bio.ferlab.cqdg.etl
 
-import bio.ferlab.cqdg.etl.models.{RawParticipant, RawResource, RawStudy}
+import bio.ferlab.cqdg.etl.models.{RawDiagnosis, RawParticipant, RawResource, RawStudy}
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model.Identifier.IdentifierUse
 import org.hl7.fhir.r4.model._
@@ -31,59 +31,72 @@ object SimpleBuildBundle {
       be.setFullUrl(s"$resourceType/${s.getId}")
         .setResource(s)
         .getRequest
-        .setIfNoneExist(s"identifier=https://fhir.qa.cqdg.ferlab.bio/fhir/Patient|${s.getId}") //FIXME for add resources
+        .setIfNoneExist(s"identifier=https://fhir.qa.cqdg.ferlab.bio/fhir/Patient|${s.getId}") //FIXME for add resources - maybe remove
         .setMethod(Bundle.HTTPVerb.PUT)
         .setUrl(s"$resourceType/${s.getId}")
       be
     }.toList
   }
 
-  def createParticipants(participantList: Seq[RawParticipant])(implicit idService: IdServerClient ): Seq[Resource] = {
+  def createParticipants(rawResources: Map[String, Map[String, RawResource]]): Seq[Resource] = {
 
-    val (hashIdMapping, participantsWithHashIds: Map[String, RawParticipant]) = getHashMapping(participantList, "participant")
+    val resourceParticipants = rawResources("participant").asInstanceOf[Map[String, RawParticipant]]
 
-    participantsWithHashIds.map(rp => {
+    resourceParticipants.map(rp => {
+      val (resourceId, resource) = rp
       val patient = new Patient
-
-      val resourceId = hashIdMapping.find(e => e.hash == rp._1) match {
-        case Some(h) => h.internal_id
-        case None => "" //TODO
-      }
 
       val meta = new Meta()
       val coding = new Coding()
-      coding.setCode(rp._2.study_id)
+      coding.setCode(resource.study_id)
       meta.addTag(coding)
 
       patient.addIdentifier()
         .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Patient")
-        .setValue(resourceId)
-      patient.setGender(Enumerations.AdministrativeGender.fromCode(rp._2.gender.trim.toLowerCase()))
-      patient.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(rp._2.submitter_participant_id)
+        .setValue(rp._1)
+      patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.gender.trim.toLowerCase()))
+      patient.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
       patient.setId(resourceId)
       patient.setMeta(meta)
     }).toSeq
   }
 
-  def createStudies(studyList: Seq[RawStudy])(implicit idService: IdServerClient): Seq[Resource] = {
-    val (hashIdMapping, studiesWithHashIds: Map[String, RawStudy]) = getHashMapping(studyList, "study")
+  def createStudies(rawResources: Map[String, Map[String, RawResource]]): Seq[Resource] = {
 
-    studiesWithHashIds.map(rp => {
-      val study = new ResearchStudy()
+    val resourceStudies = rawResources("study").asInstanceOf[Map[String, RawStudy]]
 
-      val resourceId = hashIdMapping.find(e => e.hash == rp._1) match {
-        case Some(h) => h.internal_id
-        case None => ""
-      }
+    resourceStudies.map(rp => {
+      val (resourceId, resource) = rp
+      val study = new ResearchStudy
 
       study.addIdentifier()
         .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/ResearchStudy")
         .setValue(resourceId)
-      study.setTitle(rp._2.name)
-      study.setDescription(rp._2.description)
-      study.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(rp._2.study_id)
-      study.setContact(createContacts(rp._2.keyword).asJava)
+      study.setTitle(resource.name)
+      study.setDescription(resource.description)
+      study.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.study_id)
+      study.setContact(createContacts(resource.keyword).asJava)
       study.setId(resourceId)
+    }).toSeq
+  }
+
+  def createDiagnosis(rawResources: Map[String, Map[String, RawResource]]): Seq[Resource] = {
+
+    val resourceDiagnosis = rawResources("diagnosis").asInstanceOf[Map[String, RawDiagnosis]]
+
+    resourceDiagnosis.map(rp => {
+      val (resourceId, resource) = rp
+      val diagnosis = new Condition()
+      val reference = new Reference()
+      reference.setReference("")
+
+      diagnosis.addIdentifier()
+        .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Condition")
+        .setValue(resourceId)
+      diagnosis.setSubject(reference)
+//      diagnosis.setOnset()
+      diagnosis.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.study_id)
+      diagnosis.setId(resourceId)
     }).toSeq
   }
 

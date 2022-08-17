@@ -1,7 +1,7 @@
 package bio.ferlab.cqdg.etl.s3
 
 import bio.ferlab.cqdg.etl.conf.AWSConf
-import bio.ferlab.cqdg.etl.models.{RawParticipant, RawStudy}
+import bio.ferlab.cqdg.etl.models.{RawDiagnosis, RawParticipant, RawPhenotype, RawResource, RawStudy}
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.Regions
@@ -74,6 +74,26 @@ object S3Utils {
       studies += RawStudy(myData.next(), header)
     }
     studies.toList
+  }
+
+  def getDiagnosis(obj: S3Object): List[RawDiagnosis] = {
+    val myData = Source.fromInputStream(obj.getObjectContent).getLines()
+    val header = myData.next()
+    val diagnosis = new ListBuffer[RawDiagnosis]()
+    while (myData.hasNext) {
+      diagnosis += RawDiagnosis(myData.next(), header)
+    }
+    diagnosis.toList
+  }
+
+  def getPhenotypes(obj: S3Object): List[RawPhenotype] = {
+    val myData = Source.fromInputStream(obj.getObjectContent).getLines()
+    val header = myData.next()
+    val phenotypes = new ListBuffer[RawPhenotype]()
+    while (myData.hasNext) {
+      phenotypes += RawPhenotype(myData.next(), header)
+    }
+    phenotypes.toList
   }
 
 }
