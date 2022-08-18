@@ -1,6 +1,6 @@
 package bio.ferlab.cqdg.etl
 
-import bio.ferlab.cqdg.etl.SimpleBuildBundle.{createDiagnosis, createParticipants, createStudies}
+import bio.ferlab.cqdg.etl.SimpleBuildBundle.createResources
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
 import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
 import bio.ferlab.cqdg.etl.keycloak.Auth
@@ -13,11 +13,9 @@ import play.api.libs.json.Json
 
 object FihrImport extends App {
 
-  val prefix = args(0)
-  val bucket = args(1)
-  val version = args(2)
-  val release = args(3)
-  val study = args(4)
+  val Array(prefix, bucket, version, release, study) = args
+
+  val RESOURCES = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME)
 
   withSystemExit {
     withLog {
@@ -40,21 +38,14 @@ object FihrImport extends App {
   }
 
   def run(rawResources : Map[String, Seq[RawResource]])(implicit s3: AmazonS3, client: IGenericClient, idService: IdServerClient): ValidationResult[Bundle] = {
-
-    val bundle = new Bundle
-    bundle.setType(Bundle.BundleType.TRANSACTION)
-
     val allRawResources = addIds(rawResources)
 
-    val participantsR = createParticipants(allRawResources)
-    val studiesR = createStudies(allRawResources)
-    val diagnosisR = createDiagnosis(allRawResources)
-//    val phenotypesR = createStudies(allRawResources)
+    val bundleList = RESOURCES.flatMap(rt => {
+      val ee = createResources(allRawResources, rt)
+      SimpleBuildBundle.createResourcesBundle(rt, ee)
+    }).toList
 
-    val bundlePatient = SimpleBuildBundle.createResources("Patient", participantsR)
-    val bundleStory = SimpleBuildBundle.createResources("ResearchStudy", studiesR)
-
-    val tBundle = TBundle(bundlePatient ++ bundleStory)
+    val tBundle = TBundle(bundleList)
     tBundle.save()
   }
 
@@ -73,8 +64,7 @@ object FihrImport extends App {
 
   private def addIds(resourceList: Map[String, Seq[RawResource]])(implicit idService: IdServerClient): Map[String, Map[String, RawResource]] = {
     resourceList.map(e => {
-      val resourceType = e._1
-      val resources = e._2
+      val (resourceType, resources) = e
       resourceType -> getHashMapping(resources, resourceType)
     })
   }
@@ -86,8 +76,7 @@ object FihrImport extends App {
 
     val resp = Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
     resourceWithHashIds.map(r => {
-      val hash = r._1
-      val resource = r._2
+      val (hash, resource) = r
       //todo find a better way that get... should always exist...
       val id = resp.find(e => e.hash == hash).get.internal_id
       id -> resource
