@@ -1,13 +1,15 @@
 package bio.ferlab.cqdg
 
 import bio.ferlab.cqdg.etl.conf.Conf
+import bio.ferlab.cqdg.etl.models.{RawDiagnosis, RawParticipant, RawPhenotype, RawStudy}
 import cats.data.Validated.Invalid
 import cats.data.{NonEmptyList, Validated, ValidatedNel}
-import com.amazonaws.services.s3.AmazonS3Client
 import org.slf4j.{Logger, LoggerFactory}
 
 
 package object etl {
+  val RESOURCES: Seq[String] = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME)
+
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
   type ValidationResult[A] = ValidatedNel[String, A]
 

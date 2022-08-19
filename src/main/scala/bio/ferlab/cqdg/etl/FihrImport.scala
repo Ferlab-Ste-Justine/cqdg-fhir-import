@@ -15,7 +15,7 @@ object FihrImport extends App {
 
   val Array(prefix, bucket, version, release, study) = args
 
-  val RESOURCES = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME)
+//  val RESOURCES = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME)
 
   withSystemExit {
     withLog {
@@ -37,7 +37,7 @@ object FihrImport extends App {
     }
   }
 
-  def run(rawResources : Map[String, Seq[RawResource]])(implicit s3: AmazonS3, client: IGenericClient, idService: IdServerClient): ValidationResult[Bundle] = {
+  def run(rawResources : Map[String, Seq[RawResource]])(implicit s3: AmazonS3, client: IGenericClient, idService: IIdServer): ValidationResult[Bundle] = {
     val allRawResources = addIds(rawResources)
 
     val bundleList = RESOURCES.flatMap(rt => {
@@ -62,20 +62,22 @@ object FihrImport extends App {
     )
   }
 
-  private def addIds(resourceList: Map[String, Seq[RawResource]])(implicit idService: IdServerClient): Map[String, Map[String, RawResource]] = {
+  private def addIds(resourceList: Map[String, Seq[RawResource]])(implicit idService: IIdServer): Map[String, Map[String, RawResource]] = {
     resourceList.map(e => {
       val (resourceType, resources) = e
       resourceType -> getHashMapping(resources, resourceType)
     })
   }
 
-  private def getHashMapping(rawResource: Seq[RawResource], resourceType: String)(implicit idService: IdServerClient ): Map[String, RawResource] = {
+  private def getHashMapping(rawResource: Seq[RawResource], resourceType: String)(implicit idService: IIdServer ): Map[String, RawResource] = {
     val resourceWithHashIds = Map(rawResource map {a => a.getHash -> a }: _*)
     val resourceHashes = resourceWithHashIds.keySet map (a => a -> resourceType)
     val payload = Json.stringify(Json.toJson(resourceHashes.toMap))
 
     val resp = Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
     resourceWithHashIds.map(r => {
+      resourceWithHashIds.foreach(r => println(s"${r._1}|${r._2.toString}"))
+      println(resp)
       val (hash, resource) = r
       //todo find a better way that get... should always exist...
       val id = resp.find(e => e.hash == hash).get.internal_id

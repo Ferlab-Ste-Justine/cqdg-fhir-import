@@ -1,7 +1,7 @@
 package bio.ferlab.cqdg.etl.utils
 
 import bio.ferlab.cqdg.etl.conf.AWSConf
-import bio.ferlab.cqdg.etl.models.{RawParticipant, RawStudy}
+import bio.ferlab.cqdg.etl.models.{RawDiagnosis, RawParticipant, RawPhenotype, RawStudy}
 import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.utils.containers.MinioContainer
 import com.amazonaws.services.s3.AmazonS3
@@ -22,7 +22,7 @@ trait MinioServer {
   protected val minioEndpoint = s"http://localhost:$minioPort"
   implicit val s3: AmazonS3 = S3Utils.buildS3Client(AWSConf(MinioContainer.accessKey, MinioContainer.secretKey, minioEndpoint, bucketName = BUCKETNAME, pathStyleAccess = true))
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
-  val objects: Seq[String] = Seq(RawParticipant.FILENAME, RawStudy.FILENAME)
+  val objects: Seq[String] = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME)
 
   createBuckets()
   addObjectToBucket(objects)
@@ -40,7 +40,7 @@ trait MinioServer {
 
   private def addObjectToBucket(paths: Seq[String]): Unit = {
     paths.foreach(p => {
-      val file = new File(s"./src/test/scala/resources/$p.tsv")
+      val file = new File(s"./src/test/resources/$p.tsv")
       val putObjectRequest = new PutObjectRequest(BUCKETNAME, s"$p.tsv", file)
       s3.putObject(putObjectRequest)
     })
