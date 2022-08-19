@@ -1,21 +1,21 @@
 package bio.ferlab.cqdg.etl
 
-import bio.ferlab.cqdg.etl.SimpleBuildBundle.createResources
+import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.createResources
+import bio.ferlab.cqdg.etl.clients.{IIdServer, IdServerClient}
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
 import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.s3.S3Utils._
+import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import com.amazonaws.services.s3.AmazonS3
 import org.hl7.fhir.r4.model.Bundle
 import play.api.libs.json.Json
 
-object FihrImport extends App {
+object FhirImport extends App {
 
   val Array(prefix, bucket, version, release, study) = args
-
-//  val RESOURCES = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME)
 
   withSystemExit {
     withLog {
@@ -28,9 +28,7 @@ object FihrImport extends App {
 
         val auth: Auth = new AuthTokenInterceptor(conf.keycloak).auth
 
-        val string = auth.withToken { (_, rpt) => rpt }
-
-        println(string)
+        auth.withToken { (_, rpt) => rpt }
 
         run(rawResources)
       }
@@ -76,10 +74,7 @@ object FihrImport extends App {
 
     val resp = Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
     resourceWithHashIds.map(r => {
-      resourceWithHashIds.foreach(r => println(s"${r._1}|${r._2.toString}"))
-      println(resp)
       val (hash, resource) = r
-      //todo find a better way that get... should always exist...
       val id = resp.find(e => e.hash == hash).get.internal_id
       id -> resource
     })

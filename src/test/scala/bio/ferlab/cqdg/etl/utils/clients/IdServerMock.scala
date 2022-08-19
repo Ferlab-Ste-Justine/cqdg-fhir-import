@@ -1,7 +1,6 @@
 package bio.ferlab.cqdg.etl.utils.clients
 
-import bio.ferlab.cqdg.etl.IIdServer
-
+import bio.ferlab.cqdg.etl.clients.IIdServer
 import scala.io.Source
 
 class IdServerMock extends IIdServer{

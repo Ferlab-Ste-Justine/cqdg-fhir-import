@@ -64,7 +64,3 @@ object StartFhirServer extends App with FhirServer {
 
   }
 }
-
-//object test extends FhirServer with App {
-//  FhirTestUtils.loadPatients(lastName = "River", firstName = "Jack")
-//}

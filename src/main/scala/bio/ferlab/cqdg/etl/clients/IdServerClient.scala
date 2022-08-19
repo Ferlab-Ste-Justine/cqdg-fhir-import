@@ -1,4 +1,4 @@
-package bio.ferlab.cqdg.etl
+package bio.ferlab.cqdg.etl.clients
 
 import com.typesafe.config.{Config, ConfigFactory}
 import org.apache.http.HttpHeaders
@@ -20,7 +20,6 @@ class IdServerClient extends BaseHttpClient with IIdServer{
     addBasicAuth(httpRequest, idServerUsername, idServerPassword)
     httpRequest.setEntity(new StringEntity(payload))
     val (body, status) = executeHttpRequest(httpRequest)
-    println(payload)
 
     if (200 == status && body.isDefined) {
       body.get

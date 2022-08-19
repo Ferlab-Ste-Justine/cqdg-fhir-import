@@ -1,4 +1,4 @@
-package bio.ferlab.cqdg.etl
+package bio.ferlab.cqdg.etl.task
 
 import bio.ferlab.cqdg.etl.models._
 import org.hl7.fhir.exceptions.FHIRException
@@ -28,7 +28,6 @@ object SimpleBuildBundle {
   def createResourcesBundle(str: String, s: Seq[Resource]): List[BundleEntryComponent] = {
     val resourceType = mapToFhirResourceType(str)
     s.map { s =>
-      println(s"$resourceType/${s.getId}")  //TODO remove
       val be = new BundleEntryComponent()
       be.setFullUrl(s"$resourceType/${s.getId}")
         .setResource(s)
@@ -68,7 +67,7 @@ object SimpleBuildBundle {
   private def getResourceId(targetId: String, from: Map[String, RawResource]): Option[String] = {
     val resource = from.values.headOption.getOrElse(return None)
 
-    val found = if(resource.isInstanceOf[Patient])
+    val found = if(resource.isInstanceOf[RawParticipant])
       from.asInstanceOf[Map[String, RawParticipant]].find(r => r._2.submitter_participant_id == targetId)
     else
       None

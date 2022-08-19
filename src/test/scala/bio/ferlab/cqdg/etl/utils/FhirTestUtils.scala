@@ -60,36 +60,6 @@ object FhirTestUtils {
     }
 
     LOGGER.info("Init fhir container with extensions ...")
-
-    //Sequential
-
-
-    Seq(
-      "terminology/CodeSystem-specimen-type.json",
-      "terminology/CodeSystem-genome-build.json",
-      "terminology/CodeSystem-experimental-strategy.json",
-      "terminology/CodeSystem-document-format.json",
-      "terminology/CodeSystem-data-type.json",
-      "terminology/CodeSystem-data-category.json",
-      "terminology/CodeSystem-bioinfo-analysis-code.json",
-      "terminology/ValueSet-specimen-type.json",
-      "terminology/ValueSet-genome-build.json",
-      "terminology/ValueSet-data-type.json",
-      "terminology/ValueSet-data-category.json",
-      "terminology/ValueSet-age-at-onset.json").foreach(downloadAndCreate)
-    Seq(
-      "extensions/StructureDefinition-workflow.json",
-      "extensions/StructureDefinition-sequencing-experiment.json",
-      "extensions/StructureDefinition-full-size.json",
-      "profiles/StructureDefinition-cqgc-analysis-task.json",
-      "profiles/StructureDefinition-cqgc-observation.json",
-      "profiles/StructureDefinition-cqgc-sequencing-request.json",
-      "profiles/StructureDefinition-cqgc-analysis-request.json",
-      "search/SearchParameter-run-name.json"
-
-    ).foreach(downloadAndCreate)
-
-
   }
 
   def downloadIfNotInResources(p: String): String = {

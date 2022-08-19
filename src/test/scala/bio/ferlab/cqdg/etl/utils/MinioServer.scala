@@ -30,9 +30,7 @@ trait MinioServer {
   private def createBuckets(): Unit = {
     val alreadyExistingBuckets = s3.listBuckets().asScala.collect { case b if b.getName == BUCKETNAME => b.getName }
     val bucketsToCreate = Seq(BUCKETNAME).diff(alreadyExistingBuckets)
-    println(s3.listBuckets().asScala.length)
-    s3.listBuckets().asScala.foreach(p => println(p.getName))
-    bucketsToCreate.foreach { b =>
+    bucketsToCreate.foreach { _ =>
       val buketRequest = new CreateBucketRequest(BUCKETNAME)
       s3.createBucket(buketRequest)
     }

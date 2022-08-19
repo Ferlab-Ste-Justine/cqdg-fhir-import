@@ -1,4 +1,4 @@
-package bio.ferlab.cqdg.etl
+package bio.ferlab.cqdg.etl.clients
 
 import org.apache.commons.lang3.StringUtils
 import org.apache.http.client.methods.HttpRequestBase

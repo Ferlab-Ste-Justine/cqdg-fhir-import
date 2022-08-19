@@ -17,10 +17,6 @@ lazy val root = (project in file("."))
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test,
       libraryDependencies += "org.testcontainers" % "localstack" % "1.15.2" % Test,
       libraryDependencies += "com.dimafeng" %% "testcontainers-scala-scalatest" % "0.38.8" % Test,
-      libraryDependencies += "com.github.tomakehurst" % "wiremock-jre8" % "2.33.2" % Test,
-
-      libraryDependencies += "com.softwaremill.sttp.client3" %% "core" % "3.1.0",
-
       libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.30",
       libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.30",
       libraryDependencies += "ca.uhn.hapi.fhir" % "hapi-fhir-client" % "5.4.2",
