@@ -48,16 +48,10 @@ object FhirImport extends App {
   }
 
   private def extractResources()(implicit s3: AmazonS3): Map[String, Seq[RawResource]] = {
-    val participants = getParticipants(s3.getObject(bucket, s"$prefix/$version-$study/$release/${RawParticipant.FILENAME}.tsv"))
-    val studies = getStudies(s3.getObject(bucket, s"$prefix/$version-$study/$release/${RawStudy.FILENAME}.tsv"))
-    val diagnosis = getDiagnosis(s3.getObject(bucket, s"$prefix/$version-$study/$release/${RawDiagnosis.FILENAME}.tsv"))
-    val phenotypes = getPhenotypes(s3.getObject(bucket, s"$prefix/$version-$study/$release/${RawPhenotype.FILENAME}.tsv"))
-    Map(
-      RawParticipant.FILENAME -> participants,
-      RawStudy.FILENAME -> studies,
-      RawDiagnosis.FILENAME -> diagnosis,
-      RawPhenotype.FILENAME -> phenotypes
-    )
+    RESOURCES.map(r => {
+      val rawResource = getRawResource(s3.getObject(bucket, s"$prefix/$version-$study/$release/$r.tsv"), r)
+      r -> rawResource
+    }).toMap
   }
 
   private def addIds(resourceList: Map[String, Seq[RawResource]])(implicit idService: IIdServer): Map[String, Map[String, RawResource]] = {

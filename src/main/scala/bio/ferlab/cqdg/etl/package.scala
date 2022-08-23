@@ -1,14 +1,21 @@
 package bio.ferlab.cqdg
 
 import bio.ferlab.cqdg.etl.conf.Conf
-import bio.ferlab.cqdg.etl.models.{RawDiagnosis, RawParticipant, RawPhenotype, RawStudy}
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
 import cats.data.Validated.Invalid
 import cats.data.{NonEmptyList, Validated, ValidatedNel}
 import org.slf4j.{Logger, LoggerFactory}
 
 
 package object etl {
-  val RESOURCES: Seq[String] = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME)
+  val RESOURCES: Seq[String] = Seq(
+    RawParticipant.FILENAME,
+    RawStudy.FILENAME,
+    RawDiagnosis.FILENAME,
+    RawPhenotype.FILENAME,
+    RawBiospecimen.FILENAME,
+    RawSampleRegistration.FILENAME
+  )
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
   type ValidationResult[A] = ValidatedNel[String, A]

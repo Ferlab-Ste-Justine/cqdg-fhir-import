@@ -9,15 +9,12 @@ class IdServerClient extends BaseHttpClient with IIdServer{
 
   val idServerConfig: Config = ConfigFactory.load.getObject("id-server").toConfig
   val idServerEndpoint: String = idServerConfig.getString("endpoint")
-  val idServerUsername: String = idServerConfig.getString("username")
-  val idServerPassword: String = idServerConfig.getString("password")
 
   override def getCQDGIds(payload: String): String = {
     val url = s"${idServerEndpoint}/batch"
 
     val httpRequest = new HttpPost(url)
     httpRequest.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType)
-    addBasicAuth(httpRequest, idServerUsername, idServerPassword)
     httpRequest.setEntity(new StringEntity(payload))
     val (body, status) = executeHttpRequest(httpRequest)
 

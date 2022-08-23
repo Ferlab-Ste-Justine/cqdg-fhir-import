@@ -2,7 +2,7 @@ package bio.ferlab.cqdg.etl
 
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.models.{RawDiagnosis, RawParticipant, RawPhenotype, RawStudy}
-import bio.ferlab.cqdg.etl.s3.S3Utils.{getDiagnosis, getParticipants, getPhenotypes, getStudies}
+import bio.ferlab.cqdg.etl.s3.S3Utils.getRawResource
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
 import org.hl7.fhir.r4.model.{Condition, Observation}
@@ -16,10 +16,10 @@ class FihrImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
   "run" should "return no errors" in {
     withS3Objects { () =>
-      val participants = getParticipants(s3.getObject(BUCKETNAME, s"${RawParticipant.FILENAME}.tsv"))
-      val studies = getStudies(s3.getObject(BUCKETNAME, s"${RawStudy.FILENAME}.tsv"))
-      val diagnosis = getDiagnosis(s3.getObject(BUCKETNAME, s"${RawDiagnosis.FILENAME}.tsv"))
-      val phenotypes = getPhenotypes(s3.getObject(BUCKETNAME, s"${RawPhenotype.FILENAME}.tsv"))
+      val participants = getRawResource(s3.getObject(BUCKETNAME, s"${RawParticipant.FILENAME}.tsv"), RawParticipant.FILENAME)
+      val studies = getRawResource(s3.getObject(BUCKETNAME, s"${RawStudy.FILENAME}.tsv"), RawStudy.FILENAME)
+      val diagnosis = getRawResource(s3.getObject(BUCKETNAME, s"${RawDiagnosis.FILENAME}.tsv"), RawDiagnosis.FILENAME)
+      val phenotypes = getRawResource(s3.getObject(BUCKETNAME, s"${RawPhenotype.FILENAME}.tsv"), RawPhenotype.FILENAME)
       val input = Map(
         RawParticipant.FILENAME -> participants,
         RawStudy.FILENAME -> studies,
