@@ -1,7 +1,7 @@
 package bio.ferlab.cqdg.etl.s3
 
 import bio.ferlab.cqdg.etl.conf.AWSConf
-import bio.ferlab.cqdg.etl.models.{RawParticipant, RawStudy}
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawParticipant, RawPhenotype, RawResource, RawSampleRegistration, RawStudy}
 import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
 import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
 import com.amazonaws.regions.Regions
@@ -56,24 +56,21 @@ object S3Utils {
         false
     }
 
-  def getParticipants(obj: S3Object): List[RawParticipant] = {
+  def getRawResource(obj: S3Object, _type: String): List[RawResource] = {
     val myData = Source.fromInputStream(obj.getObjectContent).getLines()
     val header = myData.next()
-    val participants = new ListBuffer[RawParticipant]()
+    val rawResource = new ListBuffer[RawResource]()
     while (myData.hasNext) {
-      participants += RawParticipant(myData.next(), header)
+      val r = _type match {
+        case "participant" => RawParticipant(myData.next(), header)
+        case "study" => RawStudy(myData.next(), header)
+        case "diagnosis" => RawDiagnosis(myData.next(), header)
+        case "phenotype" => RawPhenotype(myData.next(), header)
+        case "biospecimen" => RawBiospecimen(myData.next(), header)
+        case "sample_registration" => RawSampleRegistration(myData.next(), header)
+      }
+      rawResource += r
     }
-    participants.toList
+    rawResource.toList
   }
-
-  def getStudies(obj: S3Object): List[RawStudy] = {
-    val myData = Source.fromInputStream(obj.getObjectContent).getLines()
-    val header = myData.next()
-    val studies = new ListBuffer[RawStudy]()
-    while (myData.hasNext) {
-      studies += RawStudy(myData.next(), header)
-    }
-    studies.toList
-  }
-
 }
