@@ -21,7 +21,9 @@ case class KeycloakConf(realm: String, url: String, clientKey: String, clientSec
 
 case class IdServerConf(endpoint: String, username: String, password: String)
 
-case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf)
+case class NanuqConf(endpoint: String, username: String, password: String)
+
+case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf, nanuqConf: NanuqConf)
 
 object Conf {
 
