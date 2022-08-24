@@ -1,6 +1,6 @@
 package bio.ferlab.cqdg.etl
 
-import bio.ferlab.cqdg.etl.FihrImport.args
+import bio.ferlab.cqdg.etl.clients.NanuqClient
 import cats.implicits.catsSyntaxValidatedId
 
 object NanuqImport extends App {
@@ -11,8 +11,10 @@ object NanuqImport extends App {
   withSystemExit {
     withLog {
       withConf { conf =>
-
-        "".validNel[String]
+        val nanuq = new NanuqClient(conf.nanuq).fetch(runName)
+        println(nanuq)
+        nanuq
+//        "".validNel[String]
       }
     }
   }

@@ -1,12 +1,11 @@
-package bio.ferlab.cqdg.etl
+package bio.ferlab.cqdg.etl.clients
 
+import bio.ferlab.cqdg.etl.ValidationResult
 import bio.ferlab.cqdg.etl.conf.NanuqConf
+import cats.implicits.catsSyntaxValidatedId
 import org.apache.http.HttpHeaders
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.{ContentType, StringEntity}
-import play.api.libs.json.{JsError, JsSuccess, JsValue, Json, Reads}
-import Metadata._
-import cats.implicits.catsSyntaxValidatedId
 
 object NanuqClient extends App {
   new NanuqClient(null).fetch("1935")
