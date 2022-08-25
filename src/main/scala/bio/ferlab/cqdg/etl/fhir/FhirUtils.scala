@@ -2,7 +2,8 @@ package bio.ferlab.cqdg.etl.fhir
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource}
-import org.hl7.fhir.r4.model.{Age, CodeableConcept, Coding, Extension, Meta}
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
+import org.hl7.fhir.r4.model._
 
 import scala.language.reflectiveCalls
 
@@ -31,12 +32,20 @@ object FhirUtils {
     coding.setCode(code)
   }
 
-  def setMeta(code: String): Meta = {
+  def generateMeta(codes: Seq[String]): Meta = {
     val meta = new Meta()
-    val coding = new Coding()
 
-    coding.setCode(code)
-    meta.addTag(coding)
+    codes.foreach ( c => {
+      val coding = new Coding()
+      coding.setCode(c)
+      meta.addTag(coding)
+    } )
+    meta
+  }
+
+  def setMeta(resource: Resource, studyId: Option[String], release: String): Resource = {
+    val codes = Seq(studyId.map(s => s"study:$s"), Some(s"release:$release")).flatten
+    resource.setMeta(generateMeta(codes))
   }
 
   def setAgeExtension(value: Long, unit: String, rawResource: RawResource): Extension = {
@@ -53,22 +62,21 @@ object FhirUtils {
     extension
   }
 
-//  def validateOutcomes[T](outcome: OperationOutcome, result: T)(err: OperationOutcome.OperationOutcomeIssueComponent => String): ValidatedNel[String, T] = {
-//    val issues = outcome.getIssue.asScala
-//    val errors = issues.collect {
-//      case o if o.getSeverity.ordinal() <= OperationOutcome.IssueSeverity.ERROR.ordinal => err(o)
-//    }
-//    isValid(result, errors)
-//  }
+  def bundleDelete(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map { fhirResource =>
+    val be = new BundleEntryComponent()
+    println(fhirResource.toReference.getReference)
+    be
+      .getRequest
+      .setUrl(fhirResource.toReference.getReference)
+      .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.DELETE)
+    be
+  }
 
-//  def bundleDelete(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map { fhirResource =>
-//    val be = new BundleEntryComponent()
-//    be
-//      .getRequest
-//      .setUrl(fhirResource.toReference().getReference)
-//      .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.DELETE)
-//    be
-//  }
+  implicit class ResourceExtension(v: Resource) {
+    def toReference: Reference = {
+      new Reference(IdType.of(v).toUnqualifiedVersionless)
+    }
+  }
 
 
 }

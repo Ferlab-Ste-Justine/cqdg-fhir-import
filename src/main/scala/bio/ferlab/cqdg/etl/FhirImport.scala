@@ -3,15 +3,19 @@ package bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl.clients.{IIdServer, IdServerClient}
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
 import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.bundleDelete
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent}
-import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.createResources
+import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createResources, mapToFhirResourceType}
 import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
+import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import org.hl7.fhir.r4.model.Bundle
 import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
+
+import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
 
@@ -23,7 +27,6 @@ object FhirImport extends App {
         implicit val s3Client: S3Client = buildS3Client(conf.aws)
         implicit val fhirClient: IGenericClient = buildFhirClient(conf.fhir, conf.keycloak)
         implicit val idService: IdServerClient = new IdServerClient()
-
 
         val auth: Auth = new AuthTokenInterceptor(conf.keycloak).auth
 
@@ -39,12 +42,14 @@ object FhirImport extends App {
     val allRawResources = addIds(rawResources)
 
     val bundleList = RESOURCES.flatMap(rt => {
-      val ee = createResources(allRawResources, rt)
+      val ee = createResources(allRawResources, rt, release)
       SimpleBuildBundle.createResourcesBundle(rt, ee)
     }).toList
 
     val tBundle = TBundle(bundleList)
-    tBundle.save()
+    val result = tBundle.save()
+    deletePreviousRevisions(allRawResources)
+    result
   }
 
   private def extractResources(bucket: String, prefix: String, version: String, study: String, release: String)(implicit s3: S3Client): Map[String, Seq[RawResource]] = {
@@ -52,6 +57,22 @@ object FhirImport extends App {
       val rawResource = getRawResource(getContent(bucket, s"$prefix/$version-$study/$release/$r.tsv"), r)
       r -> rawResource
     }).toMap
+  }
+
+  private def deletePreviousRevisions(allRawResources: Map[String, Map[String, RawResource]])(implicit client: IGenericClient): Unit = {
+    val study = allRawResources(RawStudy.FILENAME).head
+    val resources = RESOURCES.map(mapToFhirResourceType).toSet
+
+    resources.foreach(resourceType => {
+      val bundle = client.search().byUrl(s"$resourceType?_tag:not=release:$release&_tag:exact=study:${study._1}")
+        .returnBundle(classOf[Bundle])
+        .summaryMode(SummaryEnum.TRUE)
+        .execute()
+
+      val deleteBundle = bundleDelete(bundle.getEntry.asScala.map(_.getResource).toList).toList
+      if(deleteBundle.nonEmpty)
+        TBundle(deleteBundle).delete()
+    })
   }
 
   def getRawResource(content: String, _type: String): List[RawResource] = {

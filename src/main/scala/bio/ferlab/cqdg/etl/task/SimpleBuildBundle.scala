@@ -3,7 +3,6 @@ package bio.ferlab.cqdg.etl.task
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.baseFhirServer
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{setAgeExtension, setCoding, setMeta}
 import bio.ferlab.cqdg.etl.models._
-import org.hl7.fhir.exceptions.FHIRException
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model.Identifier.IdentifierUse
 import org.hl7.fhir.r4.model._
@@ -40,21 +39,21 @@ object SimpleBuildBundle {
     }.toList
   }
 
-  def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String): Seq[Resource] = {
+  def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, release: String): Seq[Resource] = {
     val resources = rawResources(resourceType)
 
     resources.map(rp => {
       val (resourceId, resource) = rp
 
       resourceType match {
-        case RawParticipant.FILENAME => createParticipant(resourceId, resource.asInstanceOf[RawParticipant])(rawResources("study"))
-        case RawStudy.FILENAME => createStudy(resourceId, resource.asInstanceOf[RawStudy])
-        case RawDiagnosis.FILENAME => createDiagnosis(resourceId, resource.asInstanceOf[RawDiagnosis])(rawResources("participant"), rawResources("study"))
-        case RawPhenotype.FILENAME => createPhenotype(resourceId, resource.asInstanceOf[RawPhenotype])(rawResources("participant"), rawResources("study"))
+        case RawParticipant.FILENAME => createParticipant(resourceId, resource.asInstanceOf[RawParticipant], release)(rawResources("study"))
+        case RawStudy.FILENAME => createStudy(resourceId, resource.asInstanceOf[RawStudy], release)
+        case RawDiagnosis.FILENAME => createDiagnosis(resourceId, resource.asInstanceOf[RawDiagnosis], release)(rawResources("participant"), rawResources("study"))
+        case RawPhenotype.FILENAME => createPhenotype(resourceId, resource.asInstanceOf[RawPhenotype], release)(rawResources("participant"), rawResources("study"))
         case RawBiospecimen.FILENAME =>
-          createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen])(rawResources("participant"), rawResources("study"))
+          createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen], release)(rawResources("participant"), rawResources("study"))
         case RawSampleRegistration.FILENAME =>
-          createSampleRegistration(resourceId, resource.asInstanceOf[RawSampleRegistration])(rawResources("participant"), rawResources("study"))
+          createSampleRegistration(resourceId, resource.asInstanceOf[RawSampleRegistration], release)(rawResources("participant"), rawResources("study"))
       }
     }).toSeq
   }
@@ -84,7 +83,7 @@ object SimpleBuildBundle {
     }
   }
 
-  def createPhenotype(resourceId: String, resource: RawPhenotype)(parentList: Map[String, RawResource], studyList: Map[String, RawResource]): Observation  = {
+  def createPhenotype(resourceId: String, resource: RawPhenotype, release: String)(parentList: Map[String, RawResource], studyList: Map[String, RawResource]): Observation  = {
     val reference = new Reference()
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
     val studyId = getResourceId(resource.study_id, studyList, RawStudy.FILENAME)
@@ -102,9 +101,9 @@ object SimpleBuildBundle {
     phenotype.addIdentifier()
       .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Observation")
       .setValue(resourceId)
-    if(studyId.isDefined) {
-      phenotype.setMeta(setMeta(studyId.get))
-    }
+
+    setMeta(phenotype, studyId, release)
+
     if(parentId.isDefined) {
       phenotype.setSubject(reference.setReference(s"Patient/${parentId.get}"))
     }
@@ -112,7 +111,7 @@ object SimpleBuildBundle {
     phenotype
   }
 
-  def createDiagnosis(resourceId: String, resource: RawDiagnosis)(parentList: Map[String, RawResource], studyList: Map[String, RawResource]): Condition  = {
+  def createDiagnosis(resourceId: String, resource: RawDiagnosis, release: String)(parentList: Map[String, RawResource], studyList: Map[String, RawResource]): Condition  = {
     val reference = new Reference()
     val studyId = getResourceId(resource.study_id, studyList, RawStudy.FILENAME)
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
@@ -144,17 +143,18 @@ object SimpleBuildBundle {
       diagnosis.setSubject(reference.setReference(s"Patient/${parentId.get}"))
     }
 
-    if(studyId.isDefined) {
-      diagnosis.setMeta(setMeta(studyId.get))
-    }
+    setMeta(diagnosis, studyId, release)
+
     if(diagnosisCode.isDefined) diagnosis.setCode(diagnosisCode.get)
     diagnosis.setOnset(age)
     diagnosis.setId(resourceId)
     diagnosis
   }
 
-  def createStudy(resourceId: String, resource: RawStudy): ResearchStudy  = {
+  def createStudy(resourceId: String, resource: RawStudy, release: String): ResearchStudy  = {
     val study = new ResearchStudy
+
+    setMeta(study, Some(resourceId), release)
 
     study.addIdentifier()
       .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/ResearchStudy")
@@ -167,13 +167,11 @@ object SimpleBuildBundle {
     study
   }
 
-  def createParticipant(resourceId: String, resource: RawParticipant)(studyList: Map[String, RawResource]): Patient  = {
+  def createParticipant(resourceId: String, resource: RawParticipant, release: String)(studyList: Map[String, RawResource]): Patient  = {
     val patient = new Patient
     val studyId = getResourceId(resource.study_id, studyList, RawStudy.FILENAME)
 
-    if(studyId.isDefined) {
-      patient.setMeta(setMeta(studyId.get))
-    }
+    setMeta(patient, studyId, release)
 
     patient.addIdentifier()
       .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Patient")
@@ -184,7 +182,7 @@ object SimpleBuildBundle {
     patient
   }
 
-  def createBiospecimen(resourceId: String, resource: RawBiospecimen)
+  def createBiospecimen(resourceId: String, resource: RawBiospecimen, release: String)
                        (parentList: Map[String, RawResource], studyList: Map[String, RawResource]): Specimen = {
     val specimen = new Specimen
     val reference = new Reference()
@@ -194,9 +192,7 @@ object SimpleBuildBundle {
     val studyId = getResourceId(resource.study_id, studyList, RawStudy.FILENAME)
 
 
-    if(studyId.isDefined) {
-      specimen.setMeta(setMeta(studyId.get))
-    }
+    setMeta(specimen, studyId, release)
 
     specimen.addIdentifier()
       .setSystem(s"$baseFhirServer/fhir/Specimen")
@@ -217,7 +213,7 @@ object SimpleBuildBundle {
     specimen
   }
 
-  def createSampleRegistration(resourceId: String, resource: RawSampleRegistration)
+  def createSampleRegistration(resourceId: String, resource: RawSampleRegistration, release: String)
                        (parentList: Map[String, RawResource], studyList: Map[String, RawResource]): Specimen = {
     val specimen = new Specimen
     val reference = new Reference()
@@ -228,9 +224,7 @@ object SimpleBuildBundle {
       specimen.setSubject(reference.setReference(s"Patient/${parentId.get}"))
     }
 
-    if(studyId.isDefined) {
-      specimen.setMeta(setMeta(studyId.get))
-    }
+    setMeta(specimen, studyId, release)
 
     specimen.setId(resourceId)
     specimen.addIdentifier()
@@ -248,7 +242,6 @@ object SimpleBuildBundle {
       case RawPhenotype.FILENAME => "Observation"
       case RawBiospecimen.FILENAME => "Specimen"
       case RawSampleRegistration.FILENAME => "Specimen"
-      case _ => throw new FHIRException(s"resource not found: $str")
     }
   }
 

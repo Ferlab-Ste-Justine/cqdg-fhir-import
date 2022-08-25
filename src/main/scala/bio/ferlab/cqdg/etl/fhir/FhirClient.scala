@@ -4,6 +4,7 @@ import bio.ferlab.cqdg.etl.conf.{FhirConf, KeycloakConf}
 import ca.uhn.fhir.context.{FhirContext, PerformanceOptionsEnum}
 import ca.uhn.fhir.rest.client.api.{IGenericClient, ServerValidationModeEnum}
 
+
 object FhirClient {
   def buildFhirClient(fhirConf: FhirConf, keycloakConf: KeycloakConf) = {
     val fhirServerUrl = fhirConf.url
@@ -15,6 +16,8 @@ object FhirClient {
 
     val client: IGenericClient = fhirContext.newRestfulGenericClient(fhirServerUrl)
     val hapiFhirInterceptor: AuthTokenInterceptor = new AuthTokenInterceptor(keycloakConf)
+
+
     client.registerInterceptor(hapiFhirInterceptor)
     client
   }
