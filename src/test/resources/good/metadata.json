@@ -1,0 +1,48 @@
+{
+  "submissionSchema": "CQGC_Germline",
+  "experiment": {
+    "platform": "Illumina",
+    "sequencerId": "NB552318",
+    "runName": "runNameExample",
+    "runDate": "2014-09-21T11:50:23-05:00",
+    "runAlias": "runAliasExample",
+    "flowcellId": "0",
+    "isPairedEnd": true,
+    "fragmentSize": 100,
+    "experimentalStrategy": "WXS",
+    "captureKit": "RocheKapaHyperExome",
+    "baitDefinition": "KAPA_HyperExome_hg38_capture_targets"
+  },
+  "workflow": {
+    "name": "Dragen",
+    "version": "1.1.0",
+    "genomeBuild": "GRCh38"
+  },
+  "analyses": [
+    {
+      "patient": {
+        "clinId": "_PATIENT_ID_",
+        "firstName": "John",
+        "lastName": "Doe",
+        "sex": "male"
+      },
+      "ldm": "_ORGANIZATION_ALIAS_",
+      "ldmSampleId": "_LDM_SAMPLE_ID_",
+      "ldmSpecimenId": "_LDM_SPECIMEN_ID_",
+      "specimenType": "NBL",
+      "sampleType": "NBL",
+      "bodySite": "can be null",
+      "clinServiceRequestId": "_SERVICE_REQUEST_ID_",
+      "labAliquotId": "nanuq_sample_id",
+      "files": {
+        "cram": "file1.cram",
+        "crai": "file1.crai",
+        "snv_vcf": "file2.vcf",
+        "snv_tbi": "file2.tbi",
+        "cnv_vcf": "file4.vcf",
+        "cnv_tbi": "file4.tbi",
+        "supplement": "file3.json"
+      }
+    }
+  ]
+}

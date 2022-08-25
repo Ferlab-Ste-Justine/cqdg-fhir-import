@@ -12,7 +12,9 @@ case class AWSConf(
                     secretKey: String,
                     endpoint: String,
                     bucketName: String,
-                    pathStyleAccess: Boolean
+                    pathStyleAccess: Boolean,
+                    outputBucketName: String,
+                    outputPrefix: String
                   )
 
 case class FhirConf(url: String)
@@ -21,7 +23,9 @@ case class KeycloakConf(realm: String, url: String, clientKey: String, clientSec
 
 case class IdServerConf(endpoint: String, username: String, password: String)
 
-case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf)
+case class NanuqConf(endpoint: String, username: String, password: String)
+
+case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf, nanuq: NanuqConf)
 
 object Conf {
 

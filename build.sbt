@@ -11,7 +11,6 @@ lazy val root = (project in file("."))
       commonSettings,
       libraryDependencies += "software.amazon.awssdk" % "s3" % awssdkVersion,
       libraryDependencies += "software.amazon.awssdk" % "apache-client" % awssdkVersion,
-      libraryDependencies += "com.amazonaws" % "aws-java-sdk-s3" % "1.12.275",
       libraryDependencies += "org.keycloak" % "keycloak-authz-client" % "12.0.3",
       libraryDependencies += "com.typesafe.play" %% "play-json" % "2.9.2",
       libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.8" % Test,

@@ -1,32 +1,34 @@
 package bio.ferlab.cqdg.etl.s3
 
 import bio.ferlab.cqdg.etl.conf.AWSConf
-import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawParticipant, RawPhenotype, RawResource, RawSampleRegistration, RawStudy}
-import com.amazonaws.auth.{AWSStaticCredentialsProvider, BasicAWSCredentials}
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration
-import com.amazonaws.regions.Regions
-import com.amazonaws.services.s3.model.S3Object
-import com.amazonaws.services.s3.{AmazonS3, AmazonS3ClientBuilder}
+import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.core.sync.RequestBody
-import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.http.apache.ApacheHttpClient
+import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectRequest, NoSuchKeyException, PutObjectRequest}
+import software.amazon.awssdk.services.s3.{S3Client, S3Configuration}
 
-import scala.collection.mutable.ListBuffer
-import scala.io.Source
+import java.net.URI
 
 object S3Utils {
 
-  def buildS3Client(conf: AWSConf): AmazonS3 = {
 
-    val credentials = new BasicAWSCredentials(conf.accessKey, conf.secretKey)
-
-    AmazonS3ClientBuilder
-      .standard()
-      .withCredentials(new AWSStaticCredentialsProvider(credentials))
-      .withEndpointConfiguration(new EndpointConfiguration(conf.endpoint, Regions.US_EAST_1.getName))
-      .withPathStyleAccessEnabled(true)
+  def buildS3Client(conf: AWSConf): S3Client = {
+    val confBuilder: S3Configuration = software.amazon.awssdk.services.s3.S3Configuration.builder()
+      .pathStyleAccessEnabled(conf.pathStyleAccess)
       .build()
-
+    val staticCredentialsProvider: StaticCredentialsProvider = StaticCredentialsProvider.create(
+      AwsBasicCredentials.create(conf.accessKey, conf.secretKey)
+    )
+    val endpoint = URI.create(conf.endpoint)
+    val s3: S3Client = S3Client.builder()
+      .credentialsProvider(staticCredentialsProvider)
+      .endpointOverride(endpoint)
+      .region(Region.US_EAST_1)
+      .serviceConfiguration(confBuilder)
+      .httpClient(ApacheHttpClient.create())
+      .build()
+    s3
   }
 
 
@@ -56,21 +58,4 @@ object S3Utils {
         false
     }
 
-  def getRawResource(obj: S3Object, _type: String): List[RawResource] = {
-    val myData = Source.fromInputStream(obj.getObjectContent).getLines()
-    val header = myData.next()
-    val rawResource = new ListBuffer[RawResource]()
-    while (myData.hasNext) {
-      val r = _type match {
-        case "participant" => RawParticipant(myData.next(), header)
-        case "study" => RawStudy(myData.next(), header)
-        case "diagnosis" => RawDiagnosis(myData.next(), header)
-        case "phenotype" => RawPhenotype(myData.next(), header)
-        case "biospecimen" => RawBiospecimen(myData.next(), header)
-        case "sample_registration" => RawSampleRegistration(myData.next(), header)
-      }
-      rawResource += r
-    }
-    rawResource.toList
-  }
 }
