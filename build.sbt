@@ -19,6 +19,7 @@ lazy val root = (project in file("."))
       libraryDependencies += "org.slf4j" % "slf4j-api" % "1.7.30",
       libraryDependencies += "org.slf4j" % "slf4j-simple" % "1.7.30",
       libraryDependencies += "ca.uhn.hapi.fhir" % "hapi-fhir-client" % "5.4.2",
+      libraryDependencies += "ca.uhn.hapi.fhir" % "hapi-fhir-jpaserver-base" % "5.7.9",
       libraryDependencies += "ca.uhn.hapi.fhir" % "hapi-fhir-structures-r4" % "5.4.2",
       libraryDependencies += "ca.uhn.hapi.fhir" % "org.hl7.fhir.r4" % "5.0.0",
       libraryDependencies += "com.github.pureconfig" %% "pureconfig" % "0.17.1",

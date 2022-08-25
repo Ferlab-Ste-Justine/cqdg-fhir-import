@@ -288,7 +288,6 @@ object SimpleBuildBundle {
   def createBiospecimen(resourceId: String, resource: RawBiospecimen, release: String)
                        (parentList: Map[String, RawResource], studyId: String): Resource = {
     //TODO tumor_normal_designation => Should generate an Observation
-
     val specimen = new Specimen
     val reference = new Reference()
 

@@ -6,15 +6,12 @@ import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model._
 import bio.ferlab.cqdg.etl.isValid
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource}
-import ca.uhn.fhir.rest.client.api.IGenericClient
-import ca.uhn.fhir.rest.server.exceptions.{PreconditionFailedException, UnprocessableEntityException}
-import cats.data.ValidatedNel
-import org.hl7.fhir.r4.model.{Age, CodeableConcept, Coding, Extension, IdType, Meta, OperationOutcome, Reference, Resource, Specimen}
+import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
+import org.hl7.fhir.r4.model._
 
 import scala.jdk.CollectionConverters._
 import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.language.reflectiveCalls
-import scala.util.Try
 
 object FhirUtils {
 
@@ -71,6 +68,18 @@ object FhirUtils {
       meta.addTag(coding)
     } )
     meta
+
+    codes.foreach ( c => {
+      val coding = new Coding()
+      coding.setCode(c)
+      meta.addTag(coding)
+    } )
+    meta
+  }
+
+  def setMeta(resource: Resource, studyId: Option[String], release: String): Resource = {
+    val codes = Seq(studyId.map(s => s"study:$s"), Some(s"release:$release")).flatten
+    resource.setMeta(generateMeta(codes))
   }
 
   def setAgeExtension(value: Long, unit: String, rawResource: RawResource): Extension = {
@@ -125,41 +134,20 @@ object FhirUtils {
       val codeableConcept = new CodeableConcept()
 
       if (text.isDefined) codeableConcept.setText(text.get)
-  def validateResource(r: Resource)(implicit client: IGenericClient): OperationOutcome = {
-    Try(client.validate().resource(r).execute().getOperationOutcome).recover {
-      case e: PreconditionFailedException => e.getOperationOutcome
-      case e: UnprocessableEntityException => e.getOperationOutcome
-    }.get.asInstanceOf[OperationOutcome]
-  }
-
-  def validateOutcomes[T](outcome: OperationOutcome, result: T)(err: OperationOutcome.OperationOutcomeIssueComponent => String): ValidatedNel[String, T] = {
-    val issues = outcome.getIssue.asScala.toSeq
-    val errors = issues.collect {
-      case o if o.getSeverity.ordinal() <= OperationOutcome.IssueSeverity.ERROR.ordinal => err(o)
-    }
-    isValid(result, errors)
+  def bundleDelete(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map { fhirResource =>
+    val be = new BundleEntryComponent()
+    println(fhirResource.toReference.getReference)
+    be
+      .getRequest
+      .setUrl(fhirResource.toReference.getReference)
+      .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.DELETE)
+    be
   }
 
   implicit class ResourceExtension(v: Resource) {
-    def toReference(): Reference = {
-
-      val ref = new Reference(IdType.of(v).toUnqualifiedVersionless)
-      v.getResourceType.name() match {
-        case "Specimen" =>
-          val s = v.asInstanceOf[Specimen]
-          val ldmId = s.getAccessionIdentifier.getValue
-          val display = if (s.getParent == null || s.getParent.size() == 0) {
-            s"Submitter Specimen ID: $ldmId"
-          } else {
-            s"Submitter Sample ID: $ldmId"
-          }
-          ref.setDisplay(display)
-        case _ =>
-      }
-      ref
+    def toReference: Reference = {
+      new Reference(IdType.of(v).toUnqualifiedVersionless)
     }
-
-
   }
 
   val codings = codes.map(c =>{
