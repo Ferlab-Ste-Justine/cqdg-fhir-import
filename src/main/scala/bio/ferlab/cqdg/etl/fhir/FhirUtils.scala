@@ -64,7 +64,6 @@ object FhirUtils {
 
   def bundleDelete(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map { fhirResource =>
     val be = new BundleEntryComponent()
-    println(fhirResource.toReference.getReference)
     be
       .getRequest
       .setUrl(fhirResource.toReference.getReference)

@@ -42,13 +42,13 @@ object FhirImport extends App {
     val allRawResources = addIds(rawResources)
 
     val bundleList = RESOURCES.flatMap(rt => {
-      val ee = createResources(allRawResources, rt, release)
-      SimpleBuildBundle.createResourcesBundle(rt, ee)
+      val resources = createResources(allRawResources, rt, release)
+      SimpleBuildBundle.createResourcesBundle(rt, resources)
     }).toList
 
     val tBundle = TBundle(bundleList)
     val result = tBundle.save()
-    deletePreviousRevisions(allRawResources)
+    deletePreviousRevisions(allRawResources, release)
     result
   }
 
@@ -59,12 +59,12 @@ object FhirImport extends App {
     }).toMap
   }
 
-  private def deletePreviousRevisions(allRawResources: Map[String, Map[String, RawResource]])(implicit client: IGenericClient): Unit = {
-    val study = allRawResources(RawStudy.FILENAME).head
+  private def deletePreviousRevisions(allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit client: IGenericClient): Unit = {
+    val (studyId, _) = allRawResources(RawStudy.FILENAME).head
     val resources = RESOURCES.map(mapToFhirResourceType).toSet
 
     resources.foreach(resourceType => {
-      val bundle = client.search().byUrl(s"$resourceType?_tag:not=release:$release&_tag:exact=study:${study._1}")
+      val bundle = client.search().byUrl(s"$resourceType?_tag:not=release:$release&_tag:exact=study:$studyId")
         .returnBundle(classOf[Bundle])
         .summaryMode(SummaryEnum.TRUE)
         .execute()

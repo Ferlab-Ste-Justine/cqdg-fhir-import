@@ -1,10 +1,11 @@
 package bio.ferlab.cqdg.etl
 
 import bio.ferlab.cqdg.etl.clients.IIdServer
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.setMeta
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
-import org.hl7.fhir.r4.model.{Condition, Observation}
+import org.hl7.fhir.r4.model.{Condition, Observation, Patient}
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
 import scala.jdk.CollectionConverters._
@@ -59,6 +60,30 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
           case "PHE0000003" => resource.getSubject.getReference shouldBe "Patient/PRT0000001"
         }
       }
+
+      //Resources should have study and revision in Tag
+      val tags = Seq(s"study:STU0000001", s"release:$release")
+      searchPatient.getEntry.asScala.foreach{ p =>
+        val resource = p.getResource.asInstanceOf[Patient]
+        resource.getIdBase match {
+          case a if a.contains("PRT000000") => resource.getMeta.getTag.asScala.map(_.getCode).toSeq should contain allElementsOf tags
+          case _ =>
+        }
+      }
+
+      //Previous version documents should be deleted
+      val oldParticipant = new Patient
+      setMeta(oldParticipant, Some("STU0000001"), "RE_0000")
+      oldParticipant.setId("1234")
+      addElementToFhir(oldParticipant)
+
+      val searchPatientWithOldVersion = searchFhir("Patient")
+      searchPatientWithOldVersion.getTotal shouldBe 4
+
+      FhirImport.run(BUCKETNAME, inputPrefix, version, study, release)
+
+      val searchPatientWithoutOldVersion = searchFhir("Patient")
+      searchPatientWithoutOldVersion.getTotal shouldBe 3
     }
   }
 }

@@ -55,6 +55,10 @@ trait FhirServerSuite extends FhirServer with TestSuite with BeforeAndAfterAll w
       .summaryMode(SummaryEnum.TRUE)
       .execute()
   }
+
+  def addElementToFhir(resource: Resource) = {
+    fhirClient.create().resource(resource).execute()
+  }
 }
 
 object StartFhirServer extends App with FhirServer {
