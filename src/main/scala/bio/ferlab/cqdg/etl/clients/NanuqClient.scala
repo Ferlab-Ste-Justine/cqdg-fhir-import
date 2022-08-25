@@ -21,7 +21,6 @@ class NanuqClient(conf: NanuqConf) extends BaseHttpClient {
     httpRequest.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_FORM_URLENCODED.getMimeType)
     httpRequest.setEntity(new StringEntity(formAttributes))
     val (body, status) = executeHttpRequest(httpRequest)
-    //    val m = Json.parse(body.get).validate[Metadata]
 
     if (status != 200) {
       s"Error response from ananuq, receive HTTP status $status".invalidNel

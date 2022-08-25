@@ -1,6 +1,9 @@
-package bio.ferlab.cqdg.etl
+package bio.ferlab.cqdg.etl.models.nanuq
 
-import play.api.libs.json.{Json, Reads}
+import bio.ferlab.cqdg.etl.ValidationResult
+import cats.data.NonEmptyList
+import cats.implicits.catsSyntaxValidatedId
+import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 
 import scala.collection.Seq
 
@@ -8,6 +11,16 @@ case class Metadata(experiment: Experiment, /*workflow: Workflow,*/ analyses: Se
 
 object Metadata {
   implicit val reads: Reads[Metadata] = Json.reads[Metadata]
+
+  def validateMetadata(body: String): ValidationResult[Metadata] = {
+    val m = Json.parse(body).validate[Metadata]
+    m match {
+      case JsSuccess(m, _) => m.validNel[String]
+      case JsError(errors) =>
+        val all = errors.flatMap { case (path, jsError) => jsError.map(e => s"Error parsing $path => $e") }
+        NonEmptyList.fromList(all.toList).get.invalid[Metadata]
+    }
+  }
 }
 
 case class Experiment(
@@ -17,7 +30,7 @@ case class Experiment(
                        runDate: Option[String],
                        runAlias: Option[String],
                        flowcellId: Option[String],
-//                       isPairedEnd: Option[Boolean],
+                       //                       isPairedEnd: Option[Boolean],
                        experimentalStrategy: Option[String],
                        captureKit: Option[String],
                        baitDefinition: Option[String]

@@ -9,9 +9,9 @@ case object MinioContainer extends OurContainer {
   val secretKey = "secretkey"
   val container: GenericContainer = GenericContainer(
     "minio/minio",
-    command = Seq("server", "/data"),
+    command = Seq("server", "/data", "--console-address", ":9001"),
     //waitStrategy = Wait.forHttp("/").withStartupTimeout(Duration.ofSeconds(60)),
-    exposedPorts = Seq(port),
+    exposedPorts = Seq(port, 9001),
     labels = Map("name" -> name),
     env = Map("MINIO_ACCESS_KEY" -> accessKey, "MINIO_SECRET_KEY" -> secretKey)
   )

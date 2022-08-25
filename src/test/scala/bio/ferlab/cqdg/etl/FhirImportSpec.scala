@@ -1,8 +1,7 @@
 package bio.ferlab.cqdg.etl
 
 import bio.ferlab.cqdg.etl.clients.IIdServer
-import bio.ferlab.cqdg.etl.models.{RawDiagnosis, RawParticipant, RawPhenotype, RawStudy}
-import bio.ferlab.cqdg.etl.s3.S3Utils.getRawResource
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
 import org.hl7.fhir.r4.model.{Condition, Observation}
@@ -10,24 +9,25 @@ import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
 import scala.jdk.CollectionConverters._
 
-class FihrImportSpec extends FlatSpec with WholeStackSuite with Matchers with BeforeAndAfterEach{
+class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with BeforeAndAfterEach {
 
   implicit val idService: IIdServer = new IdServerMock()
+  val objects: Seq[String] = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME, RawBiospecimen.FILENAME, RawSampleRegistration.FILENAME)
+  val study = "CART"
+  val release = "RE_0001"
+  val version = "1"
+
+
+  private def addObjectToBucket(prefix: String, paths: Seq[String]): Unit = {
+    paths.foreach(p => {
+      transferFromResource(s"$prefix/$version-$study/$release", s"$p.tsv")
+    })
+  }
 
   "run" should "return no errors" in {
-    withS3Objects { () =>
-      val participants = getRawResource(s3.getObject(BUCKETNAME, s"${RawParticipant.FILENAME}.tsv"), RawParticipant.FILENAME)
-      val studies = getRawResource(s3.getObject(BUCKETNAME, s"${RawStudy.FILENAME}.tsv"), RawStudy.FILENAME)
-      val diagnosis = getRawResource(s3.getObject(BUCKETNAME, s"${RawDiagnosis.FILENAME}.tsv"), RawDiagnosis.FILENAME)
-      val phenotypes = getRawResource(s3.getObject(BUCKETNAME, s"${RawPhenotype.FILENAME}.tsv"), RawPhenotype.FILENAME)
-      val input = Map(
-        RawParticipant.FILENAME -> participants,
-        RawStudy.FILENAME -> studies,
-        RawDiagnosis.FILENAME -> diagnosis,
-        RawPhenotype.FILENAME -> phenotypes
-      )
-
-      val result = FhirImport.run(input)
+    withS3Objects { (inputPrefix, _) =>
+      addObjectToBucket(inputPrefix, objects)
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release)
       result.isValid shouldBe true
 
       //Right count of each resources

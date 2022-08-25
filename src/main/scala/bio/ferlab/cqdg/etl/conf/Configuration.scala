@@ -12,7 +12,9 @@ case class AWSConf(
                     secretKey: String,
                     endpoint: String,
                     bucketName: String,
-                    pathStyleAccess: Boolean
+                    pathStyleAccess: Boolean,
+                    outputBucketName: String,
+                    outputPrefix: String
                   )
 
 case class FhirConf(url: String)
