@@ -21,8 +21,11 @@ package object etl {
     RawDiagnosis.FILENAME,
     RawPhenotype.FILENAME,
     RawBiospecimen.FILENAME,
-    RawSampleRegistration.FILENAME
+    RawSampleRegistration.FILENAME,
+    RawFamily.FILENAME
   )
+
+  val PROBAND = "Is the proband"
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
   type ValidationResult[A] = ValidatedNel[String, A]

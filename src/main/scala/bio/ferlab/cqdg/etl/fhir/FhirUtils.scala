@@ -5,6 +5,7 @@ import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource}
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model._
 
+import scala.jdk.CollectionConverters._
 import scala.language.reflectiveCalls
 
 object FhirUtils {
@@ -43,11 +44,6 @@ object FhirUtils {
     meta
   }
 
-  def setMeta(resource: Resource, studyId: Option[String], release: String): Resource = {
-    val codes = Seq(studyId.map(s => s"study:$s"), Some(s"release:$release")).flatten
-    resource.setMeta(generateMeta(codes))
-  }
-
   def setAgeExtension(value: Long, unit: String, rawResource: RawResource): Extension = {
     val age = new Age
     val extension = new Extension
@@ -75,7 +71,31 @@ object FhirUtils {
     def toReference: Reference = {
       new Reference(IdType.of(v).toUnqualifiedVersionless)
     }
-  }
 
+    def setSimpleMeta(studyId: String, release: String, args: String *): Resource = {
+      val codes = Seq( s"study:$studyId", s"release:$release") ++ args
+      v.setMeta(generateMeta(codes))
+    }
+
+    //FIXME should be codes in lieu of display???? - TBD
+    def setSimpleCodes(text: Option[String], codes: String *): Resource = {
+      val codeableConcept = new CodeableConcept()
+
+      if (text.isDefined) codeableConcept.setText(text.get)
+
+      val codings = codes.map(c =>{
+        val coding = new Coding()
+        coding.setDisplay(c) //FIXME
+      })
+
+      codeableConcept.setCoding(codings.asJava)
+      v match {
+        case a if a.isInstanceOf[Observation] => a.asInstanceOf[Observation].setCode(codeableConcept)
+        case a if a.isInstanceOf[Condition] => a.asInstanceOf[Condition].setCode(codeableConcept)
+        case _ => throw new MatchError(s"Setting code for unsupported resource type: ${v.getResourceType}")
+      }
+
+    }
+  }
 
 }

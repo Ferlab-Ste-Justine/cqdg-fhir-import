@@ -1,7 +1,7 @@
 package bio.ferlab.cqdg.etl
 
 import bio.ferlab.cqdg.etl.clients.IIdServer
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.setMeta
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.ResourceExtension
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
@@ -73,7 +73,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       //Previous version documents should be deleted
       val oldParticipant = new Patient
-      setMeta(oldParticipant, Some("STU0000001"), "RE_0000")
+      oldParticipant.setSimpleMeta("STU0000001", "RE_0000")
       oldParticipant.setId("1234")
       addElementToFhir(oldParticipant)
 

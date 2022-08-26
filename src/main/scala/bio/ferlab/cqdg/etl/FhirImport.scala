@@ -7,7 +7,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils.bundleDelete
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent}
-import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createResources, mapToFhirResourceType}
+import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.createResources
 import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
 import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
@@ -48,7 +48,7 @@ object FhirImport extends App {
 
     val tBundle = TBundle(bundleList)
     val result = tBundle.save()
-    deletePreviousRevisions(allRawResources, release)
+//    deletePreviousRevisions(allRawResources, release)
     result
   }
 
@@ -61,7 +61,7 @@ object FhirImport extends App {
 
   private def deletePreviousRevisions(allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit client: IGenericClient): Unit = {
     val (studyId, _) = allRawResources(RawStudy.FILENAME).head
-    val resources = RESOURCES.map(mapToFhirResourceType).toSet
+    val resources = Seq("Patient", "ResearchStudy", "Observation", "Group", "Condition", "Specimen")
 
     resources.foreach(resourceType => {
       val bundle = client.search().byUrl(s"$resourceType?_tag:not=release:$release&_tag:exact=study:$studyId")
@@ -87,6 +87,7 @@ object FhirImport extends App {
         case "phenotype" => RawPhenotype(l, header)
         case "biospecimen" => RawBiospecimen(l, header)
         case "sample_registration" => RawSampleRegistration(l, header)
+        case "family_relationship" => RawFamily(l, header)
       }
     }.toList
   }
