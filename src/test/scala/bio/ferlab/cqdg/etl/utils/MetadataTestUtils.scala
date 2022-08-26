@@ -15,7 +15,7 @@ object MetadataTestUtils {
   )
   val defaultAnalysis: Analysis = Analysis(
     ldmSampleId = "submitted_sample_id",
-    labAliquotID = "nanuq_sample_id",
+    labAliquotId = "nanuq_sample_id",
     files = defaultFilesAnalysis
   )
   val defaultExperiment: Experiment = Experiment(

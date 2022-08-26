@@ -4,9 +4,17 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawParticipant, RawResource}
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model._
+import bio.ferlab.cqdg.etl.isValid
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource}
+import ca.uhn.fhir.rest.client.api.IGenericClient
+import ca.uhn.fhir.rest.server.exceptions.{PreconditionFailedException, UnprocessableEntityException}
+import cats.data.ValidatedNel
+import org.hl7.fhir.r4.model.{Age, CodeableConcept, Coding, Extension, IdType, Meta, OperationOutcome, Reference, Resource, Specimen}
 
 import scala.jdk.CollectionConverters._
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.language.reflectiveCalls
+import scala.util.Try
 
 object FhirUtils {
 
@@ -24,11 +32,23 @@ object FhirUtils {
       val DIAGNOSIS_SYSTEM = "http://purl.obolibrary.org/obo/mondo.owl"
       val DISEASES_STATUS = s"$baseFhirServer/CodeSystem/disease-status"
       val NCIT_SYSTEM = "http://purl.obolibrary.org/obo/ncit.owl"
+      val DR_TYPE = s"$baseFhirServer/CodeSystem/data-type"
+      val ANALYSIS_TYPE = s"$baseFhirServer/CodeSystem/bioinfo-analysis-code"
+      val DR_CATEGORY = s"$baseFhirServer/CodeSystem/data-category"
+      val DR_FORMAT = s"$baseFhirServer/CodeSystem/document-format"
+      val EXPERIMENTAL_STRATEGY = s"$baseFhirServer/CodeSystem/experimental-strategy"
+      val GENOME_BUILD = s"$baseFhirServer/CodeSystem/genome-build"
+      val OBJECT_STORE = "http://objecstore.cqgc.qc.ca"
+
     }
 
     object Extensions {
       val AGE_BIOSPECIMEN_COLLECTION = s"$baseFhirServer/StructureDefinition/Specimen/ageBiospecimenCollection"
       val AGE_PARTICIPANT_AGE_RECRUITEMENT = s"$baseFhirServer/StructureDefinition/ResearchSubject/ageAtRecruitment"
+      val WORKFLOW = s"$baseFhirServer/StructureDefinition/workflow"
+      val SEQUENCING_EXPERIMENT = s"$baseFhirServer/StructureDefinition/sequencing-experiment"
+      val FULL_SIZE = s"$baseFhirServer/StructureDefinition/full-size"
+
     }
 
   }
@@ -105,13 +125,49 @@ object FhirUtils {
       val codeableConcept = new CodeableConcept()
 
       if (text.isDefined) codeableConcept.setText(text.get)
+  def validateResource(r: Resource)(implicit client: IGenericClient): OperationOutcome = {
+    Try(client.validate().resource(r).execute().getOperationOutcome).recover {
+      case e: PreconditionFailedException => e.getOperationOutcome
+      case e: UnprocessableEntityException => e.getOperationOutcome
+    }.get.asInstanceOf[OperationOutcome]
+  }
 
-      val codings = codes.map(c =>{
-        val coding = new Coding()
-        c.display.map(d => coding.setDisplay(d))
-        c.system.map(s => coding.setSystem(s))
-        coding.setCode(c.code)
-      })
+  def validateOutcomes[T](outcome: OperationOutcome, result: T)(err: OperationOutcome.OperationOutcomeIssueComponent => String): ValidatedNel[String, T] = {
+    val issues = outcome.getIssue.asScala.toSeq
+    val errors = issues.collect {
+      case o if o.getSeverity.ordinal() <= OperationOutcome.IssueSeverity.ERROR.ordinal => err(o)
+    }
+    isValid(result, errors)
+  }
+
+  implicit class ResourceExtension(v: Resource) {
+    def toReference(): Reference = {
+
+      val ref = new Reference(IdType.of(v).toUnqualifiedVersionless)
+      v.getResourceType.name() match {
+        case "Specimen" =>
+          val s = v.asInstanceOf[Specimen]
+          val ldmId = s.getAccessionIdentifier.getValue
+          val display = if (s.getParent == null || s.getParent.size() == 0) {
+            s"Submitter Specimen ID: $ldmId"
+          } else {
+            s"Submitter Sample ID: $ldmId"
+          }
+          ref.setDisplay(display)
+        case _ =>
+      }
+      ref
+    }
+
+
+  }
+
+  val codings = codes.map(c =>{
+      val coding = new Coding()
+  c.display.map(d => coding.setDisplay(d))
+  c.system.map(s => coding.setSystem(s))
+  coding.setCode(c.code)
+    })
 
       codeableConcept.setCoding(codings.asJava)
       v match {

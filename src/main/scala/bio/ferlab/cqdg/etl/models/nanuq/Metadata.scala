@@ -7,7 +7,7 @@ import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 
 import scala.collection.Seq
 
-case class Metadata(experiment: Experiment, /*workflow: Workflow,*/ analyses: Seq[Analysis])
+case class Metadata(experiment: Experiment, workflow: Workflow, analyses: Seq[Analysis])
 
 object Metadata {
   implicit val reads: Reads[Metadata] = Json.reads[Metadata]
@@ -30,7 +30,7 @@ case class Experiment(
                        runDate: Option[String],
                        runAlias: Option[String],
                        flowcellId: Option[String],
-                       //                       isPairedEnd: Option[Boolean],
+                       isPairedEnd: Option[Boolean],
                        experimentalStrategy: Option[String],
                        captureKit: Option[String],
                        baitDefinition: Option[String]
@@ -52,7 +52,7 @@ object Workflow {
 
 case class Analysis(
                      ldmSampleId: String,
-                     labAliquotID: String,
+                     labAliquotId: String,
                      files: FilesAnalysis
                    )
 
