@@ -54,8 +54,9 @@ object SimpleBuildBundle {
       }).toSeq
     } else Nil
 
-    resources.map(rp => {
+    resources.flatMap(rp => {
       val (resourceId, resource) = rp
+      val studyId = rawResources("study").keySet.head
 
       resourceType match {
         case RawParticipant.FILENAME => createParticipant(resourceId, resource.asInstanceOf[RawParticipant], release)(studyId)
@@ -74,7 +75,9 @@ object SimpleBuildBundle {
             rawResources("family_relationship").values.toSeq
           )
       }
-    }).toSeq ++ familyGroupResource
+    }).toSeq
+
+  ++ familyGroupResource
 
   }
 

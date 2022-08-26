@@ -7,7 +7,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils.bundleDelete
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent}
-import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createResources, mapToFhirResourceType}
+import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.createResources
 import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
 import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
@@ -51,7 +51,7 @@ object FhirImport extends App {
 
     val tBundle = TBundle(bundleList)
     val result = tBundle.save()
-    deletePreviousRevisions(allRawResources, release)
+//    deletePreviousRevisions(allRawResources, release)
     result
   }
 
