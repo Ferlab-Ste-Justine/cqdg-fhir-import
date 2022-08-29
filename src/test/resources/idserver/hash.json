@@ -14,5 +14,8 @@
   {"hash": "d5d8883bd56ea029e39f1aaa96c9564e54bd4181", "internal_id":  "BIO0000003"},
   {"hash": "2d503bc255249667342011a8d5deedcc5956aac6", "internal_id":  "SAM0000001"},
   {"hash": "bbabef762116fe8a30ccab23e81cc1f624761808", "internal_id":  "SAM0000002"},
-  {"hash": "ec2887411bae04f3f112c0557c92c245fd47a69c", "internal_id":  "SAM0000003"}
+  {"hash": "ec2887411bae04f3f112c0557c92c245fd47a69c", "internal_id":  "SAM0000003"},
+  {"hash": "9ef70671611b8f3835d1cadf6e8939e877ad96c4", "internal_id":  "FAM0000003"},
+  {"hash": "d10c6d100a488a8ec254585742996f6ca59ab3d0", "internal_id":  "FAM0000003"},
+  {"hash": "a8a723af96daf54381a0777cf13b5072b1e959ac", "internal_id":  "FAM0000003"}
 ]

@@ -2,7 +2,7 @@ package bio.ferlab.cqdg.etl
 
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.ResourceExtension
-import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawFamily, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
 import org.hl7.fhir.r4.model.{Condition, Observation, Patient}
@@ -13,7 +13,15 @@ import scala.jdk.CollectionConverters._
 class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with BeforeAndAfterEach {
 
   implicit val idService: IIdServer = new IdServerMock()
-  val objects: Seq[String] = Seq(RawParticipant.FILENAME, RawStudy.FILENAME, RawDiagnosis.FILENAME, RawPhenotype.FILENAME, RawBiospecimen.FILENAME, RawSampleRegistration.FILENAME)
+  val objects: Seq[String] = Seq(
+    RawParticipant.FILENAME,
+    RawStudy.FILENAME,
+    RawDiagnosis.FILENAME,
+    RawPhenotype.FILENAME,
+    RawBiospecimen.FILENAME,
+    RawSampleRegistration.FILENAME,
+    RawFamily.FILENAME
+  )
   val study = "CART"
   val release = "RE_0001"
   val version = "1"
@@ -38,8 +46,12 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       searchStudy.getTotal shouldBe 1
       val searchDiagnosis = searchFhir("Condition")
       searchDiagnosis.getTotal shouldBe 3
-      val searchPhenotype = searchFhir("Observation")
-      searchPhenotype.getTotal shouldBe 3
+      val searchPhenotype = searchFhir("Observation").getEntry.asScala.filter(_.getResource.getIdBase.contains("PHE"))
+      searchPhenotype.length shouldBe 3
+      val searchFamilyGroup = searchFhir("Group")
+      searchFamilyGroup.getTotal shouldBe 1
+      val searchFamilyObservation = searchFhir("Observation").getEntry.asScala.filter(_.getResource.getIdBase.contains("FAM"))
+      searchFamilyObservation.length shouldBe 1
 
       //Condition should be linked to Patient if required
       searchDiagnosis.getEntry.asScala.foreach { d =>
@@ -52,7 +64,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       }
 
       //Observation should be linked to Patient if required
-      searchPhenotype.getEntry.asScala.foreach { d =>
+      searchPhenotype.foreach { d =>
         val resource = d.getResource.asInstanceOf[Observation]
         resource.getIdentifier.asScala.head.getValue match {
           case "PHE0000001" => resource.getSubject.getReference shouldBe "Patient/PRT0000003"

@@ -48,7 +48,7 @@ object FhirImport extends App {
 
     val tBundle = TBundle(bundleList)
     val result = tBundle.save()
-//    deletePreviousRevisions(allRawResources, release)
+    deletePreviousRevisions(allRawResources, release)
     result
   }
 
