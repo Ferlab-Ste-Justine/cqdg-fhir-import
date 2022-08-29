@@ -149,20 +149,23 @@ object FhirUtils {
     }
 
     //FIXME should be codes in lieu of display???? - TBD
-    def setSimpleCodes(text: Option[String], codes: String *): Resource = {
+    def setSimpleCodes(text: Option[String], codes: SimpleCode *): Resource = {
       val codeableConcept = new CodeableConcept()
 
       if (text.isDefined) codeableConcept.setText(text.get)
 
       val codings = codes.map(c =>{
         val coding = new Coding()
-        coding.setDisplay(c) //FIXME
+        c.display.map(d => coding.setDisplay(d))
+        c.system.map(s => coding.setSystem(s))
+        coding.setCode(c.code)
       })
 
       codeableConcept.setCoding(codings.asJava)
       v match {
         case a if a.isInstanceOf[Observation] => a.asInstanceOf[Observation].setCode(codeableConcept)
         case a if a.isInstanceOf[Condition] => a.asInstanceOf[Condition].setCode(codeableConcept)
+        case a if a.isInstanceOf[Group] => a.asInstanceOf[Group].setCode(codeableConcept)
         case _ => throw new MatchError(s"Setting code for unsupported resource type: ${v.getResourceType}")
       }
 

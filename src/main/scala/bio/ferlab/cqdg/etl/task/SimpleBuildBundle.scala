@@ -56,7 +56,8 @@ object SimpleBuildBundle {
 
     resources.flatMap(rp => {
       val (resourceId, resource) = rp
-      val studyId = rawResources("study").keySet.head
+
+      val studyId = rawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
 
       resourceType match {
         case RawParticipant.FILENAME => createParticipant(resourceId, resource.asInstanceOf[RawParticipant], release)(studyId)
