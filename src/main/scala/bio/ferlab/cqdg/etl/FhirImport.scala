@@ -14,6 +14,7 @@ import ca.uhn.fhir.rest.client.api.IGenericClient
 import org.hl7.fhir.r4.model.Bundle
 import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
 
 import scala.jdk.CollectionConverters._
 
@@ -53,9 +54,16 @@ object FhirImport extends App {
   }
 
   private def extractResources(bucket: String, prefix: String, version: String, study: String, release: String)(implicit s3: S3Client): Map[String, Seq[RawResource]] = {
+    val req = ListObjectsV2Request.builder().bucket(bucket).prefix(s"$prefix/$version-$study/$release").build()
+    val bucketKeys = s3.listObjectsV2(req).contents().asScala.map(_.key())
+
     RESOURCES.map(r => {
-      val rawResource = getRawResource(getContent(bucket, s"$prefix/$version-$study/$release/$r.tsv"), r)
-      r -> rawResource
+      if(bucketKeys.exists(key => key.endsWith(s"$r.tsv"))){
+        val rawResource = getRawResource(getContent(bucket, s"$prefix/$version-$study/$release/$r.tsv"), r)
+        r -> rawResource
+      } else {
+        r -> Nil
+      }
     }).toMap
   }
 

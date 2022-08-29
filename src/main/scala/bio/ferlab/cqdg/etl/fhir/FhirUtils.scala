@@ -10,12 +10,18 @@ import scala.language.reflectiveCalls
 
 object FhirUtils {
 
+  case class SimpleCode(code: String, system: Option[String] = None, display: Option[String] = None)
+
   object Constants {
 
     val baseFhirServer = "https://fhir.cqdg.ferlab.bio"
 
     object CodingSystems {
       val SPECIMEN_TYPE = s"$baseFhirServer/CodeSystem/research-domain"
+      val RELATIONSHIP_TO_PROBAND = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
+      val PHENOTYPE_SYSTEM = "http://purl.obolibrary.org/obo/hp.owl"
+      val DIAGNOSIS_SYSTEM = "http://purl.obolibrary.org/obo/mondo.owl"
+      val DISEASES_STATUS = s"$baseFhirServer/CodeSystem/disease-status"
     }
 
     object Extensions {
@@ -78,20 +84,23 @@ object FhirUtils {
     }
 
     //FIXME should be codes in lieu of display???? - TBD
-    def setSimpleCodes(text: Option[String], codes: String *): Resource = {
+    def setSimpleCodes(text: Option[String], codes: SimpleCode *): Resource = {
       val codeableConcept = new CodeableConcept()
 
       if (text.isDefined) codeableConcept.setText(text.get)
 
       val codings = codes.map(c =>{
         val coding = new Coding()
-        coding.setDisplay(c) //FIXME
+        c.display.map(d => coding.setDisplay(d))
+        c.system.map(s => coding.setSystem(s))
+        coding.setCode(c.code)
       })
 
       codeableConcept.setCoding(codings.asJava)
       v match {
         case a if a.isInstanceOf[Observation] => a.asInstanceOf[Observation].setCode(codeableConcept)
         case a if a.isInstanceOf[Condition] => a.asInstanceOf[Condition].setCode(codeableConcept)
+        case a if a.isInstanceOf[Group] => a.asInstanceOf[Group].setCode(codeableConcept)
         case _ => throw new MatchError(s"Setting code for unsupported resource type: ${v.getResourceType}")
       }
 

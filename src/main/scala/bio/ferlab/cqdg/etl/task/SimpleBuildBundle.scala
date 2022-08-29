@@ -1,7 +1,8 @@
 package bio.ferlab.cqdg.etl.task
 
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{DISEASES_STATUS, RELATIONSHIP_TO_PROBAND}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.baseFhirServer
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, setAgeExtension, setCoding}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, setAgeExtension, setCoding}
 import bio.ferlab.cqdg.etl.models.RawFamily.isProband
 import bio.ferlab.cqdg.etl.models._
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
@@ -44,7 +45,8 @@ object SimpleBuildBundle {
 
     resources.flatMap(rp => {
       val (resourceId, resource) = rp
-      val studyId = rawResources("study").keySet.head
+
+      val studyId = rawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
 
       resourceType match {
         case RawParticipant.FILENAME => Seq(createParticipant(resourceId, resource.asInstanceOf[RawParticipant], release)(studyId))
@@ -106,7 +108,7 @@ object SimpleBuildBundle {
     val phenotype = new Observation()
 
     resource.phenotype_HPO_code match {
-      case Some(v) => phenotype.setSimpleCodes(Some(resource.phenotype_source_text), v)
+      case Some(v) => phenotype.setSimpleCodes(Some(resource.phenotype_source_text), SimpleCode(code = v))
       case None => phenotype.setSimpleCodes(Some(resource.phenotype_source_text))
     }
 
@@ -132,9 +134,9 @@ object SimpleBuildBundle {
     val diagnosis = new Condition()
 
     (resource.diagnosis_mondo_code, resource.diagnosis_ICD_code) match {
-      case (Some(m), Some(i)) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), m,i)
-      case (None, Some(i)) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), i)
-      case (Some(m), None) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), m)
+      case (Some(m), Some(i)) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), SimpleCode(code = m), SimpleCode(code = i))
+      case (None, Some(i)) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), SimpleCode(code = i))
+      case (Some(m), None) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), SimpleCode(code = m))
       case _ => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text))
     }
     val age = new Age()
@@ -179,9 +181,17 @@ object SimpleBuildBundle {
     patient.addIdentifier()
       .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Patient")
       .setValue(resourceId)
-    patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.gender.trim.toLowerCase()))
+    patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.gender))
     patient.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
     patient.setId(resourceId)
+
+    val isDeceased = resource.vital_status match {
+      case "alive" => false
+      case "deceased" => true
+      case _ => true //FIXME where do 'unknown' fall?
+    }
+
+    patient.setDeceased(new BooleanType().setValue(isDeceased))
     patient
   }
 
@@ -205,7 +215,7 @@ object SimpleBuildBundle {
     specimen.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
     specimen.setId(resourceId)
     specimen.setType(codeableConcept.setCoding(List(setCoding(resource.biospecimen_tissue_source, resource)).asJava))
-    //FIXME should send code not display!
+    //FIXME should send code not displa??
 
     if(resource.age_at_biospecimen_collection.isDefined){
       val ageExtension = setAgeExtension(resource.age_at_biospecimen_collection.get, "days", resource)
@@ -239,10 +249,19 @@ object SimpleBuildBundle {
     val group = new Group()
     val observation = new Observation()
 
-    group.setSimpleMeta(studyId, release)
-    observation.setSimpleMeta(studyId, release)
 
+
+    //Group
     group.setId(resourceId)
+    group.setSimpleMeta(studyId, release)
+    group.addIdentifier()
+      .setValue(resource.submitter_family_id)
+    //FIXME clarify if with set code or display
+    group.setSimpleCodes(None, SimpleCode(code = resource.relationship_to_proband, system = Some(RELATIONSHIP_TO_PROBAND)))
+
+
+    //Observation
+    observation.setSimpleMeta(studyId, release)
     observation.setId(resourceId)
 
     val subjectId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
@@ -263,7 +282,16 @@ object SimpleBuildBundle {
       observation.setSubject(referenceSubject)
     }
 
-    observation.setSimpleCodes(None, resource.relationship_to_proband)
+    val relationshipCode = Seq(SimpleCode(code = resource.relationship_to_proband, system = Some(RELATIONSHIP_TO_PROBAND)))
+    val isAffectedCode = resource.is_affected match {
+      case Some(_) => Some(SimpleCode(code = resource.is_affected.get, system = Some(DISEASES_STATUS)))
+      case None => None
+    }
+
+    observation.setSimpleCodes(
+      None,
+      relationshipCode ++ isAffectedCode: _*
+    )
 
     Seq(group, observation)
   }

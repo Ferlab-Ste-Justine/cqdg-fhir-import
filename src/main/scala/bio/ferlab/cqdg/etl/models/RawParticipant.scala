@@ -40,9 +40,9 @@ object RawParticipant {
       line(splitHeader.indexOf("study_id")),
       line(splitHeader.indexOf("submitter_participant_id")),
       line(splitHeader.indexOf("age_at_recruitment")),
-      line(splitHeader.indexOf("gender")),
-      line(splitHeader.indexOf("ethnicity")),
-      line(splitHeader.indexOf("vital_status")),
+      line(splitHeader.indexOf("gender")).toLowerCase().trim,
+      line(splitHeader.indexOf("ethnicity")).toLowerCase().trim,
+      line(splitHeader.indexOf("vital_status")).toLowerCase().trim,
       if(splitHeader.indexOf("cause_of_death") <= line.length - 1 && line(splitHeader.indexOf("cause_of_death")).nonEmpty) {
         Some(line(splitHeader.indexOf("cause_of_death")))
       } else None,
