@@ -8,5 +8,14 @@
   {"hash": "80a67d08bd72548e31c5d509e3d970dc41be88f4", "internal_id":  "DIA0000003"},
   {"hash": "49f605e322a55fec7fb4cc1ec443367cc6c3510d", "internal_id":  "PHE0000001"},
   {"hash": "58c51863242963dd452d19eca85c6209a2c4aaf8", "internal_id":  "PHE0000002"},
-  {"hash": "c8a2b482aa2cc8701fc4cd79df073368c92ef208", "internal_id":  "PHE0000003"}
+  {"hash": "c8a2b482aa2cc8701fc4cd79df073368c92ef208", "internal_id":  "PHE0000003"},
+  {"hash": "cfc309c93273e29a3180ca7baa65b987a722973e", "internal_id":  "BIO0000003"},
+  {"hash": "04f38a6e6e25a410a55e8f15a7e322f59b84b812", "internal_id":  "BIO0000003"},
+  {"hash": "d5d8883bd56ea029e39f1aaa96c9564e54bd4181", "internal_id":  "BIO0000003"},
+  {"hash": "2d503bc255249667342011a8d5deedcc5956aac6", "internal_id":  "SAM0000001"},
+  {"hash": "bbabef762116fe8a30ccab23e81cc1f624761808", "internal_id":  "SAM0000002"},
+  {"hash": "ec2887411bae04f3f112c0557c92c245fd47a69c", "internal_id":  "SAM0000003"},
+  {"hash": "9ef70671611b8f3835d1cadf6e8939e877ad96c4", "internal_id":  "FAM0000003"},
+  {"hash": "d10c6d100a488a8ec254585742996f6ca59ab3d0", "internal_id":  "FAM0000003"},
+  {"hash": "a8a723af96daf54381a0777cf13b5072b1e959ac", "internal_id":  "FAM0000003"}
 ]

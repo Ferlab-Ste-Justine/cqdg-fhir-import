@@ -48,8 +48,8 @@ object RawStudy {
         case -1 => None
         case v => Some(line(v))
       },
-      domain = line(splitHeader.indexOf("domain")).split("|").toList,
-      population = line(splitHeader.indexOf("population")).split("|").toList,
+      domain = line(splitHeader.indexOf("domain")).split(";").toList,
+      population = line(splitHeader.indexOf("population")).split(";").toList,
       access_limitations = line(splitHeader.indexOf("access_limitations")).split(";").toList,
       access_requirements = line(splitHeader.indexOf("access_requirements")).split(";").toList,
       biospecimen_access = line(splitHeader.indexOf("biospecimen_access")).toLowerCase().trim match {

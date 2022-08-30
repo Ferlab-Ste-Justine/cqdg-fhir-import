@@ -5,7 +5,7 @@ import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCrede
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.http.apache.ApacheHttpClient
 import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectRequest, NoSuchKeyException, PutObjectRequest}
+import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectRequest, ListObjectsV2Request, NoSuchKeyException, PutObjectRequest}
 import software.amazon.awssdk.services.s3.{S3Client, S3Configuration}
 
 import java.net.URI
@@ -38,6 +38,7 @@ object S3Utils {
       .key(key)
       .bucket(bucket)
       .build()
+
     new String(s3Client.getObject(objectRequest).readAllBytes())
   }
 

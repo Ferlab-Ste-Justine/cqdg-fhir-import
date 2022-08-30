@@ -1,0 +1,4 @@
+study_id	submitter_family_id	submitter_participant_id	family_type	relationship_to_proband	is_affected
+cag	12345	35849409716	Case-parent trio	Mother	Unknown
+cag	12345	35849419216	Case-parent trio	Father	no
+cag	12345	35849430470	Case-parent trio	Is the proband	yes

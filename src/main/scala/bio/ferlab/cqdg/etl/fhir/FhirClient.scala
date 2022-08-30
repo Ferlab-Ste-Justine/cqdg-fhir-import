@@ -15,6 +15,7 @@ object FhirClient {
 
     val client: IGenericClient = fhirContext.newRestfulGenericClient(fhirServerUrl)
     val hapiFhirInterceptor: AuthTokenInterceptor = new AuthTokenInterceptor(keycloakConf)
+
     client.registerInterceptor(hapiFhirInterceptor)
     client
   }

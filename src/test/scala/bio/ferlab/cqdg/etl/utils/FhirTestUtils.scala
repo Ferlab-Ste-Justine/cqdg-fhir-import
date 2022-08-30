@@ -15,7 +15,6 @@ import scala.util.{Failure, Success, Try}
 
 
 object FhirTestUtils {
-  val IDENTIFIER_CODE_SYSTEM = "TOTO" //FIXME REMOVE
   val DEFAULT_ZONE_ID: ZoneId = ZoneId.of("UTC")
   val ROOT_REMOTE_EXTENSION = "https://raw.githubusercontent.com/Ferlab-Ste-Justine/clin-fhir/master/site_root/input/resources/"
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
