@@ -20,6 +20,7 @@ object FhirUtils {
       val SPECIMEN_TYPE = s"$baseFhirServer/CodeSystem/research-domain"
       val RELATIONSHIP_TO_PROBAND = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
       val PHENOTYPE_SYSTEM = "http://purl.obolibrary.org/obo/hp.owl"
+      val PHENOTYPE_CODE_SYSTEM = s"$baseFhirServer/CodeSystem/observation-code" //TODO RENAME
       val DIAGNOSIS_SYSTEM = "http://purl.obolibrary.org/obo/mondo.owl"
       val DISEASES_STATUS = s"$baseFhirServer/CodeSystem/disease-status"
       val NCIT_SYSTEM = "http://purl.obolibrary.org/obo/ncit.owl"
