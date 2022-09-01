@@ -65,8 +65,8 @@ object SimpleBuildBundle {
         case RawBiospecimen.FILENAME =>
           createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen], release)(rawResources("participant"), rawResources("study").keySet.head)
         case RawSampleRegistration.FILENAME =>
-          createSampleRegistration(resourceId, resource.asInstanceOf[RawSampleRegistration], release)
-          (rawResources("participant"), rawResources(RawBiospecimen.FILENAME), studyId)
+          createSampleRegistration(resourceId, resource.asInstanceOf[RawSampleRegistration], release)(
+            rawResources("participant"), rawResources(RawBiospecimen.FILENAME), studyId)
         case RawFamily.FILENAME =>
           createFamilyObservation(resourceId, resource.asInstanceOf[RawFamily], release)(
             rawResources("participant"),
@@ -80,7 +80,8 @@ object SimpleBuildBundle {
 
   private def getResourceId(targetId: String, from: Map[String, RawResource], resourceType: String): Option[String] = {
     val found = resourceType match {
-      case RawParticipant.FILENAME => from.asInstanceOf[Map[String, RawParticipant]].find(r => r._2.submitter_participant_id == targetId)
+      case RawParticipant.FILENAME => from.asInstanceOf[Map[String, RawParticipant]].find{r => r._2.submitter_participant_id == targetId}
+      case RawBiospecimen.FILENAME => from.asInstanceOf[Map[String, RawBiospecimen]].find{r => r._2.submitter_biospecimen_id == targetId}
       case RawStudy.FILENAME => from.asInstanceOf[Map[String, RawStudy]].find(r => r._2.study_id == targetId)
       case _ => None
     }
@@ -332,8 +333,12 @@ object SimpleBuildBundle {
     }
 
     val biospecimenRef = getResourceId(resource.submitter_biospecimen_id, specimenList, RawBiospecimen.FILENAME)
+    if(biospecimenRef.isDefined) {
+      val parentReference = new Reference()
+      parentReference.setReference(s"Specimen/${biospecimenRef.get}")
+      specimen.setParent(List(parentReference).asJava)
+    }
 
-    //TODO add parent reference (biospecimen)
     specimen.setSimpleMeta(studyId, release)
 
     specimen.setId(resourceId)
@@ -350,17 +355,21 @@ object SimpleBuildBundle {
 
     observation.setSimpleMeta(studyId, release)
     observation.setId(resourceId)
+
+    // ********** code.coding[0] ****************
     observation.setSimpleCodes(None, SimpleCode(code = "FAMM", system = Some(PHENOTYPE_CODE_SYSTEM)))
 
+    // ********** category[0].coding ****************
     val codeableConcept = new CodeableConcept()
     val coding = new Coding()
     coding.setSystem("http://hl7.org/fhir/ValueSet/observation-category").setCode(ObservationCategory.SOCIALHISTORY.name())
     codeableConcept.setCoding(List(coding).asJava)
     observation.setCategory(List(codeableConcept).asJava)
 
-    val subjectId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
-
+    // ********** focus[0].reference ****************
     val focusId = getProband(resource.submitter_family_id, familyList.asInstanceOf[Seq[RawFamily]])
+
+
     if(focusId.isDefined) {
       val focusFhirId = getResourceId(focusId.get, parentList, RawParticipant.FILENAME)
       focusFhirId.map(f => {
@@ -370,27 +379,34 @@ object SimpleBuildBundle {
       })
     }
 
+    // ********** subject.reference ****************
+    val subjectId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
     if(subjectId.isDefined) {
       val referenceSubject = new Reference()
       referenceSubject.setReference(s"Patient/${subjectId.get}")
       observation.setSubject(referenceSubject)
     }
 
-    val relationshipCode = Seq(SimpleCode(code = resource.relationship_to_proband, system = Some(RELATIONSHIP_TO_PROBAND)))
+    // ************* valueCodeableConcept.coding[0] **************
+    val valueCodeableConcept = new CodeableConcept()
+    val valueCoding = new Coding()
+    valueCoding.setSystem(RELATIONSHIP_TO_PROBAND).setCode(resource.relationship_to_proband)
+    valueCodeableConcept.setCoding(List(valueCoding).asJava)
+    observation.setValue(valueCodeableConcept)
+
+//    val relationshipCode = Seq(SimpleCode(code = resource.relationship_to_proband, system = Some(RELATIONSHIP_TO_PROBAND)))
 
     //FIXME isAffected should be another observation .... TBD
-    //FIXME valueCodeableConcept.coding.system (http://terminology.hl7.org/CodeSystem/v3-RoleCode,
-    //FIXME  code.coding.system, http://fhir.cqdg.ferlab.bio/CodeSystem/observation-code,
+
 //    val isAffectedCode = resource.is_affected match {
 //      case Some(_) => Some(SimpleCode(code = resource.is_affected.get, system = Some(DISEASES_STATUS)))
 //      case None => None
 //    }
 
-    observation.setSimpleCodes(
-      None,
+//    observation.setSimpleCodes(
+//      None,
 //      relationshipCode ++ isAffectedCode: _*
-      relationshipCode: _*
-    )
+//    )
   }
 
   def createFamilyGroup(resourceId: String, resources: Seq[RawFamily], release: String)(parentList: Map[String, RawResource], studyId: String): Resource = {
