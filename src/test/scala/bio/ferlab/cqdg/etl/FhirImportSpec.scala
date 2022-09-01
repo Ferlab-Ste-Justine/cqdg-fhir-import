@@ -5,7 +5,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils.ResourceExtension
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawFamily, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
-import org.hl7.fhir.r4.model.{Condition, Observation, Patient}
+import org.hl7.fhir.r4.model.{Condition, Observation, Patient, Specimen}
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
 import scala.jdk.CollectionConverters._
@@ -48,6 +48,10 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       searchDiagnosis.getTotal shouldBe 3
       val searchPhenotype = searchFhir("Observation").getEntry.asScala.filter(_.getResource.getIdBase.contains("PHE"))
       searchPhenotype.length shouldBe 3
+      val searchBioSpecimen = searchFhir("Specimen").getEntry.asScala.filter(_.getResource.getIdBase.contains("BIO"))
+      searchBioSpecimen.length shouldBe 3
+      val searchSampleRegistration = searchFhir("Specimen").getEntry.asScala.filter(_.getResource.getIdBase.contains("SAM"))
+      searchSampleRegistration.length shouldBe 3
       val searchFamilyGroup = searchFhir("Group")
       searchFamilyGroup.getTotal shouldBe 1
       val searchFamilyObservation = searchFhir("Observation").getEntry.asScala.filter(_.getResource.getIdBase.contains("FAM"))
