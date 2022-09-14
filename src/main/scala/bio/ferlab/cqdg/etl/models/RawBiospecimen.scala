@@ -6,7 +6,7 @@ case class RawBiospecimen(
                            study_id: String,
                            submitter_participant_id: String,
                            submitter_biospecimen_id: String,
-                           age_at_biospecimen_collection: Option[Int],
+                           age_biospecimen_collection: Option[Int],
                            biospecimen_tissue_source: String,
                          ) extends RawResource {
 
@@ -15,13 +15,13 @@ case class RawBiospecimen(
     s"study_id=$study_id|" +
       s"submitter_participant_id=$submitter_participant_id|" +
       s"submitter_biospecimen_id=$submitter_biospecimen_id|" +
-      s"age_at_biospecimen_collection=$age_at_biospecimen_collection|" +
+      s"age_biospecimen_collection=$age_biospecimen_collection|" +
       s"biospecimen_tissue_source=$biospecimen_tissue_source|" +
       s"submitter_participant_id=$submitter_participant_id"
   }
 
   override def getHash: String = {
-    DigestUtils.sha1Hex(List(study_id, submitter_participant_id, submitter_biospecimen_id, age_at_biospecimen_collection.getOrElse("").toString, biospecimen_tissue_source, submitter_participant_id).mkString("-"))
+    DigestUtils.sha1Hex(List(study_id, submitter_participant_id, submitter_biospecimen_id, age_biospecimen_collection.getOrElse("").toString, biospecimen_tissue_source, submitter_participant_id).mkString("-"))
   }
 }
 
@@ -35,8 +35,8 @@ object RawBiospecimen {
       line(splitHeader.indexOf("study_id")),
       line(splitHeader.indexOf("submitter_participant_id")),
       line(splitHeader.indexOf("submitter_biospecimen_id")),
-      if(splitHeader.indexOf("age_at_biospecimen_collection") <= line.length - 1 && line(splitHeader.indexOf("age_at_biospecimen_collection")).nonEmpty) {
-        Some(line(splitHeader.indexOf("age_at_biospecimen_collection")).toInt)
+      if(splitHeader.indexOf("age_biospecimen_collection") <= line.length - 1 && line(splitHeader.indexOf("age_biospecimen_collection")).nonEmpty) {
+        Some(line(splitHeader.indexOf("age_biospecimen_collection")).toInt)
       } else None,
       line(splitHeader.indexOf("biospecimen_tissue_source"))
     )

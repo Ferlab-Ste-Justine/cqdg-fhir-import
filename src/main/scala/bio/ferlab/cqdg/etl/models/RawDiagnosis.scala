@@ -8,7 +8,7 @@ case class RawDiagnosis(
                            diagnosis_source_text: String,
                            diagnosis_ICD_code: Option[String],
                            diagnosis_mondo_code: Option[String],
-                           age_at_diagnosis: Int,
+                           age_at_diagnosis: Option[Int],
                          ) extends RawResource {
 
 
@@ -42,7 +42,9 @@ object RawDiagnosis {
       if(splitHeader.indexOf("diagnosis_mondo_code") <= line.length - 1 && line(splitHeader.indexOf("diagnosis_mondo_code")).nonEmpty) {
         Some(line(splitHeader.indexOf("diagnosis_mondo_code")))
       } else None,
-      line(splitHeader.indexOf("age_at_diagnosis")).toInt
+      if(splitHeader.indexOf("age_at_diagnosis") <= line.length - 1 && line(splitHeader.indexOf("age_at_diagnosis")).nonEmpty) {
+        Some(line(splitHeader.indexOf("age_at_diagnosis")).toInt)
+      } else None
     )
   }
 }

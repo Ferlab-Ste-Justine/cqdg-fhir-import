@@ -157,10 +157,12 @@ object SimpleBuildBundle {
     }
 
     // ************* Age at Diagnosis **********************
-    val age = new Age()
-    age.setValue(resource.age_at_diagnosis)
-    age.setUnit("days")
-    diagnosis.setOnset(age)
+    if(resource.age_at_diagnosis.isDefined){
+      val age = new Age()
+      age.setValue(resource.age_at_diagnosis.get)
+      age.setUnit("days")
+      diagnosis.setOnset(age)
+    }
 
     diagnosis.addIdentifier()
       .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Condition")
@@ -271,7 +273,7 @@ object SimpleBuildBundle {
 
     patient.setExtension(List(ageExtension, ethnicityExtension).asJava)
 
-    patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.gender))
+    patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.sex))
     patient.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
     patient.setId(resourceId)
 
@@ -313,8 +315,8 @@ object SimpleBuildBundle {
     specimen.setType(typeCodeableConcept)
     //FIXME should send code not display??
 
-    if(resource.age_at_biospecimen_collection.isDefined){
-      val ageExtension = setAgeExtension(resource.age_at_biospecimen_collection.get, "days", resource)
+    if(resource.age_biospecimen_collection.isDefined){
+      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, "days", resource)
       specimen.setExtension(List(ageExtension).asJava)
     }
     specimen
