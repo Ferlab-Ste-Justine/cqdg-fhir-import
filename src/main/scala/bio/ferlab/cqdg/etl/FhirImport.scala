@@ -138,6 +138,7 @@ object FhirImport extends App {
     val resp = Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
     resourceWithHashIds.map(r => {
       val (hash, resource) = r
+      rawResource.foreach(r => println(r.getHash))
       val id = resp.find(e => e.hash == hash).get.internal_id
       id -> resource
     })

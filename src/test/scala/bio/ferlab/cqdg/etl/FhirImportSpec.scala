@@ -42,8 +42,14 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
   "run" should "return no errors" in {
     withS3Objects { (inputPrefix, _) =>
+      val inputBucket = "testInputBucket"
+
       addObjectToBucket(inputPrefix, objects)
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, "inputBucket", "inputPrefix", "outputPrefix", metadata)
+
+      //add all experiment files to input bucket
+      transferFromResources(inputPrefix, "good")
+
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, inputBucket, "inputPrefix", "outputPrefix", metadata)
       result.isValid shouldBe true
 
       //Right count of each resources
