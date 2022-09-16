@@ -1,18 +1,23 @@
 package bio.ferlab.cqdg.etl
 
 import bio.ferlab.cqdg.etl.clients.IIdServer
+import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.ResourceExtension
+import bio.ferlab.cqdg.etl.models.nanuq.Metadata
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawFamily, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
 import org.hl7.fhir.r4.model.{Condition, Observation, Patient, Specimen}
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
+import scala.io.Source
 import scala.jdk.CollectionConverters._
 
 class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with BeforeAndAfterEach {
 
   implicit val idService: IIdServer = new IdServerMock()
+  implicit val ferloadConf: FerloadConf = new FerloadConf(url = "http://flerloadurl")
+
   val objects: Seq[String] = Seq(
     RawParticipant.FILENAME,
     RawStudy.FILENAME,
@@ -25,6 +30,8 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
   val study = "CART"
   val release = "RE_0001"
   val version = "1"
+  val templateMetadata: String = Source.fromResource("good/metadata.json").mkString
+  val metadata: ValidationResult[Metadata] = Metadata.validateMetadata(templateMetadata)
 
 
   private def addObjectToBucket(prefix: String, paths: Seq[String]): Unit = {
@@ -36,7 +43,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
   "run" should "return no errors" in {
     withS3Objects { (inputPrefix, _) =>
       addObjectToBucket(inputPrefix, objects)
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release)
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, "inputBucket", "inputPrefix", "outputPrefix", metadata)
       result.isValid shouldBe true
 
       //Right count of each resources
@@ -96,7 +103,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val searchPatientWithOldVersion = searchFhir("Patient")
       searchPatientWithOldVersion.getTotal shouldBe 4
 
-      FhirImport.run(BUCKETNAME, inputPrefix, version, study, release)
+      FhirImport.run(BUCKETNAME, inputPrefix, version, study, release,"inputBucket", "inputPrefix", "outputPrefix", metadata)
 
       val searchPatientWithoutOldVersion = searchFhir("Patient")
       searchPatientWithoutOldVersion.getTotal shouldBe 3

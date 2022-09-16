@@ -16,17 +16,15 @@ case class TaskExtensions(workflowExtension: Extension, experimentExtension: Ext
 
 case class TTask(taskExtensions: TaskExtensions) {
 
-  def buildResource(serviceRequest: Reference, patient: Reference, requester: Reference, sample: Reference, drr: DocumentReferencesResources): Resource = {
+  def buildResource(patient: Reference, sample: Reference, drr: DocumentReferencesResources): Resource = {
     val t = AnalysisTask()
 
     t.getCode.addCoding()
       .setSystem(CodingSystems.ANALYSIS_TYPE)
       .setCode(GENOME_GERMLINE_ANALYSIS)
 
-    t.setFocus(serviceRequest)
     t.setFor(patient)
 
-    t.setRequester(requester)
     t.setOwner(new Reference(s"Organization/$CQDG_ORG"))
 
     val input = new ParameterComponent()
@@ -40,7 +38,7 @@ case class TTask(taskExtensions: TaskExtensions) {
         .setCode(SequencingAlignment.documentType)
       val sequencingAlignment = new TaskOutputComponent()
         .setType(code)
-        .setValue(drr.sequencingAlignment.toReference())
+        .setValue(drr.sequencingAlignment.toReference)
       sequencingAlignment
     }
 
@@ -51,7 +49,7 @@ case class TTask(taskExtensions: TaskExtensions) {
         .setCode(VariantCalling.documentType)
       val variantCalling = new TaskOutputComponent()
         .setType(code)
-        .setValue(drr.variantCalling.toReference())
+        .setValue(drr.variantCalling.toReference)
       variantCalling
     }
 
@@ -62,7 +60,7 @@ case class TTask(taskExtensions: TaskExtensions) {
         .setCode(CopyNumberVariant.documentType)
       val cnv = new TaskOutputComponent()
         .setType(code)
-        .setValue(drr.copyNumberVariant.toReference())
+        .setValue(drr.copyNumberVariant.toReference)
       cnv
     }
 
@@ -73,7 +71,7 @@ case class TTask(taskExtensions: TaskExtensions) {
         .setCode(StructuralVariant.documentType)
       val sv = new TaskOutputComponent()
         .setType(code)
-        .setValue(drr.structuralVariant.toReference())
+        .setValue(drr.structuralVariant.toReference)
       sv
     }
 
@@ -84,7 +82,7 @@ case class TTask(taskExtensions: TaskExtensions) {
         .setCode(SupplementDocument.documentType)
       val sup = new TaskOutputComponent()
         .setType(code)
-        .setValue(drr.supplement.toReference())
+        .setValue(drr.supplement.toReference)
       sup
     }
 

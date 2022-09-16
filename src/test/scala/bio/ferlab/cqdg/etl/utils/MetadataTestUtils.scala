@@ -25,12 +25,13 @@ object MetadataTestUtils {
     runDate = Some("2014-09-21T11:50:23-05:00"),
     runAlias = Some("runAliasExample"),
     flowcellId = Some("0"),
-    //    isPairedEnd = Some(true),
+        isPairedEnd = Some(true),
     //    fragmentSize = Some(100),
     experimentalStrategy = Some("WXS"),
     captureKit = Some("RocheKapaHyperExome"),
     baitDefinition = Some("KAPA_HyperExome_hg38_capture_targets")
   )
+
   val defaultWorkflow: Workflow = Workflow(
     name = Some("Dragen"),
     version = Some("1.1.0"),
@@ -38,11 +39,9 @@ object MetadataTestUtils {
   )
   val defaultMetadata: Metadata = Metadata(
     defaultExperiment,
-    //    defaultWorkflow,
+    defaultWorkflow,
     analyses = Seq(
       defaultAnalysis
     )
-
   )
-
 }

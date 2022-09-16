@@ -23,7 +23,7 @@ trait TDocumentReference extends DocumentReferenceType {
     FhirUtils.validateResource(baseResource)
   }
 
-  def buildResource(subject: Reference, custodian: Reference, related: Seq[Reference])(implicit ferloadConf: FerloadConf): Resource = {
+  def buildResource(subject: Reference, related: Seq[Reference])(implicit ferloadConf: FerloadConf): Resource = {
     val dr = buildBase()
 
     val drc = new DocumentReferenceContextComponent()
@@ -32,7 +32,6 @@ trait TDocumentReference extends DocumentReferenceType {
 
     dr.setId(IdType.newRandomUuid())
     dr.setSubject(subject)
-    dr.setCustodian(custodian)
     dr
 
   }

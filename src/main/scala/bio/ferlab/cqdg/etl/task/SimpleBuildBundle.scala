@@ -1,8 +1,8 @@
 package bio.ferlab.cqdg.etl.task
 
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{DIAGNOSIS_SYSTEM, DISEASES_STATUS, NCIT_SYSTEM, PHENOTYPE_CODE_SYSTEM, PHENOTYPE_SYSTEM, RELATIONSHIP_TO_PROBAND}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, baseFhirServer}
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension, setCoding}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension}
 import bio.ferlab.cqdg.etl.models.RawFamily.isProband
 import bio.ferlab.cqdg.etl.models._
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
@@ -54,10 +54,8 @@ object SimpleBuildBundle {
       }).toSeq
     } else Nil
 
-    resources.flatMap(rp => {
+    resources.map(rp => {
       val (resourceId, resource) = rp
-
-      val studyId = rawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
 
       resourceType match {
         case RawParticipant.FILENAME => createParticipant(resourceId, resource.asInstanceOf[RawParticipant], release)(studyId)
@@ -76,9 +74,7 @@ object SimpleBuildBundle {
             rawResources("family_relationship").values.toSeq
           )
       }
-    }).toSeq
-
-  ++ familyGroupResource
+    }).toSeq ++ familyGroupResource
 
   }
 
@@ -292,6 +288,7 @@ object SimpleBuildBundle {
   def createBiospecimen(resourceId: String, resource: RawBiospecimen, release: String)
                        (parentList: Map[String, RawResource], studyId: String): Resource = {
     //TODO tumor_normal_designation => Should generate an Observation
+
     val specimen = new Specimen
     val reference = new Reference()
 
@@ -326,7 +323,7 @@ object SimpleBuildBundle {
   }
 
   def createSampleRegistration(resourceId: String, resource: RawSampleRegistration, release: String)
-                       (parentList: Map[String, RawResource], specimenList: Map[String, RawResource], studyId: String): Resource = {
+                              (parentList: Map[String, RawResource], specimenList: Map[String, RawResource], studyId: String): Resource = {
     val specimen = new Specimen
     val reference = new Reference()
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
@@ -399,19 +396,19 @@ object SimpleBuildBundle {
     valueCodeableConcept.setCoding(List(valueCoding).asJava)
     observation.setValue(valueCodeableConcept)
 
-//    val relationshipCode = Seq(SimpleCode(code = resource.relationship_to_proband, system = Some(RELATIONSHIP_TO_PROBAND)))
+    //    val relationshipCode = Seq(SimpleCode(code = resource.relationship_to_proband, system = Some(RELATIONSHIP_TO_PROBAND)))
 
     //FIXME isAffected should be another observation .... TBD
 
-//    val isAffectedCode = resource.is_affected match {
-//      case Some(_) => Some(SimpleCode(code = resource.is_affected.get, system = Some(DISEASES_STATUS)))
-//      case None => None
-//    }
+    //    val isAffectedCode = resource.is_affected match {
+    //      case Some(_) => Some(SimpleCode(code = resource.is_affected.get, system = Some(DISEASES_STATUS)))
+    //      case None => None
+    //    }
 
-//    observation.setSimpleCodes(
-//      None,
-//      relationshipCode ++ isAffectedCode: _*
-//    )
+    //    observation.setSimpleCodes(
+    //      None,
+    //      relationshipCode ++ isAffectedCode: _*
+    //    )
   }
 
   def createFamilyGroup(resourceId: String, resources: Seq[RawFamily], release: String)(parentList: Map[String, RawResource], studyId: String): Resource = {

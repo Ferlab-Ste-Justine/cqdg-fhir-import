@@ -1,17 +1,17 @@
 package bio.ferlab.cqdg.etl.fhir
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
-import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawParticipant, RawResource}
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
-import org.hl7.fhir.r4.model._
 import bio.ferlab.cqdg.etl.isValid
-import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource}
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawParticipant, RawResource}
+import ca.uhn.fhir.rest.client.api.IGenericClient
+import ca.uhn.fhir.rest.server.exceptions.{PreconditionFailedException, UnprocessableEntityException}
+import cats.data.ValidatedNel
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model._
 
 import scala.jdk.CollectionConverters._
-import scala.jdk.CollectionConverters.CollectionHasAsScala
 import scala.language.reflectiveCalls
+import scala.util.Try
 
 object FhirUtils {
 
@@ -50,6 +50,21 @@ object FhirUtils {
 
   }
 
+  def validateResource(r: Resource)(implicit client: IGenericClient): OperationOutcome = {
+    Try(client.validate().resource(r).execute().getOperationOutcome).recover {
+      case e: PreconditionFailedException => e.getOperationOutcome
+      case e: UnprocessableEntityException => e.getOperationOutcome
+    }.get.asInstanceOf[OperationOutcome]
+  }
+
+  def validateOutcomes[T](outcome: OperationOutcome, result: T)(err: OperationOutcome.OperationOutcomeIssueComponent => String): ValidatedNel[String, T] = {
+    val issues = outcome.getIssue.asScala.toSeq
+    val errors = issues.collect {
+      case o if o.getSeverity.ordinal() <= OperationOutcome.IssueSeverity.ERROR.ordinal => err(o)
+    }
+    isValid(result, errors)
+  }
+
   def setCoding(code: String, rawResource: RawResource): Coding = {
     val coding = new Coding()
     rawResource match {
@@ -61,13 +76,6 @@ object FhirUtils {
 
   def generateMeta(codes: Seq[String]): Meta = {
     val meta = new Meta()
-
-    codes.foreach ( c => {
-      val coding = new Coding()
-      coding.setCode(c)
-      meta.addTag(coding)
-    } )
-    meta
 
     codes.foreach ( c => {
       val coding = new Coding()
@@ -114,28 +122,15 @@ object FhirUtils {
 
   }
 
-  implicit class ResourceExtension(v: Resource) {
-    def toReference: Reference = {
-      new Reference(IdType.of(v).toUnqualifiedVersionless)
-    }
-
-    def setSimpleMeta(studyId: String, release: String, args: String *): Resource = {
-      val codes = Seq( s"study:$studyId", s"release:$release") ++ args
-      v.setMeta(generateMeta(codes))
-    }
-
-    //FIXME should be codes in lieu of display???? - TBD
-    def setSimpleCodes(text: Option[String], codes: SimpleCode *): Resource = {
-      val codeableConcept = new CodeableConcept()
-
-      if (text.isDefined) codeableConcept.setText(text.get)
-  def bundleDelete(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map { fhirResource =>
-    val be = new BundleEntryComponent()
-    be
-      .getRequest
-      .setUrl(fhirResource.toReference.getReference)
-      .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.DELETE)
-    be
+  def bundleCreate(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map {
+    fhirResource =>
+      val be = new BundleEntryComponent()
+      be.setFullUrl(fhirResource.getIdElement.getValue)
+        .setResource(fhirResource)
+        .getRequest
+        .setUrl(fhirResource.fhirType())
+        .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST)
+      be
   }
 
   implicit class ResourceExtension(v: Resource) {
@@ -143,8 +138,8 @@ object FhirUtils {
       new Reference(IdType.of(v).toUnqualifiedVersionless)
     }
 
-    def setSimpleMeta(studyId: String, release: String, args: String *): Resource = {
-      val codes = Seq( s"study:$studyId", s"release:$release") ++ args
+    def setSimpleMeta(studyId: String, release: String, args: String*): Resource = {
+      val codes = Seq(s"study:$studyId", s"release:$release") ++ args
       v.setMeta(generateMeta(codes))
     }
 
@@ -166,26 +161,16 @@ object FhirUtils {
         case a if a.isInstanceOf[Observation] => a.asInstanceOf[Observation].setCode(codeableConcept)
         case a if a.isInstanceOf[Condition] => a.asInstanceOf[Condition].setCode(codeableConcept)
         case a if a.isInstanceOf[Group] => a.asInstanceOf[Group].setCode(codeableConcept)
-        case _ => throw new MatchError(s"Setting code for unsupported resource type: ${v.getResourceType}")
-      }
-
-  val codings = codes.map(c =>{
-      val coding = new Coding()
-  c.display.map(d => coding.setDisplay(d))
-  c.system.map(s => coding.setSystem(s))
-  coding.setCode(c.code)
-    })
-
-      codeableConcept.setCoding(codings.asJava)
-      v match {
-        case a if a.isInstanceOf[Observation] => a.asInstanceOf[Observation].setCode(codeableConcept)
-        case a if a.isInstanceOf[Condition] => a.asInstanceOf[Condition].setCode(codeableConcept)
-        case a if a.isInstanceOf[Group] => a.asInstanceOf[Group].setCode(codeableConcept)
         case a if a.isInstanceOf[Specimen] => a.asInstanceOf[Specimen].setType(codeableConcept)
         case _ => throw new MatchError(s"Setting code for unsupported resource type: ${v.getResourceType}")
       }
-
     }
   }
 
+
+  implicit class IdTypeExtension(v: IdType) {
+    def toReference(): Reference = new Reference(v.toUnqualifiedVersionless)
+
+
+  }
 }
