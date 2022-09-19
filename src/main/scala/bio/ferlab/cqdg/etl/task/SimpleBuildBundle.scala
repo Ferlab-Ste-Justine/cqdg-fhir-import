@@ -29,7 +29,7 @@ object SimpleBuildBundle {
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
-  def createResourcesBundle(str: String, s: Seq[Resource]): List[BundleEntryComponent] = {
+  def createResourcesBundle(s: Seq[Resource]): List[BundleEntryComponent] = {
     s.map { s =>
       val be = new BundleEntryComponent()
       be.setFullUrl(s"${s.getResourceType.name()}/${s.getId}")
@@ -437,6 +437,13 @@ object SimpleBuildBundle {
 
     }).toList
     group.setMember(members.asJava)
+  }
+
+  def createOrganization(release: String, studyId: String): Resource = {
+    val organization = new Organization()
+
+    organization.setSimpleMeta(studyId, release)
+    organization.setId("CQDG")
   }
 
 }

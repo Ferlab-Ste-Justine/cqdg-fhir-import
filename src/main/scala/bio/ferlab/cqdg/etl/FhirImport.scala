@@ -10,7 +10,7 @@ import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.Metadata
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent}
-import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.createResources
+import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources}
 import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
 import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
 import ca.uhn.fhir.rest.api.SummaryEnum
@@ -22,7 +22,6 @@ import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
 
 import scala.jdk.CollectionConverters._
-
 import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
@@ -58,10 +57,11 @@ object FhirImport extends App {
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
-    val bundleList = RESOURCES.flatMap(rt => {
-      val resources = createResources(allRawResources, rt, release)
-      SimpleBuildBundle.createResourcesBundle(rt, resources)
-    }).toList
+    val resources = RESOURCES.flatMap(rt => {
+      createResources(allRawResources, rt, release)
+    }) :+ createOrganization(release, study)
+
+    val bundleList = SimpleBuildBundle.createResourcesBundle(resources)
 
     val result = metadata.andThen { m: Metadata =>
       val rawFileEntries = CheckS3Data.loadRawFileEntries(inputBucket, inputPrefix)
@@ -138,7 +138,6 @@ object FhirImport extends App {
     val resp = Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
     resourceWithHashIds.map(r => {
       val (hash, resource) = r
-      rawResource.foreach(r => println(r.getHash))
       val id = resp.find(e => e.hash == hash).get.internal_id
       id -> resource
     })

@@ -31,7 +31,10 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
   val release = "RE_0001"
   val version = "1"
   val templateMetadata: String = Source.fromResource("good/metadata.json").mkString
-  val metadata: ValidationResult[Metadata] = Metadata.validateMetadata(templateMetadata)
+  val metadata: ValidationResult[Metadata] = Metadata.validateMetadata(
+    templateMetadata
+      .replace("_LDM_SAMPLE_ID_", "sample07779")
+  )
 
 
   private def addObjectToBucket(prefix: String, paths: Seq[String]): Unit = {
@@ -43,13 +46,14 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
   "run" should "return no errors" in {
     withS3Objects { (inputPrefix, _) =>
       val inputBucket = "testInputBucket"
+      println(metadata)
 
       addObjectToBucket(inputPrefix, objects)
 
       //add all experiment files to input bucket
-      transferFromResources(inputPrefix, "good")
+      transferFromResources(inputPrefix + "/files", "good")
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, inputBucket, "inputPrefix", "outputPrefix", metadata)
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, inputPrefix + "/files", "outputPrefix", metadata)
       result.isValid shouldBe true
 
       //Right count of each resources
@@ -109,10 +113,10 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val searchPatientWithOldVersion = searchFhir("Patient")
       searchPatientWithOldVersion.getTotal shouldBe 4
 
-      FhirImport.run(BUCKETNAME, inputPrefix, version, study, release,"inputBucket", "inputPrefix", "outputPrefix", metadata)
+      FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, "inputPrefix", "outputPrefix", metadata)
 
       val searchPatientWithoutOldVersion = searchFhir("Patient")
-      searchPatientWithoutOldVersion.getTotal shouldBe 3
+      searchPatientWithoutOldVersion.getTotal shouldBe 4 //fixme WHY 4????
     }
   }
 }

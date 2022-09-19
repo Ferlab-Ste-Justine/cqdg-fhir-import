@@ -4,7 +4,7 @@ import bio.ferlab.cqdg.etl.ValidationResult
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{IdTypeExtension, bundleCreate}
 import bio.ferlab.cqdg.etl.models.nanuq._
-import bio.ferlab.cqdg.etl.models.{RawResource, TBundle}
+import bio.ferlab.cqdg.etl.models.{RawParticipant, RawResource, RawSampleRegistration, TBundle}
 import bio.ferlab.cqdg.etl.task.nanuq.DocumentReferencesValidation.validateFiles
 import bio.ferlab.cqdg.etl.task.nanuq.TaskExtensionValidation.validateTaskExtension
 import ca.uhn.fhir.rest.client.api.IGenericClient
@@ -24,15 +24,34 @@ object NanuqBuildBundle {
     LOGGER.info("################# Validate Resources ##################")
     val taskExtensions = validateTaskExtension(metadata)
     val mapFiles = files.map(f => (f.filename, f)).toMap
-    val allResources: ValidatedNel[String, List[BundleEntryComponent]] = metadata.analyses.toList.map { a =>
-      val patient = IdType.newRandomUuid().valid[String]
-      val sample = IdType.newRandomUuid().valid[String]
-      (
-        patient.toValidatedNel,
-        sample.toValidatedNel,
-        validateFiles(mapFiles, a),
-        taskExtensions.map(_.forAliquot(a.labAliquotId))
-        ).mapN(createResources)
+    val allResources: ValidatedNel[String, List[BundleEntryComponent]] = metadata.analyses.toList.flatMap { a =>
+
+      val relatedSample = allRawResources("sample_registration").find{
+        case (_, rawResource: RawSampleRegistration) => rawResource.submitter_sample_id === a.ldmSampleId
+      }
+
+      relatedSample match {
+        case Some((sampleId, rawSampleRegistration: RawSampleRegistration)) =>
+          val sample = rawSampleRegistration.submitter_participant_id
+          allRawResources("participant").find{ case (_, rawResource: RawParticipant) => rawResource.submitter_participant_id === sample } match {
+            case Some((participantId, _: RawParticipant)) =>
+              val sampleIdType = new IdType()
+              sampleIdType.setId(sampleId)
+
+              val participantIdType = new IdType()
+              participantIdType.setId(participantId)
+
+              Some((
+                participantIdType.valid[String].toValidatedNel,
+                sampleIdType.valid[String].toValidatedNel,
+                validateFiles(mapFiles, a),
+                taskExtensions.map(_.forAliquot(a.labAliquotId))
+                ).mapN(createResources))
+            case None => None
+          }
+
+        case None => None
+      }
 
     }.combineAll
 
