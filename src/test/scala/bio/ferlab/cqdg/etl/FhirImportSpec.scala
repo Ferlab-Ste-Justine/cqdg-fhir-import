@@ -4,10 +4,10 @@ import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.ResourceExtension
 import bio.ferlab.cqdg.etl.models.nanuq.Metadata
-import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawDiagnosis, RawFamily, RawParticipant, RawPhenotype, RawSampleRegistration, RawStudy}
+import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
-import org.hl7.fhir.r4.model.{Condition, Observation, Patient, Specimen}
+import org.hl7.fhir.r4.model._
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
 import scala.io.Source
@@ -46,7 +46,6 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
   "run" should "return no errors" in {
     withS3Objects { (inputPrefix, _) =>
       val inputBucket = "testInputBucket"
-      println(metadata)
 
       addObjectToBucket(inputPrefix, objects)
 
@@ -104,7 +103,33 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
         }
       }
 
-      //Previous version documents should be deleted
+      //*************** Task *******************
+      val searchTasks = searchFhir("Task")
+      searchTasks.getEntry.size() shouldEqual 1
+
+      val taskParticipant1 = read(searchTasks, classOf[Task]).find(t => t.getFor.getReference === "Patient/PRT0000001")
+      taskParticipant1 should be (Symbol("defined"))
+
+      //Task should be linked to organization
+      taskParticipant1.get.getOwner.getReference shouldBe "Organization/CQDG"
+
+      //Task should be linked to the specimen
+      taskParticipant1.get.getInput.size() shouldEqual 1
+
+      taskParticipant1.get.getOutput.size() shouldEqual 5
+
+      //*************** Document Reference *******************
+      val searchDocumentReference = searchFhir("DocumentReference")
+      val patientDocuments =
+        searchDocumentReference
+          .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
+          .filter(e => e.getSubject.getReference === "Patient/PRT0000001")
+
+      patientDocuments.size shouldEqual 5
+
+
+
+//      Previous version documents should be deleted
       val oldParticipant = new Patient
       oldParticipant.setSimpleMeta("STU0000001", "RE_0000")
       oldParticipant.setId("1234")
@@ -116,7 +141,8 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, "inputPrefix", "outputPrefix", metadata)
 
       val searchPatientWithoutOldVersion = searchFhir("Patient")
-      searchPatientWithoutOldVersion.getTotal shouldBe 4 //fixme WHY 4????
+
+      searchPatientWithoutOldVersion.getTotal shouldBe 4 //fixme WHY 4 should be 3????
     }
   }
 }

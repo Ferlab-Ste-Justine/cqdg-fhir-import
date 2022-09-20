@@ -4,7 +4,7 @@ import bio.ferlab.cqdg.etl.ValidationResult
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{IdTypeExtension, bundleCreate}
 import bio.ferlab.cqdg.etl.models.nanuq._
-import bio.ferlab.cqdg.etl.models.{RawParticipant, RawResource, RawSampleRegistration, TBundle}
+import bio.ferlab.cqdg.etl.models.{RawParticipant, RawResource, RawSampleRegistration}
 import bio.ferlab.cqdg.etl.task.nanuq.DocumentReferencesValidation.validateFiles
 import bio.ferlab.cqdg.etl.task.nanuq.TaskExtensionValidation.validateTaskExtension
 import ca.uhn.fhir.rest.client.api.IGenericClient
@@ -32,14 +32,13 @@ object NanuqBuildBundle {
 
       relatedSample match {
         case Some((sampleId, rawSampleRegistration: RawSampleRegistration)) =>
-          val sample = rawSampleRegistration.submitter_participant_id
-          allRawResources("participant").find{ case (_, rawResource: RawParticipant) => rawResource.submitter_participant_id === sample } match {
-            case Some((participantId, _: RawParticipant)) =>
-              val sampleIdType = new IdType()
-              sampleIdType.setId(sampleId)
+          val sampleParticipantId = rawSampleRegistration.submitter_participant_id
 
-              val participantIdType = new IdType()
-              participantIdType.setId(participantId)
+          allRawResources("participant").find{ case (_, rawResource: RawParticipant) => rawResource.submitter_participant_id === sampleParticipantId } match {
+            case Some((participantId, _: RawParticipant)) =>
+
+              val sampleIdType = new IdType(s"Specimen/$sampleId")
+              val participantIdType = new IdType(s"Patient/$participantId")
 
               Some((
                 participantIdType.valid[String].toValidatedNel,
@@ -68,8 +67,6 @@ object NanuqBuildBundle {
     val bundleEntriesToCreate: Seq[BundleEntryComponent] = bundleCreate(resourcesToCreate)
 
     bundleEntriesToCreate.toList
-
-
   }
 
 }

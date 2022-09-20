@@ -1,6 +1,5 @@
 package bio.ferlab.cqdg.etl
 
-import bio.ferlab.cqdg.etl.FhirImport.{bucket, prefix, release, study, version}
 import bio.ferlab.cqdg.etl.clients.{IIdServer, IdServerClient, NanuqClient}
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
@@ -21,7 +20,6 @@ import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
 
-import scala.jdk.CollectionConverters._
 import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
