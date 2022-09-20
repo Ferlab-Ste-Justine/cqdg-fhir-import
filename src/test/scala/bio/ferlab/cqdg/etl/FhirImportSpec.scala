@@ -142,7 +142,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       val searchPatientWithoutOldVersion = searchFhir("Patient")
 
-      searchPatientWithoutOldVersion.getTotal shouldBe 4 //fixme WHY 4 should be 3????
+      searchPatientWithoutOldVersion.getTotal shouldBe 3
     }
   }
 }

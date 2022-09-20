@@ -15,7 +15,7 @@ import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
 import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.data.{NonEmptyList, Validated}
-import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.{Bundle, Patient}
 import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
@@ -68,6 +68,8 @@ object FhirImport extends App {
       NanuqBuildBundle.validate(m, fileEntries, allRawResources)
     }
 
+    deletePreviousRevisions(allRawResources, release)
+
     result.map(bundle => {
       val totalBundle = bundle ++ bundleList
       TBundle(totalBundle)
@@ -89,18 +91,21 @@ object FhirImport extends App {
   }
 
   //TODO should return a Validation result
-  private def deletePreviousRevisions(study:String, release: String)(implicit client: IGenericClient): Unit = {
+  private def deletePreviousRevisions(allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit client: IGenericClient): Unit = {
+    val (studyId, _) = allRawResources(RawStudy.FILENAME).head
     val resources = Seq("Patient", "ResearchStudy", "Observation", "Group", "Condition", "Specimen")
 
     resources.foreach(resourceType => {
-      val bundle = client.search().byUrl(s"$resourceType?_tag:not=release:$release&_tag:exact=study:$study")
+
+      val bundle = client.search().byUrl(s"$resourceType?_tag:not=release:$release&_tag:exact=study:$studyId")
         .returnBundle(classOf[Bundle])
         .summaryMode(SummaryEnum.TRUE)
         .execute()
 
       val deleteBundle = bundleDelete(bundle.getEntry.asScala.map(_.getResource).toList).toList
-      if(deleteBundle.nonEmpty)
-        TBundle(deleteBundle).execute()
+      if(deleteBundle.nonEmpty) {
+        TBundle(deleteBundle).delete()
+      }
     })
   }
 

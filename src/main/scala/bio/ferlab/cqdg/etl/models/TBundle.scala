@@ -40,6 +40,23 @@ case class TBundle(resources: List[BundleEntryComponent]) {
 
   }
 
+  def delete()(implicit client: IGenericClient): ValidationResult[Bundle] = {
+    LOGGER.info("################# Delete Bundle ##################")
+    try {
+      val resp = client.transaction.withBundle(bundle).execute
+      resp.validNel[String]
+    } catch {
+      case e: BaseServerResponseException =>
+        val issues = e.getOperationOutcome.asInstanceOf[OperationOutcome].getIssue.asScala.toList
+          .collect { case i if i.getSeverity == IssueSeverity.ERROR || i.getSeverity == IssueSeverity.FATAL =>
+            s"${i.getSeverity} : ${i.getDiagnostics}, location : ${i.getLocation.asScala.mkString(",")}"
+          }
+        NonEmptyList.fromList(issues).map(Invalid(_)).getOrElse(e.getMessage.invalidNel[Bundle])
+      case e => throw e
+    }
+
+  }
+
 
   def print()(implicit client: IGenericClient): String = {
     client.getFhirContext.newJsonParser.setPrettyPrint(true).encodeResourceToString(bundle)
