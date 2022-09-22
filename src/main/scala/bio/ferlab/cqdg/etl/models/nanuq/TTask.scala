@@ -16,7 +16,7 @@ case class TaskExtensions(workflowExtension: Extension, experimentExtension: Ext
 
 case class TTask(taskExtensions: TaskExtensions) {
 
-  def buildResource(patient: Reference, sample: Reference, drr: DocumentReferencesResources): Resource = {
+  def buildResource(patient: Reference, sample: Reference, drr: DocumentReferencesResources, id: String): Resource = {
     val t = AnalysisTask()
 
     t.getCode.addCoding()
@@ -90,7 +90,8 @@ case class TTask(taskExtensions: TaskExtensions) {
       t.addOutput(r)
     }
 
-    t.setId(IdType.newRandomUuid())
+    val idType = new IdType(id)
+    t.setId(idType)
     t.addExtension(taskExtensions.workflowExtension)
     t.addExtension(taskExtensions.experimentExtension)
     t

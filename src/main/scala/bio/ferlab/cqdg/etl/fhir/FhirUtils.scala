@@ -125,11 +125,20 @@ object FhirUtils {
   def bundleCreate(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map {
     fhirResource =>
       val be = new BundleEntryComponent()
-      be.setFullUrl(fhirResource.getIdElement.getValue)
-        .setResource(fhirResource)
-        .getRequest
-        .setUrl(fhirResource.fhirType())
-        .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST)
+
+      if(fhirResource.fhirType() == "Task"){
+        be.setFullUrl(s"Task/${fhirResource.getIdElement.getValue}")
+          .setResource(fhirResource)
+          .getRequest
+          .setUrl(s"Task/${fhirResource.getIdElement.getValue}")
+          .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.PUT)
+      } else {
+        be.setFullUrl(fhirResource.getIdElement.getValue)
+          .setResource(fhirResource)
+          .getRequest
+          .setUrl(fhirResource.fhirType())
+          .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST)
+      }
       be
   }
 

@@ -7,7 +7,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.bundleDelete
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
-import bio.ferlab.cqdg.etl.models.nanuq.Metadata
+import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent}
 import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources}
 import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
@@ -15,7 +15,8 @@ import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
 import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.data.{NonEmptyList, Validated}
-import org.hl7.fhir.r4.model.{Bundle, Patient}
+import cats.implicits.catsSyntaxTuple2Semigroupal
+import org.hl7.fhir.r4.model.Bundle
 import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
@@ -45,13 +46,16 @@ object FhirImport extends App {
         auth.withToken { (_, rpt) => rpt }
 
         withReport(inputBucket, inputPrefix) { reportPath =>
-          run(bucket, prefix, version, study, release, inputBucket, inputPrefix, outputPrefix, metadata)
+          run(bucket, prefix, version, study, release, inputBucket, inputPrefix, outputPrefix, metadata, reportPath, outputBucket)
         }
       }
     }
   }
 
-  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String, inputPrefix: String, outputPrefix: String, metadata:  Validated[NonEmptyList[String], Metadata])(implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
+  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String, inputPrefix: String, outputPrefix: String, metadata:  Validated[NonEmptyList[String], Metadata], reportPath: String, outputBucket: String)(implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
+    println("reportPath")
+    println(reportPath)
+    println("reportPath")
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
@@ -61,19 +65,31 @@ object FhirImport extends App {
 
     val bundleList = SimpleBuildBundle.createResourcesBundle(resources)
 
-    val result = metadata.andThen { m: Metadata =>
+    metadata.andThen { m: Metadata =>
       val rawFileEntries = CheckS3Data.loadRawFileEntries(inputBucket, inputPrefix)
       val fileEntries = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix)
-      CheckS3Data.validateFileEntries(rawFileEntries, fileEntries)
-      NanuqBuildBundle.validate(m, fileEntries, allRawResources)
+
+      (NanuqBuildBundle.validate(m, fileEntries, allRawResources), CheckS3Data.validateFileEntries(rawFileEntries, fileEntries))
+        .mapN((bundle, files) => (bundle, files))
+        .andThen({ case (bundle, files) =>
+          try {
+            //            In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
+            //            writeAheadLog(inputBucket, reportPath, bundle, files)
+            CheckS3Data.copyFiles(files, outputBucket)
+            deletePreviousRevisions(allRawResources, release)
+            val result = TBundle(bundle ++ bundleList).execute()
+            //            if (result.isInvalid) {
+            //              CheckS3Data.revert(files, outputBucket)
+            //            }
+            result
+          } catch {
+            case e: Exception =>
+              //              CheckS3Data.revert(files, outputBucket)
+              throw e
+          }
+
+        })
     }
-
-    deletePreviousRevisions(allRawResources, release)
-
-    result.map(bundle => {
-      val totalBundle = bundle ++ bundleList
-      TBundle(totalBundle)
-    }).andThen(_.execute())
   }
 
   private def extractResources(bucket: String, prefix: String, version: String, study: String, release: String)(implicit s3: S3Client): Map[String, Seq[RawResource]] = {
@@ -125,6 +141,11 @@ object FhirImport extends App {
       }
     }.toList
   }
+  def writeAheadLog(inputBucket: String, reportPath: String, bundle: TBundle, files: Seq[FileEntry])(implicit s3: S3Client, client: IGenericClient): Unit = {
+//    S3Utils.writeContent(inputBucket, s"$reportPath/bundle.json", bundle.print())
+//    val filesToCSV = files.map(f => s"${f.key},${f.id}").mkString("\n")
+//    S3Utils.writeContent(inputBucket, s"$reportPath/files.csv", filesToCSV)
+  }
 
   private def addIds(resourceList: Map[String, Seq[RawResource]])(implicit idService: IIdServer): Map[String, Map[String, RawResource]] = {
     resourceList.map(e => {
@@ -145,4 +166,5 @@ object FhirImport extends App {
       id -> resource
     })
   }
+
 }
