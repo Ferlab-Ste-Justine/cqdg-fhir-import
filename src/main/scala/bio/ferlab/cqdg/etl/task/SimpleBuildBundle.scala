@@ -223,10 +223,10 @@ object SimpleBuildBundle {
     val accessLimitationCodes = resource.access_limitations.map({a =>
       val code = new Coding()
       code.setSystem("http://purl.obolibrary.org/obo/duo.owl").setCode(a)
+      codeableConceptAL.setCoding(List(code).asJava)
+      accessLimitationExtension.setValue(codeableConceptAL)
     })
 
-    codeableConceptAL.setCoding(accessLimitationCodes.asJava)
-    accessLimitationExtension.setValue(codeableConceptAL)
 
     //****************** Access Requirements ***************
     val accessRequirementsExtension = new Extension("http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchStudy/requirement")

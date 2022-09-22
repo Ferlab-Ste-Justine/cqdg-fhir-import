@@ -8,6 +8,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils.bundleDelete
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
+import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent}
 import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources}
 import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
@@ -53,9 +54,7 @@ object FhirImport extends App {
   }
 
   def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String, inputPrefix: String, outputPrefix: String, metadata:  Validated[NonEmptyList[String], Metadata], reportPath: String, outputBucket: String)(implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
-    println("reportPath")
-    println(reportPath)
-    println("reportPath")
+
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
@@ -65,7 +64,7 @@ object FhirImport extends App {
 
     val bundleList = SimpleBuildBundle.createResourcesBundle(resources)
 
-    metadata.andThen { m: Metadata =>
+    val results = metadata.andThen { m: Metadata =>
       val rawFileEntries = CheckS3Data.loadRawFileEntries(inputBucket, inputPrefix)
       val fileEntries = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix)
 
@@ -73,23 +72,27 @@ object FhirImport extends App {
         .mapN((bundle, files) => (bundle, files))
         .andThen({ case (bundle, files) =>
           try {
-            //            In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
-            //            writeAheadLog(inputBucket, reportPath, bundle, files)
+            // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
+            writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
             CheckS3Data.copyFiles(files, outputBucket)
-            deletePreviousRevisions(allRawResources, release)
             val result = TBundle(bundle ++ bundleList).execute()
-            //            if (result.isInvalid) {
-            //              CheckS3Data.revert(files, outputBucket)
-            //            }
+            if (result.isInvalid) {
+              CheckS3Data.revert(files, outputBucket)
+            }
             result
           } catch {
             case e: Exception =>
-              //              CheckS3Data.revert(files, outputBucket)
+              CheckS3Data.revert(files, outputBucket)
               throw e
           }
 
         })
     }
+    if(results.isValid) {
+      val (studyId, _) = allRawResources(RawStudy.FILENAME).head
+      deletePreviousRevisions(studyId, release)
+    }
+    results
   }
 
   private def extractResources(bucket: String, prefix: String, version: String, study: String, release: String)(implicit s3: S3Client): Map[String, Seq[RawResource]] = {
@@ -107,8 +110,7 @@ object FhirImport extends App {
   }
 
   //TODO should return a Validation result
-  private def deletePreviousRevisions(allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit client: IGenericClient): Unit = {
-    val (studyId, _) = allRawResources(RawStudy.FILENAME).head
+  def deletePreviousRevisions(studyId: String, release: String)(implicit client: IGenericClient): Unit = {
     val resources = Seq("Patient", "ResearchStudy", "Observation", "Group", "Condition", "Specimen")
 
     resources.foreach(resourceType => {
@@ -142,9 +144,9 @@ object FhirImport extends App {
     }.toList
   }
   def writeAheadLog(inputBucket: String, reportPath: String, bundle: TBundle, files: Seq[FileEntry])(implicit s3: S3Client, client: IGenericClient): Unit = {
-//    S3Utils.writeContent(inputBucket, s"$reportPath/bundle.json", bundle.print())
-//    val filesToCSV = files.map(f => s"${f.key},${f.id}").mkString("\n")
-//    S3Utils.writeContent(inputBucket, s"$reportPath/files.csv", filesToCSV)
+    S3Utils.writeContent(inputBucket, s"$reportPath/bundle.json", bundle.print())
+    val filesToCSV = files.map(f => s"${f.key},${f.id}").mkString("\n")
+    S3Utils.writeContent(inputBucket, s"$reportPath/files.csv", filesToCSV)
   }
 
   private def addIds(resourceList: Map[String, Seq[RawResource]])(implicit idService: IIdServer): Map[String, Map[String, RawResource]] = {
