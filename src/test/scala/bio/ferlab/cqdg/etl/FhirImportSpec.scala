@@ -2,6 +2,8 @@ package bio.ferlab.cqdg.etl
 
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.CAUSE_OF_DEATH
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions.{AGE_OF_DEATH, POPULATION_URL}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.ResourceExtension
 import bio.ferlab.cqdg.etl.models.nanuq.Metadata
 import bio.ferlab.cqdg.etl.models._
@@ -57,14 +59,37 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val resultFiles = list(outputBucket, "outputPrefix")
       resultFiles.size shouldBe 6
 
-      //Right count of each resources
-      val searchPatient = searchFhir("Patient")
-      searchPatient.getTotal shouldBe 3
+      // Get Resources
+      val patients = searchFhir("Patient")
+      val observations = searchFhir("Observation")
+
+
+      // ################## Patient #######################
+      //Should have 3 PATIENTS
+      patients.getTotal shouldBe 3
+      //have deceased participants and right age of death
+      val deceasedParticipants = read(patients, classOf[Patient]).filter(p => p.getDeceased.asInstanceOf[BooleanType].getValue)
+      deceasedParticipants.size shouldBe 1
+      deceasedParticipants.head.getExtension.asScala.count(e => e.getUrl == AGE_OF_DEATH) shouldBe 1
+
+      //Should have 1 PATIENT OBSERVATION - cause of death
+      val searchPatientObservations = observations.getEntry.asScala.filter(r => r.getResource.asInstanceOf[Observation].getCode.getCoding.asScala.exists(c => c.getSystem == CAUSE_OF_DEATH))
+      searchPatientObservations.size shouldBe 1
+      val participantObservation3 = searchPatientObservations.head.getResource.asInstanceOf[Observation]
+      participantObservation3.getSubject.getReference shouldBe "Patient/PRT0000003"
+      participantObservation3.getCode.getCoding.asScala.head.getCode shouldBe "Pie eating"
+
+      // ################## ResearchStudy #######################
       val searchStudy = searchFhir("ResearchStudy")
       searchStudy.getTotal shouldBe 1
+      val researchStudy = read(searchStudy, classOf[ResearchStudy]).head
+      // Population
+      researchStudy.getExtension.asScala.count(e => e.getUrl == POPULATION_URL) shouldBe 1
+
+
       val searchDiagnosis = searchFhir("Condition")
       searchDiagnosis.getTotal shouldBe 3
-      val searchPhenotype = searchFhir("Observation").getEntry.asScala.filter(_.getResource.getIdBase.contains("PHE"))
+      val searchPhenotype = observations.getEntry.asScala.filter(_.getResource.getIdBase.contains("PHE"))
       searchPhenotype.length shouldBe 3
       val searchBioSpecimen = searchFhir("Specimen").getEntry.asScala.filter(_.getResource.getIdBase.contains("BIO"))
       searchBioSpecimen.length shouldBe 3
@@ -97,7 +122,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       //Resources should have study and revision in Tag
       val tags = Seq(s"study:STU0000001", s"release:$release")
-      searchPatient.getEntry.asScala.foreach{ p =>
+      patients.getEntry.asScala.foreach{ p =>
         val resource = p.getResource.asInstanceOf[Patient]
         resource.getIdBase match {
           case a if a.contains("PRT000000") => resource.getMeta.getTag.asScala.map(_.getCode).toSeq should contain allElementsOf tags

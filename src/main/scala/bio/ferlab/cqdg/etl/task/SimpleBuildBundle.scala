@@ -1,6 +1,7 @@
 package bio.ferlab.cqdg.etl.task
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems._
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions.{AGE_BIOSPECIMEN_COLLECTION, AGE_OF_DEATH, AGE_PARTICIPANT_AGE_RECRUITEMENT, ETHNICITY, POPULATION_URL}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, baseFhirServer}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension}
 import bio.ferlab.cqdg.etl.models.RawFamily.isProband
@@ -54,25 +55,32 @@ object SimpleBuildBundle {
       }).toSeq
     } else Nil
 
-    resources.map(rp => {
+    resources.flatMap(rp => {
       val (resourceId, resource) = rp
 
       resourceType match {
-        case RawParticipant.FILENAME => createParticipant(resourceId, resource.asInstanceOf[RawParticipant], release)(studyId)
-        case RawStudy.FILENAME => createStudy(resourceId, resource.asInstanceOf[RawStudy], release)
-        case RawDiagnosis.FILENAME => createDiagnosis(resourceId, resource.asInstanceOf[RawDiagnosis], release)(rawResources("participant"), studyId)
-        case RawPhenotype.FILENAME => createPhenotype(resourceId, resource.asInstanceOf[RawPhenotype], release)(rawResources("participant"), studyId)
+        case RawParticipant.FILENAME =>
+          val rawParticipant = resource.asInstanceOf[RawParticipant]
+          val participant = createParticipant(resourceId, rawParticipant, release)(studyId)
+
+          rawParticipant.cause_of_death match {
+            case Some(cause) => Seq(createParticipantObservation(resourceId, cause, release)(studyId), participant)
+            case None => Seq(participant)
+          }
+        case RawStudy.FILENAME => Seq(createStudy(resourceId, resource.asInstanceOf[RawStudy], release))
+        case RawDiagnosis.FILENAME => Seq(createDiagnosis(resourceId, resource.asInstanceOf[RawDiagnosis], release)(rawResources("participant"), studyId))
+        case RawPhenotype.FILENAME => Seq(createPhenotype(resourceId, resource.asInstanceOf[RawPhenotype], release)(rawResources("participant"), studyId))
         case RawBiospecimen.FILENAME =>
-          createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen], release)(rawResources("participant"), rawResources("study").keySet.head)
+          Seq(createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen], release)(rawResources("participant"), rawResources("study").keySet.head))
         case RawSampleRegistration.FILENAME =>
-          createSampleRegistration(resourceId, resource.asInstanceOf[RawSampleRegistration], release)(
-            rawResources("participant"), rawResources(RawBiospecimen.FILENAME), studyId)
+          Seq(createSampleRegistration(resourceId, resource.asInstanceOf[RawSampleRegistration], release)(
+            rawResources("participant"), rawResources(RawBiospecimen.FILENAME), studyId))
         case RawFamily.FILENAME =>
-          createFamilyObservation(resourceId, resource.asInstanceOf[RawFamily], release)(
+          Seq(createFamilyObservation(resourceId, resource.asInstanceOf[RawFamily], release)(
             rawResources("participant"),
             studyId,
             rawResources("family_relationship").values.toSeq
-          )
+          ))
       }
     }).toSeq ++ familyGroupResource
 
@@ -218,9 +226,8 @@ object SimpleBuildBundle {
 
     //****************** Access Limitations ***************
     val accessLimitationExtension = new Extension("http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchStudy/limitation")
-    val codeableConceptAL = new CodeableConcept()
-
-    val accessLimitationCodes = resource.access_limitations.map({a =>
+    resource.access_limitations.map({a =>
+      val codeableConceptAL = new CodeableConcept()
       val code = new Coding()
       code.setSystem("http://purl.obolibrary.org/obo/duo.owl").setCode(a)
       codeableConceptAL.setCoding(List(code).asJava)
@@ -240,9 +247,16 @@ object SimpleBuildBundle {
     codeableConceptAR.setCoding(accessRequirementCodes.asJava)
     accessRequirementsExtension.setValue(codeableConceptAR)
 
-    study.setExtension(List(accessLimitationExtension, accessRequirementsExtension).asJava)
+    //************ Population **********************
+    val populationExtension = resource.population.map(p => {
+      val populationCode = new Coding()
+      populationCode.setCode(p).setSystem(POPULATION).setDisplay(p)
+      new Extension(POPULATION_URL).setValue(populationCode)
+    })
 
+    study.setExtension((List(accessLimitationExtension, accessRequirementsExtension) ++ populationExtension).asJava)
     //******************************************
+
     study.setStatus(ResearchStudy.ResearchStudyStatus.COMPLETED)
     study.setId(resourceId)
     study
@@ -258,10 +272,10 @@ object SimpleBuildBundle {
       .setValue(resourceId)
 
     //****************** Age At Recruitment ***************
-    val ageExtension = setAgeExtension(resource.age_at_recruitment.toLong, "days", resource)
+    val ageExtension = setAgeExtension(resource.age_at_recruitment.toLong, "days", AGE_PARTICIPANT_AGE_RECRUITEMENT)
 
     //****************** Ethnicity ***************
-    val ethnicityExtension = new Extension("http://fhir.cqdg.ferlab.bio/StructureDefinition/Patient/Ethnicity")
+    val ethnicityExtension = new Extension(ETHNICITY)
     val codeableConceptEthnicity = new CodeableConcept()
 
     val code = new Coding()
@@ -269,20 +283,53 @@ object SimpleBuildBundle {
 
     codeableConceptEthnicity.setCoding(List(code).asJava)
     ethnicityExtension.setValue(codeableConceptEthnicity)
-    //***************************************************************
-
-    patient.setExtension(List(ageExtension, ethnicityExtension).asJava)
-
-    patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.sex))
-    patient.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
-    patient.setId(resourceId)
 
     resource.vital_status match {
       case "alive" => patient.setDeceased(new BooleanType().setValue(false))
       case "deceased" => patient.setDeceased(new BooleanType().setValue(true))
       case _ =>
     }
+
+    //****************** Age of Death Extension***************
+    val ageOfDeathExtension =
+      if(patient.getDeceased.asInstanceOf[BooleanType].getValue){
+       resource.age_of_death match {
+        case Some(age) => Some(setAgeExtension(age.toLong, "days", AGE_OF_DEATH))
+        case None => None
+      }
+    } else None
+
+    //***************************************************************
+    patient.setExtension((List(ageExtension, ethnicityExtension) ++ ageOfDeathExtension).asJava)
+
+    patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.sex))
+    patient.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
+
+    patient.setId(resourceId)
     patient
+  }
+
+  def createParticipantObservation(resourceId: String, causeOfDeath: String, release: String)(studyId: String): Resource  = {
+    val participantObservation = new Observation()
+    val reference = new Reference()
+
+    participantObservation.setSimpleMeta(studyId, release)
+
+    participantObservation.setId(resourceId)
+
+    //****************** Cause of death ***************
+    val codeableConcept = new CodeableConcept()
+    val coding = new Coding()
+    coding.setSystem(CAUSE_OF_DEATH)
+    coding.setCode(causeOfDeath)
+    coding.setDisplay(causeOfDeath)
+
+    codeableConcept.setCoding(List(coding).asJava)
+    participantObservation.setCode(codeableConcept)
+
+    participantObservation.setSubject(reference.setReference(s"Patient/${resourceId}"))
+
+    participantObservation
   }
 
   def createBiospecimen(resourceId: String, resource: RawBiospecimen, release: String)
@@ -316,7 +363,7 @@ object SimpleBuildBundle {
     //FIXME should send code not display??
 
     if(resource.age_biospecimen_collection.isDefined){
-      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, "days", resource)
+      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, "days", AGE_BIOSPECIMEN_COLLECTION)
       specimen.setExtension(List(ageExtension).asJava)
     }
     specimen

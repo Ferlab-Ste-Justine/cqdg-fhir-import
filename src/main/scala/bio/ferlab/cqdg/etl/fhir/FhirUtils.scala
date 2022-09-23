@@ -36,6 +36,9 @@ object FhirUtils {
       val EXPERIMENTAL_STRATEGY = s"$baseFhirServer/CodeSystem/experimental-strategy"
       val GENOME_BUILD = s"$baseFhirServer/CodeSystem/genome-build"
       val OBJECT_STORE = "http://objecstore.cqgc.qc.ca"
+      val CAUSE_OF_DEATH = s"$baseFhirServer/CodeSystem/cause-of-death"
+      val POPULATION = s"$baseFhirServer/CodeSystem/population"
+
 
     }
 
@@ -45,6 +48,9 @@ object FhirUtils {
       val WORKFLOW = s"$baseFhirServer/StructureDefinition/workflow"
       val SEQUENCING_EXPERIMENT = s"$baseFhirServer/StructureDefinition/sequencing-experiment"
       val FULL_SIZE = s"$baseFhirServer/StructureDefinition/full-size"
+      val ETHNICITY = s"$baseFhirServer/StructureDefinition/Patient/Ethnicity"
+      val AGE_OF_DEATH = s"$baseFhirServer/StructureDefinition/Patient/age-of-death"
+      val POPULATION_URL = s"$baseFhirServer/StructureDefinition/ResearchStudy/population"
 
     }
 
@@ -85,17 +91,13 @@ object FhirUtils {
     meta
   }
 
-  def setAgeExtension(value: Long, unit: String, rawResource: RawResource): Extension = {
+  def setAgeExtension(value: Long, unit: String, url: String): Extension = {
     val age = new Age
     val extension = new Extension
     age.setUnit(unit)
     age.setValue(value)
+    extension.setUrl(url)
 
-    rawResource match {
-      case _: RawBiospecimen => extension.setUrl(Extensions.AGE_BIOSPECIMEN_COLLECTION)
-      case _: RawParticipant => extension.setUrl("http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchSubject/ageAtRecruitment")
-      case _ => throw new MatchError(s"unknown resource type ${rawResource.getClass.getName}")
-    }
     extension.setValue(age)
     extension
   }
