@@ -38,6 +38,7 @@ object FhirUtils {
       val CAUSE_OF_DEATH = s"$baseFhirServer/CodeSystem/cause-of-death"
       val POPULATION = s"$baseFhirServer/CodeSystem/population"
       val OBSERVATION_CATEGORY = s"${baseFhirServer}/CodeSystem/observation-code"
+      val TUMOR_NORMAL_DESIGNATION = s"${baseFhirServer}/CodeSystem/tumor-normal-designation"
     }
 
     object Extensions {

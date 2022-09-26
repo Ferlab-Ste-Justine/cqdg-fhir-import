@@ -8,6 +8,7 @@ case class RawBiospecimen(
                            submitter_biospecimen_id: String,
                            age_biospecimen_collection: Option[Int],
                            biospecimen_tissue_source: String,
+                           tumor_normal_designation: Option[String]
                          ) extends RawResource {
 
 
@@ -38,7 +39,10 @@ object RawBiospecimen {
       if(splitHeader.indexOf("age_biospecimen_collection") <= line.length - 1 && line(splitHeader.indexOf("age_biospecimen_collection")).nonEmpty) {
         Some(line(splitHeader.indexOf("age_biospecimen_collection")).toInt)
       } else None,
-      line(splitHeader.indexOf("biospecimen_tissue_source"))
+      line(splitHeader.indexOf("biospecimen_tissue_source")),
+      if(splitHeader.indexOf("tumor_normal_designation") <= line.length - 1 && line(splitHeader.indexOf("tumor_normal_designation")).nonEmpty) {
+        Some(line(splitHeader.indexOf("tumor_normal_designation")))
+      } else None,
     )
   }
 }

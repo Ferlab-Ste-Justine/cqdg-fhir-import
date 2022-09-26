@@ -58,16 +58,23 @@ object SimpleBuildBundle {
         case RawDiagnosis.FILENAME => Seq(createDiagnosis(resourceId, resource.asInstanceOf[RawDiagnosis], release)(rawResources("participant"), studyId))
         case RawPhenotype.FILENAME => Seq(createPhenotype(resourceId, resource.asInstanceOf[RawPhenotype], release)(rawResources("participant"), studyId))
         case RawBiospecimen.FILENAME =>
-          Seq(createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen], release)(rawResources("participant"), rawResources("study").keySet.head))
+          val tumorLocationResources = resource.asInstanceOf[RawBiospecimen].tumor_normal_designation.map(_ => {
+            createTumorNormalDesignation(resourceId, resource.asInstanceOf[RawBiospecimen], release)(rawResources("participant"), rawResources("study").keySet.head)
+          })
+          Seq(createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen], release)(
+            rawResources("participant"), rawResources("study").keySet.head)) ++ tumorLocationResources
         case RawSampleRegistration.FILENAME =>
           Seq(createSampleRegistration(resourceId, resource.asInstanceOf[RawSampleRegistration], release)(
             rawResources("participant"), rawResources(RawBiospecimen.FILENAME), studyId))
         case RawFamily.FILENAME =>
+          val diseaseStatusResources = resource.asInstanceOf[RawFamily].is_affected.map(_ => {
+            createDiseaseStatus(resourceId, resource.asInstanceOf[RawFamily], release)(rawResources("participant"), studyId)
+          })
           Seq(createFamilyObservation(resourceId, resource.asInstanceOf[RawFamily], release)(
             rawResources("participant"),
             studyId,
             rawResources("family_relationship").values.toSeq
-          ), createDiseaseStatus(resourceId, resource.asInstanceOf[RawFamily], release)(rawResources("participant"), studyId))
+          )) ++ diseaseStatusResources
       }
     }).toSeq ++ familyGroupResource
 
@@ -337,7 +344,6 @@ object SimpleBuildBundle {
 
   def createBiospecimen(resourceId: String, resource: RawBiospecimen, release: String)
                        (parentList: Map[String, RawResource], studyId: String): Resource = {
-    //TODO tumor_normal_designation => Should generate an Observation
 
     val specimen = new Specimen
     val reference = new Reference()
@@ -371,6 +377,35 @@ object SimpleBuildBundle {
     }
     specimen
   }
+
+  def createTumorNormalDesignation(resourceId: String, resource: RawBiospecimen, release: String)
+                       (parentList: Map[String, RawResource], studyId: String): Resource = {
+
+    val observation = new Observation()
+
+    observation.setSimpleMeta(studyId, release)
+
+    observation.setId(resourceId)
+
+    observation.setSimpleCodes(None, SimpleCode(code = "Tumor Normal Designation", system = Some(OBSERVATION_CATEGORY)))
+
+    // ********** subject.reference ****************
+    val subjectId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
+    subjectId.map(id => {
+      val referenceSubject = new Reference().setReference(s"Patient/$id")
+      observation.setSubject(referenceSubject)
+//      observation.setSpecimen(referenceSubject) //TODO why setSpecimen Fails?
+    })
+
+    // ************* valueCodeableConcept.coding[0] **************
+    val valueCodeableConcept = new CodeableConcept()
+    val valueCoding = new Coding()
+    valueCoding.setSystem(TUMOR_NORMAL_DESIGNATION).setCode(resource.tumor_normal_designation.get)
+    valueCodeableConcept.setCoding(List(valueCoding).asJava)
+    observation.setValue(valueCodeableConcept)
+  }
+
+
 
   def createSampleRegistration(resourceId: String, resource: RawSampleRegistration, release: String)
                               (parentList: Map[String, RawResource], specimenList: Map[String, RawResource], studyId: String): Resource = {

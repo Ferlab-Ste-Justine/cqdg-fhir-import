@@ -64,6 +64,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val observations = searchFhir("Observation")
       val searchStudy = searchFhir("ResearchStudy")
       val groups = searchFhir("Group")
+      val specimens = searchFhir("Specimen")
 
 
       // ################## Patient #######################
@@ -114,18 +115,21 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val isAffectedUnk = diseaseStatus.find(d => d.getValue.asInstanceOf[CodeableConcept].getCoding.asScala.head.getCode == "Unknown")
       isAffectedUnk.get.getId should include("FAM0000001DS")
 
+      // ################## BIOSPECIMEN #######################
+      // Specimen
+      val allSpecimens = read(specimens, classOf[Specimen])
+      val searchBioSpecimen = allSpecimens.filter(_.getIdBase.contains("BIO"))
+      searchBioSpecimen.length shouldBe 3
+      // Observation
+      val tumorNormalDesignation = read(observations, classOf[Observation]).filter(p => p.getCode.getCoding.asScala.exists(c => c.getCode == "Tumor Normal Designation"))
+      tumorNormalDesignation.size shouldBe 2
 
       val searchDiagnosis = searchFhir("Condition")
       searchDiagnosis.getTotal shouldBe 3
 
-      val searchBioSpecimen = searchFhir("Specimen").getEntry.asScala.filter(_.getResource.getIdBase.contains("BIO"))
-      searchBioSpecimen.length shouldBe 3
+
       val searchSampleRegistration = searchFhir("Specimen").getEntry.asScala.filter(_.getResource.getIdBase.contains("SAM"))
       searchSampleRegistration.length shouldBe 3
-      val searchFamilyGroup = searchFhir("Group")
-      searchFamilyGroup.getTotal shouldBe 1
-//      val searchFamilyObservation = searchFhir("Observation").getEntry.asScala.filter(_.getResource.getIdBase.contains("FAM"))
-//      searchFamilyObservation.length shouldBe 1
 
       //Condition should be linked to Patient if required
       searchDiagnosis.getEntry.asScala.foreach { d =>
