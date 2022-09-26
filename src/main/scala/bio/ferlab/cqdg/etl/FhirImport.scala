@@ -4,7 +4,7 @@ import bio.ferlab.cqdg.etl.clients.{IIdServer, IdServerClient, NanuqClient}
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
 import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.bundleDelete
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.{bundleCreate, bundleDelete}
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
@@ -62,7 +62,7 @@ object FhirImport extends App {
       createResources(allRawResources, rt, release)
     }) :+ createOrganization(release, study)
 
-    val bundleList = SimpleBuildBundle.createResourcesBundle(resources)
+    val bundleList = bundleCreate(resources)
 
     val results = metadata.andThen { m: Metadata =>
       val rawFileEntries = CheckS3Data.loadRawFileEntries(inputBucket, inputPrefix)

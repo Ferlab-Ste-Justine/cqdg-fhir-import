@@ -30,18 +30,6 @@ object SimpleBuildBundle {
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
-  def createResourcesBundle(s: Seq[Resource]): List[BundleEntryComponent] = {
-    s.map { s =>
-      val be = new BundleEntryComponent()
-      be.setFullUrl(s"${s.getResourceType.name()}/${s.getId}")
-        .setResource(s)
-        .getRequest
-        .setMethod(Bundle.HTTPVerb.PUT)
-        .setUrl(s"${s.getResourceType.name()}/${s.getId}")
-      be
-    }.toList
-  }
-
   def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, release: String): Seq[Resource] = {
     val resources = rawResources(resourceType)
     val studyId = rawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))

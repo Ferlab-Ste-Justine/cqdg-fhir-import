@@ -128,11 +128,11 @@ object FhirUtils {
     fhirResource =>
       val be = new BundleEntryComponent()
 
-      if(fhirResource.fhirType() == "Task"){
-        be.setFullUrl(s"Task/${fhirResource.getIdElement.getValue}")
+      if(fhirResource.fhirType() != "DocumentReference"){
+        be.setFullUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
           .setResource(fhirResource)
           .getRequest
-          .setUrl(s"Task/${fhirResource.getIdElement.getValue}")
+          .setUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
           .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.PUT)
       } else {
         be.setFullUrl(fhirResource.getIdElement.getValue)
