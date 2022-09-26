@@ -8,6 +8,7 @@ case class RawPhenotype(
                          phenotype_source_text: String,
                          phenotype_HPO_code: Option[String],
                          age_at_phenotype: Int,
+                         phenotype_observed: Option[String],
                        ) extends RawResource {
 
 
@@ -38,6 +39,9 @@ object RawPhenotype {
         Some(line(splitHeader.indexOf("phenotype_HPO_code")))
       } else None,
       line(splitHeader.indexOf("age_at_phenotype")).toInt,
+      if(splitHeader.indexOf("phenotype_observed") <= line.length - 1 && line(splitHeader.indexOf("phenotype_observed")).nonEmpty) {
+        Some(line(splitHeader.indexOf("phenotype_observed")).trim.toLowerCase)
+      } else None,
     )
   }
 }

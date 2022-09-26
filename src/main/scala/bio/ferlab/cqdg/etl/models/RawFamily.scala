@@ -43,7 +43,7 @@ object RawFamily {
       family_type = line(splitHeader.indexOf("family_type")),
       relationship_to_proband = line(splitHeader.indexOf("relationship_to_proband")),
       if(splitHeader.indexOf("is_affected") <= line.length - 1 && line(splitHeader.indexOf("is_affected")).nonEmpty) {
-        Some(line(splitHeader.indexOf("is_affected")))
+        Some(line(splitHeader.indexOf("is_affected")).trim.toLowerCase)
       } else None,
     )
   }

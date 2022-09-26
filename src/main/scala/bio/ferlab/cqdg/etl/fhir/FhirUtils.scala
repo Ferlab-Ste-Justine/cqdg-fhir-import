@@ -1,8 +1,8 @@
 package bio.ferlab.cqdg.etl.fhir
 
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
 import bio.ferlab.cqdg.etl.isValid
-import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawParticipant, RawResource}
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource}
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import ca.uhn.fhir.rest.server.exceptions.{PreconditionFailedException, UnprocessableEntityException}
 import cats.data.ValidatedNel
@@ -25,7 +25,6 @@ object FhirUtils {
       val SPECIMEN_TYPE = s"$baseFhirServer/CodeSystem/research-domain"
       val RELATIONSHIP_TO_PROBAND = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
       val PHENOTYPE_SYSTEM = "http://purl.obolibrary.org/obo/hp.owl"
-      val PHENOTYPE_CODE_SYSTEM = s"$baseFhirServer/CodeSystem/observation-code" //TODO RENAME
       val DIAGNOSIS_SYSTEM = "http://purl.obolibrary.org/obo/mondo.owl"
       val DISEASES_STATUS = s"$baseFhirServer/CodeSystem/disease-status"
       val NCIT_SYSTEM = "http://purl.obolibrary.org/obo/ncit.owl"
@@ -38,8 +37,7 @@ object FhirUtils {
       val OBJECT_STORE = "http://objecstore.cqgc.qc.ca"
       val CAUSE_OF_DEATH = s"$baseFhirServer/CodeSystem/cause-of-death"
       val POPULATION = s"$baseFhirServer/CodeSystem/population"
-
-
+      val OBSERVATION_CATEGORY = s"${baseFhirServer}/CodeSystem/observation-code"
     }
 
     object Extensions {

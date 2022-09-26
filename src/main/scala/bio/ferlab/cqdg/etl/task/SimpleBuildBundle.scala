@@ -1,12 +1,11 @@
 package bio.ferlab.cqdg.etl.task
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems._
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions.{AGE_BIOSPECIMEN_COLLECTION, AGE_OF_DEATH, AGE_PARTICIPANT_AGE_RECRUITEMENT, ETHNICITY, POPULATION_URL}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, baseFhirServer}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension}
 import bio.ferlab.cqdg.etl.models.RawFamily.isProband
 import bio.ferlab.cqdg.etl.models._
-import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model.Identifier.IdentifierUse
 import org.hl7.fhir.r4.model._
 import org.hl7.fhir.r4.model.codesystems.ObservationCategory
@@ -68,7 +67,7 @@ object SimpleBuildBundle {
             rawResources("participant"),
             studyId,
             rawResources("family_relationship").values.toSeq
-          ))
+          ), createDiseaseStatus(resourceId, resource.asInstanceOf[RawFamily], release)(rawResources("participant"), studyId))
       }
     }).toSeq ++ familyGroupResource
 
@@ -107,7 +106,7 @@ object SimpleBuildBundle {
 
     phenotype.setSimpleCodes(
       Some(resource.phenotype_source_text),
-      SimpleCode(code = "PHEN", system = Some(PHENOTYPE_CODE_SYSTEM)))
+      SimpleCode(code = "PHEN", system = Some(OBSERVATION_CATEGORY)))
 
     //TODO add age at phenotype - add an extension
 
@@ -129,6 +128,22 @@ object SimpleBuildBundle {
       codeableConceptHPO.setCoding(List(codeHPO).asJava)
       phenotype.setValue(codeableConceptHPO)
     }
+
+    // ***************** Phenotype Observed *********************
+    resource.phenotype_observed.map(obs => {
+      val observedCodeableConcept = new CodeableConcept()
+      val codingObserved = new Coding()
+      val observedCode = if(obs == "true" || obs == "pos") "POS" else "NEG"
+
+      codingObserved
+        .setSystem("http://terminology.hl7.org/3.1.0/CodeSystem-v3-ObservationInterpretation.html")
+        .setCode(observedCode)
+        .setDisplay(observedCode)
+      observedCodeableConcept.setCoding(List(codingObserved).asJava)
+      phenotype.setInterpretation(List(observedCodeableConcept).asJava)
+    })
+
+
 
     if(parentId.isDefined) {
       phenotype.setSubject(reference.setReference(s"Patient/${parentId.get}"))
@@ -391,10 +406,11 @@ object SimpleBuildBundle {
     val observation = new Observation()
 
     observation.setSimpleMeta(studyId, release)
-    observation.setId(resourceId)
+    // To differentiate the id of Family Relationship Observation form the Disease Status Observation
+    observation.setId(s"${resourceId}FR")
 
     // ********** code.coding[0] ****************
-    observation.setSimpleCodes(None, SimpleCode(code = "FAMM", system = Some(PHENOTYPE_CODE_SYSTEM)))
+    observation.setSimpleCodes(None, SimpleCode(code = "Family Relationship", system = Some(OBSERVATION_CATEGORY)))
 
     // ********** category[0].coding ****************
     val codeableConcept = new CodeableConcept()
@@ -430,20 +446,41 @@ object SimpleBuildBundle {
     valueCoding.setSystem(RELATIONSHIP_TO_PROBAND).setCode(resource.relationship_to_proband)
     valueCodeableConcept.setCoding(List(valueCoding).asJava)
     observation.setValue(valueCodeableConcept)
+  }
 
-    //    val relationshipCode = Seq(SimpleCode(code = resource.relationship_to_proband, system = Some(RELATIONSHIP_TO_PROBAND)))
+  def createDiseaseStatus(resourceId: String, resource: RawFamily, release: String)
+                             (parentList: Map[String, RawResource], studyId: String): Resource = {
+    val observation = new Observation()
 
-    //FIXME isAffected should be another observation .... TBD
+    observation.setSimpleMeta(studyId, release)
 
-    //    val isAffectedCode = resource.is_affected match {
-    //      case Some(_) => Some(SimpleCode(code = resource.is_affected.get, system = Some(DISEASES_STATUS)))
-    //      case None => None
-    //    }
+    // To differentiate the id of Family Relationship Observation form the Disease Status Observation
+    observation.setId(s"${resourceId}DS")
 
-    //    observation.setSimpleCodes(
-    //      None,
-    //      relationshipCode ++ isAffectedCode: _*
-    //    )
+    // ********** code.coding[0] ****************
+    observation.setSimpleCodes(None, SimpleCode(code = "Disease Status", system = Some(OBSERVATION_CATEGORY)))
+
+    // ********** subject.reference ****************
+    val subjectId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
+    if(subjectId.isDefined) {
+      val referenceSubject = new Reference()
+      referenceSubject.setReference(s"Patient/${subjectId.get}")
+      observation.setSubject(referenceSubject)
+    }
+
+    // ************* valueCodeableConcept.coding[0] **************
+    val valueCodeableConcept = new CodeableConcept()
+    val valueCoding = new Coding()
+    val code = resource.is_affected.get match {
+      case "yes"|"true" => "Yes"
+      case "no"|"false" => "No"
+      case _ => "Unknown"
+    }
+
+    valueCoding.setSystem(DISEASES_STATUS).setCode(code)
+    valueCodeableConcept.setCoding(List(valueCoding).asJava)
+    observation.setValue(valueCodeableConcept)
+
   }
 
   def createFamilyGroup(resourceId: String, resources: Seq[RawFamily], release: String)(parentList: Map[String, RawResource], studyId: String): Resource = {
