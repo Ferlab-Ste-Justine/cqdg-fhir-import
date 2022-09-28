@@ -24,7 +24,7 @@ object NanuqBuildBundle {
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
 
-  def validate(metadata: Metadata, files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]])(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
+  def validate(metadata: Metadata, files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
     LOGGER.info("################# Validate Resources ##################")
     val taskExtensions = validateTaskExtension(metadata)
     val mapFiles = files.map(f => (f.filename, f)).toMap
@@ -61,9 +61,11 @@ object NanuqBuildBundle {
               Some((
                 participantIdType.valid[String].toValidatedNel,
                 sampleIdType.valid[String].toValidatedNel,
-                validateFiles(mapFiles, a),
+                validateFiles(mapFiles, a, studyId, release),
                 taskExtensions.map(_.forAliquot(a.labAliquotId)),
                 id.valid[String].toValidatedNel,
+                studyId.valid[String].toValidatedNel,
+                release.valid[String].toValidatedNel
                 ).mapN(createResources))
             case None => None
           }
@@ -76,9 +78,9 @@ object NanuqBuildBundle {
     allResources
   }
 
-  def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions, id: String)(implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
+  def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions, id: String, studyId: String, release: String)(implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
     val task = TTask(taskExtensions)
-    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference())
+    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, release)
     val taskResource: Resource = task.buildResource(patient.toReference(), sample.toReference(), documentReferencesResources, id)
 
     val resourcesToCreate = (documentReferencesResources.resources() :+ taskResource).toList

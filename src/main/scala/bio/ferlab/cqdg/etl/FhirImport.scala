@@ -68,7 +68,7 @@ object FhirImport extends App {
       val rawFileEntries = CheckS3Data.loadRawFileEntries(inputBucket, inputPrefix)
       val fileEntries = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix)
 
-      (NanuqBuildBundle.validate(m, fileEntries, allRawResources), CheckS3Data.validateFileEntries(rawFileEntries, fileEntries))
+      (NanuqBuildBundle.validate(m, fileEntries, allRawResources, release), CheckS3Data.validateFileEntries(rawFileEntries, fileEntries))
         .mapN((bundle, files) => (bundle, files))
         .andThen({ case (bundle, files) =>
           try {

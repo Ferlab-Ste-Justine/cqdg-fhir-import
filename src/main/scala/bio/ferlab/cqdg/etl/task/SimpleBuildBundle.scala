@@ -113,7 +113,7 @@ object SimpleBuildBundle {
 
     phenotype.setSimpleCodes(
       Some(resource.phenotype_source_text),
-      SimpleCode(code = "PHEN", system = Some(OBSERVATION_CATEGORY)))
+      SimpleCode(code = "Phenotype", system = Some(OBSERVATION_CATEGORY)))
 
     //TODO add age at phenotype - add an extension
 
@@ -324,6 +324,8 @@ object SimpleBuildBundle {
     val reference = new Reference()
 
     participantObservation.setSimpleMeta(studyId, release)
+
+    SimpleCode(code = "Cause of Death", system = Some(OBSERVATION_CATEGORY))
 
     participantObservation.setId(resourceId)
 
