@@ -149,7 +149,7 @@ object FhirUtils {
     }
 
     def setSimpleMeta(studyId: String, release: String, args: String*): Resource = {
-      val codes = Seq(s"study:$studyId", s"release:$release") ++ args
+      val codes = Seq(s"study:$studyId", s"study_version:$release") ++ args
       v.setMeta(generateMeta(codes))
     }
 

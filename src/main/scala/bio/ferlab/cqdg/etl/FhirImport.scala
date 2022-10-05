@@ -59,8 +59,8 @@ object FhirImport extends App {
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
     val resources = RESOURCES.flatMap(rt => {
-      createResources(allRawResources, rt, release)
-    }) :+ createOrganization(release, study)
+      createResources(allRawResources, rt, version)
+    }) :+ createOrganization(version, study)
 
     val bundleList = bundleCreate(resources)
 
@@ -68,7 +68,7 @@ object FhirImport extends App {
       val rawFileEntries = CheckS3Data.loadRawFileEntries(inputBucket, inputPrefix)
       val fileEntries = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix)
 
-      (NanuqBuildBundle.validate(m, fileEntries, allRawResources, release), CheckS3Data.validateFileEntries(rawFileEntries, fileEntries))
+      (NanuqBuildBundle.validate(m, fileEntries, allRawResources, version), CheckS3Data.validateFileEntries(rawFileEntries, fileEntries))
         .mapN((bundle, files) => (bundle, files))
         .andThen({ case (bundle, files) =>
           try {
@@ -90,7 +90,7 @@ object FhirImport extends App {
     }
     if(results.isValid) {
       val (studyId, _) = allRawResources(RawStudy.FILENAME).head
-      deletePreviousRevisions(studyId, release)
+      deletePreviousRevisions(studyId, version)
     }
     results
   }
@@ -115,7 +115,7 @@ object FhirImport extends App {
 
     resources.foreach(resourceType => {
 
-      val bundle = client.search().byUrl(s"$resourceType?_tag:not=release:$release&_tag:exact=study:$studyId")
+      val bundle = client.search().byUrl(s"$resourceType?_tag:not=study_version:$release&_tag:exact=study:$studyId")
         .returnBundle(classOf[Bundle])
         .summaryMode(SummaryEnum.TRUE)
         .execute()
