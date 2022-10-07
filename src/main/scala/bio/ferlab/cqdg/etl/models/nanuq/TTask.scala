@@ -16,8 +16,10 @@ case class TaskExtensions(workflowExtension: Extension, experimentExtension: Ext
 
 case class TTask(taskExtensions: TaskExtensions) {
 
-  def buildResource(patient: Reference, sample: Reference, drr: DocumentReferencesResources, id: String): Resource = {
+  def buildResource(patient: Reference, sample: Reference, drr: DocumentReferencesResources, id: String)(studyId: String, version: String): Resource = {
     val t = AnalysisTask()
+
+    t.setSimpleMeta(studyId, version)
 
     t.getCode.addCoding()
       .setSystem(CodingSystems.ANALYSIS_TYPE)

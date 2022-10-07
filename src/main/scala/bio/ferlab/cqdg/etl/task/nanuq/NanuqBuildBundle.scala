@@ -78,10 +78,10 @@ object NanuqBuildBundle {
     allResources
   }
 
-  def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions, id: String, studyId: String, release: String)(implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
+  def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions, id: String, studyId: String, version: String)(implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
     val task = TTask(taskExtensions)
-    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, release)
-    val taskResource: Resource = task.buildResource(patient.toReference(), sample.toReference(), documentReferencesResources, id)
+    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, version)
+    val taskResource: Resource = task.buildResource(patient.toReference(), sample.toReference(), documentReferencesResources, id)(studyId, version)
 
     val resourcesToCreate = (documentReferencesResources.resources() :+ taskResource).toList
 
