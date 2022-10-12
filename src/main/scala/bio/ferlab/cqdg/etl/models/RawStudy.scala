@@ -43,12 +43,12 @@ object RawStudy {
       study_id = line(splitHeader.indexOf("study_id")),
       name = line(splitHeader.indexOf("name")),
       description = line(splitHeader.indexOf("description")),
-      keyword = line(splitHeader.indexOf("keyword")).split(";").toList,
+      keyword = line(splitHeader.indexOf("keyword")).split(";").map(_.trim).toList,
       access_authority = splitHeader.indexOf("access_authority") match {
         case -1 => None
         case v => Some(line(v))
       },
-      domain = line(splitHeader.indexOf("domain")).split(";").toList,
+      domain = line(splitHeader.indexOf("domain")).split(";").map(_.trim).toList,
       population = splitHeader.indexOf("population") match {
         case -1 => None
         case v => Some(line(v))
@@ -57,7 +57,7 @@ object RawStudy {
         case -1 => None
         case v => Some(line(v))
       },
-      access_requirements = line(splitHeader.indexOf("access_requirements")).split(";").toList,
+      access_requirements = line(splitHeader.indexOf("access_requirements")).split(";").map(_.trim).toList,
       biospecimen_access = line(splitHeader.indexOf("biospecimen_access")).toLowerCase().trim match {
         case "true"|"1" => true
         case "false"|"0" => false
