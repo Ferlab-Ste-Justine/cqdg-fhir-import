@@ -37,7 +37,7 @@ object CheckS3Data {
 
   def validateFileEntries(rawFileEntries: Seq[RawFileEntry], fileEntries: Seq[FileEntry]): ValidatedNel[String, Seq[FileEntry]] = {
     LOGGER.info("################# Validate File entries ##################")
-    val fileEntriesNotInAnalysis = rawFileEntries.filterNot(r => r.isChecksum || fileEntries.exists(f => f.key == r.key))
+    val fileEntriesNotInAnalysis = rawFileEntries.filterNot(r => r.isMd5 || fileEntries.exists(f => f.key == r.key))
     val errorFilesNotExist = fileEntriesNotInAnalysis.map(f => s"File ${f.filename} not found in metadata JSON file.")
     isValid(fileEntries, errorFilesNotExist)
   }

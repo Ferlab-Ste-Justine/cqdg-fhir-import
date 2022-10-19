@@ -23,5 +23,6 @@ object FileEntry {
 case class RawFileEntry(bucket: String, key: String, size: Long) {
   val filename: String = FileEntry.getFileName(key)
   val isChecksum: Boolean = filename.endsWith(".md5sum")
+  val isMd5: Boolean = filename.endsWith(".md5")
 }
 

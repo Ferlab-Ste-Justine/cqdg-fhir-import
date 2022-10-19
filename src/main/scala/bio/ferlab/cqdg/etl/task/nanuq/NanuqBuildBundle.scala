@@ -24,14 +24,15 @@ object NanuqBuildBundle {
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
 
-  def validate(metadata: Metadata, files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
+  def validate(metadataList: Seq[Metadata], files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
     LOGGER.info("################# Validate Resources ##################")
-    val taskExtensions = validateTaskExtension(metadata)
+    //TODO validate - can we assume that we only need to generate one TASK and we can just use the head metadata for this????
+    val taskExtensions =  validateTaskExtension(metadataList.head)
     val mapFiles = files.map(f => (f.filename, f)).toMap
 
-    val allAnalysis = metadata.analyses
+    val allAnalysis = metadataList.flatMap(_.analyses)
     val studyId = allRawResources("study").keySet.head
-    val hashLabAliquotIds = metadata.analyses.map(a => a.labAliquotId).map(aliquot => DigestUtils.sha1Hex(List(studyId, aliquot).mkString("-")) -> aliquot)
+    val hashLabAliquotIds = allAnalysis.map(a => a.labAliquotId).map(aliquot => DigestUtils.sha1Hex(List(studyId, aliquot).mkString("-")) -> aliquot)
 
     val payload = Json.stringify(Json.toJson(hashLabAliquotIds.map{ case(hash, _) => hash -> "sequencing_experiment"}.toMap))
 

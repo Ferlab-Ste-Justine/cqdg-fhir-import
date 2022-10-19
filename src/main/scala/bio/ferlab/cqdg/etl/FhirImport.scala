@@ -16,7 +16,7 @@ import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
 import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.data.{NonEmptyList, Validated}
-import cats.implicits.catsSyntaxTuple2Semigroupal
+import cats.implicits.{catsSyntaxSemigroupal, catsSyntaxTuple2Semigroupal}
 import org.hl7.fhir.r4.model.Bundle
 import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
@@ -27,6 +27,7 @@ import scala.jdk.CollectionConverters._
 object FhirImport extends App {
 
   val Array(prefix, bucket, version, release, study, runName) = args
+  val runNames = runName.split(",")
 
   withSystemExit {
     withLog {
@@ -35,10 +36,15 @@ object FhirImport extends App {
         implicit val fhirClient: IGenericClient = buildFhirClient(conf.fhir, conf.keycloak)
         implicit val idService: IdServerClient = new IdServerClient()
         implicit val ferloadConf: FerloadConf = conf.ferload
-        val metadata = new NanuqClient(conf.nanuq).fetch(runName).andThen(Metadata.validateMetadata)
+        val nanuqClient = new NanuqClient(conf.nanuq)
+
+
+        val metadataInputPrefixMap = runNames.map(r => {
+          s"genorefq_wgs_data/$r" -> nanuqClient.fetch(r).andThen(Metadata.validateMetadata)
+        }).toMap
 
         val inputBucket = conf.aws.bucketName
-        val inputPrefix = s"$study/$runName"
+//        val inputPrefix = s"genorefq_wgs_data/$runName"
         val outputBucket = conf.aws.outputBucketName
         val outputPrefix = conf.aws.outputPrefix
 
@@ -46,14 +52,14 @@ object FhirImport extends App {
 
         auth.withToken { (_, rpt) => rpt }
 
-        withReport(inputBucket, inputPrefix) { reportPath =>
-          run(bucket, prefix, version, study, release, inputBucket, inputPrefix, outputPrefix, metadata, reportPath, outputBucket)
+        withReport(inputBucket, metadataInputPrefixMap.keySet) { reportPath =>
+          run(bucket, prefix, version, study, release, inputBucket, outputPrefix, metadataInputPrefixMap, reportPath, outputBucket)
         }
       }
     }
   }
 
-  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String, inputPrefix: String, outputPrefix: String, metadata:  Validated[NonEmptyList[String], Metadata], reportPath: String, outputBucket: String)(implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
+  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String, outputPrefix: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, outputBucket: String)(implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
 
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
@@ -64,30 +70,42 @@ object FhirImport extends App {
 
     val bundleList = bundleCreate(resources)
 
-    val results = metadata.andThen { m: Metadata =>
-      val rawFileEntries = CheckS3Data.loadRawFileEntries(inputBucket, inputPrefix)
-      val fileEntries = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix)
+    val rawFileEntries = inputPrefixMetadataMap.keySet.flatMap(p => {
+      CheckS3Data.loadRawFileEntries(inputBucket, p)
+    }).toSeq
 
-      (NanuqBuildBundle.validate(m, fileEntries, allRawResources, version), CheckS3Data.validateFileEntries(rawFileEntries, fileEntries))
+    val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
+      metadata.map { m: Metadata =>
+        val seq = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix)
+        Map(m -> seq)
+      }
+    }.reduce(_ combine _)
+
+    val ttt = mapDataFilesSeq.andThen(m => {
+      val allFiles = m.values.toSeq.flatten
+
+      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version), CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
         .mapN((bundle, files) => (bundle, files))
-        .andThen({ case (bundle, files) =>
-          try {
-            // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
-            writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
-            CheckS3Data.copyFiles(files, outputBucket)
-            val result = TBundle(bundle ++ bundleList).execute()
-            if (result.isInvalid) {
-              CheckS3Data.revert(files, outputBucket)
-            }
-            result
-          } catch {
-            case e: Exception =>
-              CheckS3Data.revert(files, outputBucket)
-              throw e
-          }
+    })
 
-        })
-    }
+    val results = ttt.andThen({ case (bundle, files) =>
+      try {
+        // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
+        writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
+        //            CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
+        val result = TBundle(bundle ++ bundleList).execute()
+        if (result.isInvalid) {
+          CheckS3Data.revert(files, outputBucket)
+        }
+        result
+      } catch {
+        case e: Exception =>
+          CheckS3Data.revert(files, outputBucket)
+          throw e
+      }
+
+    })
+
     if(results.isValid) {
       val (studyId, _) = allRawResources(RawStudy.FILENAME).head
       deletePreviousRevisions(studyId, version)
