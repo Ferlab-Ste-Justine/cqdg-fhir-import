@@ -1,9 +1,9 @@
 package bio.ferlab.cqdg.etl.task.nanuq
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils
-import bio.ferlab.cqdg.etl.{ValidationResult, isValid}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
-import bio.ferlab.cqdg.etl.models.nanuq.{AnalysisTask, Experiment, Metadata, TaskExtensions, Workflow}
+import bio.ferlab.cqdg.etl.models.nanuq._
+import bio.ferlab.cqdg.etl.{ValidationResult, isValid}
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.data.ValidatedNel
 import cats.implicits._
@@ -17,6 +17,7 @@ object TaskExtensionValidation {
   def validateTaskExtension(m: Metadata)(implicit client: IGenericClient): ValidationResult[TaskExtensions] = {
     // Experiment are built without run date because we need to validate FHIR resource without this field, otherwise we get an exception before submitting validation to server
     // Run date is validate elsewhere
+
     val experimentExtWithoutRunDate = buildExperimentExtension(m.experiment)
     val workflowExt = buildWorkflowExtension(m.workflow)
     val taskExtensions = validTaskExtension(experimentExtWithoutRunDate, workflowExt)
@@ -26,7 +27,6 @@ object TaskExtensionValidation {
     (experimentExt, taskExtensions).mapN {
       (validExp, taskExtensions) => taskExtensions.copy(experimentExtension = validExp)
     }
-
   }
 
   private def validTaskExtension(experimentExtWithoutRunDate: Extension, workflowExt: Extension)(implicit client: IGenericClient) = {

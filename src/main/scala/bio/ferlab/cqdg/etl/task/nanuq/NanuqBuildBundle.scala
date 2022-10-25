@@ -26,65 +26,81 @@ object NanuqBuildBundle {
 
   def validate(metadataList: Seq[Metadata], files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
     LOGGER.info("################# Validate Resources ##################")
-    //TODO validate - can we assume that we only need to generate one TASK and we can just use the head metadata for this????
-    val taskExtensions =  validateTaskExtension(metadataList.head)
+
     val mapFiles = files.map(f => (f.filename, f)).toMap
+    val filesPayload = Json.stringify(Json.toJson(mapFiles.map{ case(_, file) => file.id -> "file" }))
+    val fileIdMap = Json.parse(idService.getCQDGIds(filesPayload)).as[List[HashIdMap]]
 
-    val allAnalysis = metadataList.flatMap(_.analyses)
-    val studyId = allRawResources("study").keySet.head
-    val hashLabAliquotIds = allAnalysis.map(a => a.labAliquotId).map(aliquot => DigestUtils.sha1Hex(List(studyId, aliquot).mkString("-")) -> aliquot)
+    val bundleListPerMetadata = metadataList.map(m => {
+      val taskExtensions =  validateTaskExtension(m)
 
-    val payload = Json.stringify(Json.toJson(hashLabAliquotIds.map{ case(hash, _) => hash -> "sequencing_experiment"}.toMap))
+      val allAnalysis = m.analyses
 
-    val resp = Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
+      val studyId = allRawResources("study").keySet.head
+      val hashLabAliquotIds = allAnalysis.map(a => a.labAliquotId).map(aliquot => DigestUtils.sha1Hex(List(studyId, aliquot).mkString("-")) -> aliquot)
 
-    val mapAliquotId = hashLabAliquotIds.map{ case(hash, aliquot) => (aliquot, resp.find(h => h.hash == hash))}.map {
-      case (aliquotId, Some(hash: HashIdMap)) => aliquotId -> hash.internal_id
-    }.toMap
+      val payload = Json.stringify(Json.toJson(hashLabAliquotIds.map{ case(hash, _) => hash -> "sequencing_experiment"}.toMap))
 
-    val allResources: ValidatedNel[String, List[BundleEntryComponent]] = allAnalysis.toList.flatMap { a =>
+      val resp = Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
 
-      val id = mapAliquotId(a.labAliquotId)
-      val relatedSample = allRawResources("sample_registration").find{
-        case (_, rawResource: RawSampleRegistration) => rawResource.submitter_sample_id === a.ldmSampleId
-      }
+      val mapAliquotId = hashLabAliquotIds.map{ case(hash, aliquot) => (aliquot, resp.find(h => h.hash == hash))}.map {
+        case (aliquotId, Some(hash: HashIdMap)) => aliquotId -> hash.internal_id
+      }.toMap
 
-      relatedSample match {
-        case Some((sampleId, rawSampleRegistration: RawSampleRegistration)) =>
-          val sampleParticipantId = rawSampleRegistration.submitter_participant_id
+      val allResources: ValidatedNel[String, List[BundleEntryComponent]] = allAnalysis.toList.flatMap { a =>
 
-          allRawResources("participant").find{ case (_, rawResource: RawParticipant) => rawResource.submitter_participant_id === sampleParticipantId } match {
-            case Some((participantId, _: RawParticipant)) =>
+        //todo Check that submitter_sample_id in Raw are in the Metadata analysis (fail other) - or vice versa
+        //part 1 : TDB / part: we Ignore yes
+        //Todo what happens if sample is in 2 different batches AND if same samples are in the same batch? question for JP
+        //part one: we create 2 Tasks / part 2: TBD
 
-              val sampleIdType = new IdType(s"Specimen/$sampleId")
-              val participantIdType = new IdType(s"Patient/$participantId")
+        val id = mapAliquotId(a.labAliquotId)
+        val relatedSample = allRawResources("sample_registration").find{
+          case (_, rawResource: RawSampleRegistration) => rawResource.submitter_sample_id === a.ldmSampleId  //its ok to ignore if not found
+        }
 
-              Some((
-                participantIdType.valid[String].toValidatedNel,
-                sampleIdType.valid[String].toValidatedNel,
-                validateFiles(mapFiles, a, studyId, release),
-                taskExtensions.map(_.forAliquot(a.labAliquotId)),
-                id.valid[String].toValidatedNel,
-                studyId.valid[String].toValidatedNel,
-                release.valid[String].toValidatedNel
-                ).mapN(createResources))
-            case None => None
-          }
+        relatedSample match {
+          case Some((sampleId, rawSampleRegistration: RawSampleRegistration)) =>
+            val sampleParticipantId = rawSampleRegistration.submitter_participant_id
 
-        case None => None
-      }
+            allRawResources("participant").find{ case (_, rawResource: RawParticipant) => rawResource.submitter_participant_id === sampleParticipantId } match {
+              case Some((participantId, _: RawParticipant)) =>
 
-    }.combineAll
+                val sampleIdType = new IdType(s"Specimen/$sampleId")
+                val participantIdType = new IdType(s"Patient/$participantId")
 
-    allResources
+                Some((
+                  participantIdType.valid[String].toValidatedNel,
+                  sampleIdType.valid[String].toValidatedNel,
+                  validateFiles(mapFiles, a, studyId, release),
+                  taskExtensions.map(c => c.forAliquot(a.labAliquotId)),
+                  id.valid[String].toValidatedNel,
+                  studyId.valid[String].toValidatedNel,
+                  release.valid[String].toValidatedNel,
+                  fileIdMap.valid[String].toValidatedNel
+                  ).mapN(createResources))
+              case None => None
+            }
+
+          case None => None
+        }
+
+      }.combineAll
+
+      allResources
+    })
+
+    bundleListPerMetadata.reduce(_ combine _)
   }
 
-  def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions, id: String, studyId: String, version: String)(implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
+  def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions,
+                      taskId: String, studyId: String, version: String, filesHashId: List[HashIdMap])(implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
     val task = TTask(taskExtensions)
-    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, version)
-    val taskResource: Resource = task.buildResource(patient.toReference(), sample.toReference(), documentReferencesResources, id)(studyId, version)
+    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, version, filesHashId)
 
-    val resourcesToCreate = (documentReferencesResources.resources() :+ taskResource).toList
+    val taskResources: Resource = task.buildResource(patient.toReference(), sample.toReference(), documentReferencesResources, taskId)(studyId, version)
+
+    val resourcesToCreate = (documentReferencesResources.resources() :+ taskResources).toList
 
     val bundleEntriesToCreate: Seq[BundleEntryComponent] = bundleCreate(resourcesToCreate)
 

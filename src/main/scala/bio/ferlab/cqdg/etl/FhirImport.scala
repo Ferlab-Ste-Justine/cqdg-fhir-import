@@ -10,13 +10,13 @@ import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
 import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent}
+import bio.ferlab.cqdg.etl.task.HashIdMap
 import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources}
 import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
-import bio.ferlab.cqdg.etl.task.{HashIdMap, SimpleBuildBundle}
 import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.data.{NonEmptyList, Validated}
-import cats.implicits.{catsSyntaxSemigroupal, catsSyntaxTuple2Semigroupal}
+import cats.implicits.catsSyntaxTuple2Semigroupal
 import org.hl7.fhir.r4.model.Bundle
 import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
@@ -44,7 +44,6 @@ object FhirImport extends App {
         }).toMap
 
         val inputBucket = conf.aws.bucketName
-//        val inputPrefix = s"genorefq_wgs_data/$runName"
         val outputBucket = conf.aws.outputBucketName
         val outputPrefix = conf.aws.outputPrefix
 
@@ -74,21 +73,22 @@ object FhirImport extends App {
       CheckS3Data.loadRawFileEntries(inputBucket, p)
     }).toSeq
 
+
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
       metadata.map { m: Metadata =>
-        val seq = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix)
+        val seq = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix, study)
         Map(m -> seq)
       }
     }.reduce(_ combine _)
 
-    val ttt = mapDataFilesSeq.andThen(m => {
+    val bundleListWithFiles = mapDataFilesSeq.andThen(m => {
       val allFiles = m.values.toSeq.flatten
 
       (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version), CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
         .mapN((bundle, files) => (bundle, files))
     })
 
-    val results = ttt.andThen({ case (bundle, files) =>
+    val results = bundleListWithFiles.andThen({ case (bundle, files) =>
       try {
         // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
         writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)

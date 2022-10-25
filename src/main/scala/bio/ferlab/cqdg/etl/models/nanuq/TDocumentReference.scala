@@ -7,6 +7,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, validateOutcomes}
 import bio.ferlab.cqdg.etl.models.nanuq.TDocumentAttachment.{idFromList, valid}
+import bio.ferlab.cqdg.etl.task.HashIdMap
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.implicits._
 import org.hl7.fhir.r4.model.DocumentReference.{DocumentReferenceContentComponent, DocumentReferenceContextComponent}
@@ -23,14 +24,21 @@ trait TDocumentReference extends DocumentReferenceType {
     FhirUtils.validateResource(baseResource)
   }
 
-  def buildResource(subject: Reference, related: Seq[Reference], studyId: String, release: String)(implicit ferloadConf: FerloadConf): Resource = {
+  def buildResource(subject: Reference, related: Seq[Reference], studyId: String, release: String, filesHashId: List[HashIdMap])
+                   (implicit ferloadConf: FerloadConf): Resource = {
+
+    val fileId = filesHashId.find(h => h.hash == this.id) match {
+      case Some(hashId) => hashId.internal_id
+      case None => throw new RuntimeException(s"Failed to retrieve id for ${this.id}")
+    }
+
     val dr = buildBase(studyId, release)
 
     val drc = new DocumentReferenceContextComponent()
     drc.setRelated(related.asJava)
     dr.setContext(drc)
 
-    dr.setId(IdType.newRandomUuid())
+    dr.setId(fileId)
     dr.setSubject(subject)
     dr
 

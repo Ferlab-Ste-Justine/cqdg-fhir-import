@@ -127,19 +127,11 @@ object FhirUtils {
     fhirResource =>
       val be = new BundleEntryComponent()
 
-      if(fhirResource.fhirType() != "DocumentReference"){
-        be.setFullUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
-          .setResource(fhirResource)
-          .getRequest
-          .setUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
-          .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.PUT)
-      } else {
-        be.setFullUrl(fhirResource.getIdElement.getValue)
-          .setResource(fhirResource)
-          .getRequest
-          .setUrl(fhirResource.fhirType())
-          .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.POST)
-      }
+      be.setFullUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
+        .setResource(fhirResource)
+        .getRequest
+        .setUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
+        .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.PUT)
       be
   }
 

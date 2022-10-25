@@ -62,9 +62,11 @@ package object etl {
     }
   }
 
-  def withReport[T](inputBucket: String, inputPrefix: String)(b: String => ValidationResult[T])(implicit s3Client: S3Client): ValidationResult[T] = {
+  def withReport[T](inputBucket: String, inputPrefixes: Set[String])(b: String => ValidationResult[T])(implicit s3Client: S3Client): ValidationResult[T] = {
     val dateTimePart = LocalDateTime.now(ZoneId.of("UTC")).format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-    val reportPath = s"$inputPrefix/logs/$dateTimePart"
+
+    ////FIXME this IS WIP - should be fixed
+    val reportPath = s"${inputPrefixes.head}/logs/$dateTimePart"
 
     val errorFilePath = s"$reportPath/error.txt"
     try {

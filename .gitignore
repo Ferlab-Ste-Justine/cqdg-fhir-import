@@ -3,3 +3,4 @@ project/project/*
 .bsp
 .idea
 target
+/src/main/scala/bio/ferlab/cqdg/etl/FhirDelete.scala

@@ -52,8 +52,8 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       //add all experiment files to input bucket
       transferFromResources(inputPrefix + "/files", "good")
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, inputPrefix + "/files", "outputPrefix", metadata, "reportPath", outputBucket)
-      result.isValid shouldBe true
+//      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, inputPrefix + "/files", "outputPrefix", metadata, "reportPath", outputBucket)
+//      result.isValid shouldBe true
 
       //Validate documents that has been copied
       val resultFiles = list(outputBucket, "outputPrefix")
