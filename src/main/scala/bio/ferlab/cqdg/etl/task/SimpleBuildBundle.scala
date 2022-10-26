@@ -29,9 +29,8 @@ object SimpleBuildBundle {
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
-  def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, studyVersion: String): Seq[Resource] = {
+  def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, studyVersion: String, studyId: String): Seq[Resource] = {
     val resources = rawResources(resourceType)
-    val studyId = rawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
 
     // Group fhir resource for family
     val familyGroupResource = if(resourceType == RawFamily.FILENAME) {

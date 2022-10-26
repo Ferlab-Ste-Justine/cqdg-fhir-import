@@ -55,8 +55,8 @@ object CheckS3Data {
     fileEntries
   }
 
-  def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], outputPrefix: String, studyId: String, generateId: () => String = () => UUID.randomUUID().toString)(implicit s3Client: S3Client): Seq[FileEntry] = {
-    val (checksums, files) = fileEntries.partition(_.isChecksum)
+  def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], studyId: String)(implicit s3Client: S3Client): Seq[FileEntry] = {
+    val (checksums, files) = fileEntries.partition(_.isMd5)
     val mapOfIds = m.analyses.flatMap { a =>
       val cramId: String = s"${DigestUtils.sha1Hex(List(a.files.cram, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val craiId: String = s"${DigestUtils.sha1Hex(List(a.files.crai, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
@@ -101,14 +101,14 @@ object CheckS3Data {
 
   def copyFiles(files: Seq[FileEntry], bucketDest: String)(implicit s3Client: S3Client): Unit = {
     LOGGER.info("################# Copy Files ##################")
-    files.foreach { f =>
+    files.take(2).foreach { f => //FIXME remove the take 2
       val encodedUrl = URLEncoder.encode(f.bucket + "/" + f.key, StandardCharsets.UTF_8.toString)
       val cp = CopyObjectRequest.builder()
         .copySource(encodedUrl)
         .contentType(f.contentType)
         .contentDisposition(f.contentDisposition)
         .destinationBucket(bucketDest)
-        .destinationKey(f.id)
+        .destinationKey(s"files/${f.id}")
         .metadataDirective(MetadataDirective.REPLACE)
         .build()
 

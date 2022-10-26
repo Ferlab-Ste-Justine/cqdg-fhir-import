@@ -55,7 +55,7 @@ object NanuqBuildBundle {
         //part one: we create 2 Tasks / part 2: TBD
 
         val id = mapAliquotId(a.labAliquotId)
-        val relatedSample = allRawResources("sample_registration").find{
+        val relatedSample = allRawResources("sample_registration").find {
           case (_, rawResource: RawSampleRegistration) => rawResource.submitter_sample_id === a.ldmSampleId  //its ok to ignore if not found
         }
 

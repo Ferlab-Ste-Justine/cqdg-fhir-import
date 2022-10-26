@@ -63,9 +63,11 @@ object FhirImport extends App {
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
+    val studyId = allRawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
+
     val resources = RESOURCES.flatMap(rt => {
-      createResources(allRawResources, rt, version)
-    }) :+ createOrganization(version, study)
+      createResources(allRawResources, rt, version, studyId)
+    }) :+ createOrganization(version, studyId)
 
     val bundleList = bundleCreate(resources)
 
@@ -76,7 +78,7 @@ object FhirImport extends App {
 
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
       metadata.map { m: Metadata =>
-        val seq = CheckS3Data.loadFileEntries(m, rawFileEntries, outputPrefix, study)
+        val seq = CheckS3Data.loadFileEntries(m, rawFileEntries, study)
         Map(m -> seq)
       }
     }.reduce(_ combine _)
@@ -92,7 +94,7 @@ object FhirImport extends App {
       try {
         // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
         writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
-        //            CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
+//        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
         val result = TBundle(bundle ++ bundleList).execute()
         if (result.isInvalid) {
           CheckS3Data.revert(files, outputBucket)
