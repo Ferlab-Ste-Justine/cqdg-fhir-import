@@ -52,13 +52,13 @@ object FhirImport extends App {
         auth.withToken { (_, rpt) => rpt }
 
         withReport(inputBucket, metadataInputPrefixMap.keySet) { reportPath =>
-          run(bucket, prefix, version, study, release, inputBucket, outputPrefix, metadataInputPrefixMap, reportPath, outputBucket)
+          run(bucket, prefix, version, study, release, inputBucket, metadataInputPrefixMap, reportPath, outputBucket) //todo add output Prefix
         }
       }
     }
   }
 
-  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String, outputPrefix: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, outputBucket: String)(implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
+  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, outputBucket: String)(implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
 
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
@@ -94,7 +94,7 @@ object FhirImport extends App {
       try {
         // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
         writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
-//        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
+        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
         val result = TBundle(bundle ++ bundleList).execute()
         if (result.isInvalid) {
           CheckS3Data.revert(files, outputBucket)
@@ -105,13 +105,8 @@ object FhirImport extends App {
           CheckS3Data.revert(files, outputBucket)
           throw e
       }
-
     })
 
-    if(results.isValid) {
-      val (studyId, _) = allRawResources(RawStudy.FILENAME).head
-      deletePreviousRevisions(studyId, version)
-    }
     results
   }
 

@@ -18,5 +18,10 @@
   {"hash": "4a43f2c8b893c3ac01f9913deb2092e022336aa0", "internal_id":  "FAM0000001"},
   {"hash": "d10c6d100a488a8ec254585742996f6ca59ab3d0", "internal_id":  "FAM0000002"},
   {"hash": "a8a723af96daf54381a0777cf13b5072b1e959ac", "internal_id":  "FAM0000003"},
-  {"hash": "5f66ea55ade4c24142fdca813bd1c3f379979ee1", "internal_id":  "SXP0000001"}
+  {"hash": "5f66ea55ade4c24142fdca813bd1c3f379979ee1", "internal_id":  "SXP0000001"},
+  {"hash": "b8935d28c190c7631c2104bb777a6eb3a9b67fcf", "internal_id":  "FIL0000001"},
+  {"hash": "48eea2f04582a8f8c353d6065d56a02ceeb82d2e", "internal_id":  "FIL0000002"},
+  {"hash": "b9c2f765919b0ce28e546512b74c8c1492dfaf39", "internal_id":  "FIL0000003"},
+  {"hash": "bf01ded4a6c2bebc34ee128106f250254c0f6181", "internal_id":  "FIL0000004"},
+  {"hash": "0a4ccf57172ad9fb76a1735f71cbe97e6547a435", "internal_id":  "FIL0000005"}
 ]
