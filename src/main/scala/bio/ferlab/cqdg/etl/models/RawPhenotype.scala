@@ -16,7 +16,7 @@ case class RawPhenotype(
     s"study_id=$study_id|" +
       s"phenotype_source_text=$phenotype_source_text|" +
       s"phenotype_HPO_code=$phenotype_HPO_code|" +
-      s"age_at_phenotype=${age_at_phenotype.toString}|" +
+      s"age_at_phenotype=${age_at_phenotype}|" +
       s"submitter_participant_id=$submitter_participant_id"
   }
 

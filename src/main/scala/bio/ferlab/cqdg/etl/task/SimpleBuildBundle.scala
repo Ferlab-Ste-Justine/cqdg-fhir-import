@@ -149,7 +149,11 @@ object SimpleBuildBundle {
       phenotype.setInterpretation(List(observedCodeableConcept).asJava)
     })
 
-
+    // ***************** Phenotype Age at Phenotype *********************
+    val ageValue = new Age()
+    ageValue.setValue(resource.age_at_phenotype)
+    val ageExtension = new Extension("http://fhir.cqdg.ferlab.bio/StructureDefinition/Observation/AgeAtPhenotype", ageValue)
+    phenotype.setExtension(List(ageExtension).asJava)
 
     if(parentId.isDefined) {
       phenotype.setSubject(reference.setReference(s"Patient/${parentId.get}"))
