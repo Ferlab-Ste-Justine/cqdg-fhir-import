@@ -1,0 +1,25 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "GenomeBuild",
+  "id": "genome-build",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/genome-build",
+  "concept": [
+    {
+      "code": "GRCh38",
+      "display": "GRCh38",
+      "designation": [
+        {
+          "use": {
+            "code": "GRCh38",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/genome-build"
+          },
+          "value": "GRCh38"
+        }
+      ]
+    }
+  ],
+  "count": 1
+}

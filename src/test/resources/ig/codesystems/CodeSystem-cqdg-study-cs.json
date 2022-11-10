@@ -15,7 +15,7 @@
         {
           "use": {
             "code": "internal-label",
-            "system": "http://acme.com/config/fhir/codesystems/internal"
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-study-cs"
           },
           "value": "Étude CARTaGENE"
         }
@@ -28,7 +28,7 @@
         {
           "use": {
             "code": "internal-label",
-            "system": "http://acme.com/config/fhir/codesystems/internal"
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-study-cs"
           },
           "value": "Étude CARTaGENE"
         }
@@ -42,7 +42,7 @@
         {
           "use": {
             "code": "internal-label",
-            "system": "http://acme.com/config/fhir/codesystems/internal"
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-study-cs"
           },
           "value": "Autre étude"
         }

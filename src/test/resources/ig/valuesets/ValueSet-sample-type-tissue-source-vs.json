@@ -1,0 +1,41 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "SampleTypeTissueSourceVS",
+  "id": "sample-type-tissue-source-vs",
+  "version": "0.1.0",
+  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/sample-type-tissue-source-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://purl.obolibrary.org/obo/ncit.owl",
+        "concept": [
+          {
+            "code": "C449",
+            "display": "DNA"
+          },
+          {
+            "code": "C812",
+            "display": "Ribonucleic Acid"
+          },
+          {
+            "code": "C12434",
+            "display": "Blood"
+          },
+          {
+            "code": "C13275",
+            "display": "Saliva"
+          },
+          {
+            "code": "C164014",
+            "display": "Solid Tissue Specimen"
+          },
+          {
+            "code": "C12431",
+            "display": "Bone Marrow"
+          }
+        ]
+      }
+    ]
+  }
+}

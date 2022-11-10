@@ -1,0 +1,168 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "V3RoleCode",
+  "id": "v3-role-code",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code",
+  "concept": [
+    {
+      "code": "Self",
+      "display": "Self",
+      "designation": [
+        {
+          "use": {
+            "code": "self",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Self"
+        }
+      ]
+    },
+    {
+      "code": "Mother",
+      "display": "Mother",
+      "designation": [
+        {
+          "use": {
+            "code": "mother",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Mother"
+        }
+      ]
+    },
+    {
+      "code": "Father",
+      "display": "Father",
+      "designation": [
+        {
+          "use": {
+            "code": "father",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Father"
+        }
+      ]
+    },
+    {
+      "code": "Brother",
+      "display": "Brother",
+      "designation": [
+        {
+          "use": {
+            "code": "brother",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Brother"
+        }
+      ]
+    },
+    {
+      "code": "Sister",
+      "display": "Sister",
+      "designation": [
+        {
+          "use": {
+            "code": "sister",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Sister"
+        }
+      ]
+    },
+    {
+      "code": "Half-brother",
+      "display": "Half-brother",
+      "designation": [
+        {
+          "use": {
+            "code": "half-brother",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Half-brother"
+        }
+      ]
+    },
+    {
+      "code": "Half-sister",
+      "display": "Half-sister",
+      "designation": [
+        {
+          "use": {
+            "code": "half-sister",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Half-sister"
+        }
+      ]
+    },
+    {
+      "code": "Identical twin",
+      "display": "Identical twin",
+      "designation": [
+        {
+          "use": {
+            "code": "identical-twin",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Identical twin"
+        }
+      ]
+    },
+    {
+      "code": "Fraternal twin brother",
+      "display": "Fraternal twin brother",
+      "designation": [
+        {
+          "use": {
+            "code": "fraternal-twin-brother",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Fraternal twin brother"
+        }
+      ]
+    },
+    {
+      "code": "Fraternal twin sister",
+      "display": "Fraternal twin sister",
+      "designation": [
+        {
+          "use": {
+            "code": "fraternal-twin-sister",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Fraternal twin sister"
+        }
+      ]
+    },
+    {
+      "code": "Son",
+      "display": "Son",
+      "designation": [
+        {
+          "use": {
+            "code": "son",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Son"
+        }
+      ]
+    },
+    {
+      "code": "Daughter",
+      "display": "Daughter",
+      "designation": [
+        {
+          "use": {
+            "code": "daughter",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+          },
+          "value": "Daughter"
+        }
+      ]
+    }
+  ],
+  "count": 12
+}

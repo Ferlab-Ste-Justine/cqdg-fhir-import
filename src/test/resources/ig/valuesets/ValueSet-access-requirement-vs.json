@@ -1,0 +1,94 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "AccessRequirementVS",
+  "id": "access-requirement-vs",
+  "title": "Access requirement value set",
+  "description": "Requirements before access",
+  "version": "0.1.0",
+  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/access-requirement-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://purl.obolibrary.org/obo/duo.owl",
+        "concept": [
+          {
+            "code": "0000012",
+            "display": "research specific restrictions"
+          },
+          {
+            "code": "0000015",
+            "display": "no general methods research"
+          },
+          {
+            "code": "0000016",
+            "display": "genetic studies only"
+          },
+          {
+            "code": "0000018",
+            "display": "not for profit, non commercial use only"
+          },
+          {
+            "code": "0000019",
+            "display": "publication required"
+          },
+          {
+            "code": "0000020",
+            "display": "collaboration required"
+          },
+          {
+            "code": "0000021",
+            "display": "ethics approval required"
+          },
+          {
+            "code": "0000022",
+            "display": "geographical restriction"
+          },
+          {
+            "code": "0000024",
+            "display": "publication moratorium"
+          },
+          {
+            "code": "0000025",
+            "display": "time limit on use"
+          },
+          {
+            "code": "0000026",
+            "display": "user specific restriction"
+          },
+          {
+            "code": "0000027",
+            "display": "project specific restriction"
+          },
+          {
+            "code": "0000028",
+            "display": "institution specific restriction"
+          },
+          {
+            "code": "0000029",
+            "display": "return to database or resource"
+          },
+          {
+            "code": "00000043",
+            "display": "clinical care use"
+          },
+          {
+            "code": "00000044",
+            "display": "population origins or ancestry research prohibited"
+          },
+          {
+            "code": "00000045",
+            "display": "not for profit organisation use only"
+          },
+          {
+            "code": "00000046",
+            "display": "non-commercial use only"
+          }
+        ]
+      },
+      {
+        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/access-requirements"
+      }
+    ]
+  }
+}

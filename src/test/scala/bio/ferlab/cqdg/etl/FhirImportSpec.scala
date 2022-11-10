@@ -55,6 +55,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val metaDataMap = Map(inputPrefix + "/files" -> metadata)
 
       val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, metaDataMap, "reportPath", outputBucket)
+
       result.isValid shouldBe true
 
       //Validate documents that has been copied
@@ -92,7 +93,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       researchStudy.getExtension.asScala.count(e => e.getUrl == POPULATION_URL) shouldBe 1
 
       // ################## PHENOTYPE #######################
-      val phenotypes = read(observations, classOf[Observation]).filter(p => p.getCode.getCoding.asScala.exists(c => c.getCode == "PHEN"))
+      val phenotypes = read(observations, classOf[Observation]).filter(p => p.getCode.getCoding.asScala.exists(c => c.getCode == "Phenotype"))
       phenotypes.size shouldBe 3
 
       val observedPhenotype = phenotypes.find(p => p.getInterpretation.asScala.exists(c => c.getCoding.asScala.exists(code => code.getCode == "POS")))
@@ -154,7 +155,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       }
 
       //Resources should have study and revision in Tag
-      val tags = Seq(s"study:STU0000001", s"release:$release")
+      val tags = Seq(s"study:STU0000001", s"study_version:$version")
       patients.getEntry.asScala.foreach{ p =>
         val resource = p.getResource.asInstanceOf[Patient]
         resource.getIdBase match {
@@ -187,20 +188,6 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       patientDocuments.size shouldEqual 5
 
-//      Previous version documents should be deleted
-      val oldParticipant = new Patient
-      oldParticipant.setSimpleMeta("STU0000001", "RE_0000")
-      oldParticipant.setId("1234")
-      addElementToFhir(oldParticipant)
-
-      val searchPatientWithOldVersion = searchFhir("Patient")
-      searchPatientWithOldVersion.getTotal shouldBe 4
-
-      FhirImport.deletePreviousRevisions(study, release)
-
-      val searchPatientWithoutOldVersion = searchFhir("Patient")
-
-      searchPatientWithoutOldVersion.getTotal shouldBe 3
     }
   }
 }

@@ -5,7 +5,7 @@
   "id": "study-domain",
   "title": "Study domain value set",
   "version": "0.1.0",
-  "url": "http://localhost:8080/ValueSet/study-domain",
+  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/study-domain",
   "compose": {
     "include": [
       {

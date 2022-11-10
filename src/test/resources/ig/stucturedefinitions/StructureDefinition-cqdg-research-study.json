@@ -11,7 +11,7 @@
       "valueCode": "business"
     }
   ],
-  "url": "http://localhost:8080/StructureDefinition/cqdg-research-study",
+  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/cqdg-research-study",
   "version": "0.1.0",
   "name": "CQDGResearchStudy",
   "status": "active",
@@ -75,7 +75,7 @@
           {
             "code": "Extension",
             "profile": [
-              "http://localhost:8080/StructureDefinition/population-info"
+              "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/population-info"
             ]
           }
         ]
@@ -90,7 +90,7 @@
           {
             "code": "Extension",
             "profile": [
-              "http://localhost:8080/StructureDefinition/AccessLimitations"
+              "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/AccessLimitations"
             ]
           }
         ]
@@ -105,7 +105,7 @@
           {
             "code": "Extension",
             "profile": [
-              "http://localhost:8080/StructureDefinition/AccessRequirements"
+              "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/AccessRequirements"
             ]
           }
         ]
