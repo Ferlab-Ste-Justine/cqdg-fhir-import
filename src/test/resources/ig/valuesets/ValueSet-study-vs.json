@@ -1,0 +1,16 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "StudyVS",
+  "id": "study-vs",
+  "title": "Study domain value set",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/study-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-study-cs"
+      }
+    ]
+  }
+}

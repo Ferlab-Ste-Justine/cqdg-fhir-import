@@ -78,7 +78,14 @@ trait MinioServer {
     val f = new File(getClass.getResource(s"/$resource").toURI)
     val put = PutObjectRequest.builder().bucket(bucket).key(s"$prefix/${f.getName}").build()
     s3.putObject(put, RequestBody.fromFile(f))
+  }
 
+  def transferFromResources(prefix: String, resource: String, bucket: String = BUCKETNAME): Unit = {
+    val files = ls(new File(getClass.getResource(s"/$resource").toURI))
+    files.foreach { f =>
+      val put = PutObjectRequest.builder().bucket(bucket).key(s"$prefix/${f.getName}").build()
+      s3.putObject(put, RequestBody.fromFile(f))
+    }
   }
 
   def copyNFile(prefix: String, resource: String, times: Int, bucket: String = BUCKETNAME): Unit = {

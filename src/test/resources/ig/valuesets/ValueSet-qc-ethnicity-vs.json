@@ -1,0 +1,16 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "QCEthnicityVS",
+  "id": "qc-ethnicity-vs",
+  "title": "CQDG observation value set",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/qc-ethnicity-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/qc-ethnicity"
+      }
+    ]
+  }
+}

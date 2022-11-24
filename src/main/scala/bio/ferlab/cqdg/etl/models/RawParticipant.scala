@@ -5,9 +5,9 @@ import org.apache.commons.codec.digest.DigestUtils
 case class RawParticipant(
                            study_id: String,
                            submitter_participant_id: String,
-                           age_at_recruitment: String,
+                           age_at_recruitment: Option[String],
                            sex: String,
-                           ethnicity: String,
+                           ethnicity: Option[String],
                            vital_status: String,
                            cause_of_death: Option[String],
                            age_of_death: Option[String],
@@ -33,22 +33,16 @@ case class RawParticipant(
 object RawParticipant {
   val FILENAME = "participant"
 
-  def apply(s: String, header: String): RawParticipant = {
-    val line = s.split("\\t", -1)
-    val splitHeader = header.split("\\t+")
+  def apply(line: Array[String], header: Array[String]): RawParticipant = {
     RawParticipant(
-      line(splitHeader.indexOf("study_id")),
-      line(splitHeader.indexOf("submitter_participant_id")),
-      line(splitHeader.indexOf("age_at_recruitment")),
-      line(splitHeader.indexOf("sex")).toLowerCase().trim,
-      line(splitHeader.indexOf("ethnicity")).toLowerCase().trim,
-      line(splitHeader.indexOf("vital_status")).toLowerCase().trim,
-      if(splitHeader.indexOf("cause_of_death") <= line.length - 1 && line(splitHeader.indexOf("cause_of_death")).nonEmpty) {
-        Some(line(splitHeader.indexOf("cause_of_death")))
-      } else None,
-      if(splitHeader.indexOf("age_of_death") <= line.length - 1 && line(splitHeader.indexOf("age_of_death")).nonEmpty) {
-        Some(line(splitHeader.indexOf("age_of_death")))
-      } else None,
+      line(header.indexOf("study_id")),
+      line(header.indexOf("submitter_participant_id")),
+      if(!line(header.indexOf("age_at_recruitment")).isBlank) Some(line(header.indexOf("age_at_recruitment"))) else None,
+      line(header.indexOf("sex")),
+      if(!line(header.indexOf("ethnicity")).isBlank) Some(line(header.indexOf("ethnicity"))) else None,
+      line(header.indexOf("vital_status")),
+      if(!line(header.indexOf("cause_of_death")).isBlank) Some(line(header.indexOf("cause_of_death"))) else None,
+      if(!line(header.indexOf("age_of_death")).isBlank) Some(line(header.indexOf("age_of_death"))) else None,
     )
   }
 }

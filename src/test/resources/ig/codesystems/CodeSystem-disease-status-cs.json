@@ -1,0 +1,51 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "DiseaseStatusCS",
+  "id": "disease-status-cs",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status",
+  "concept": [
+    {
+      "code": "Affected",
+      "display": "Affected",
+      "designation": [
+        {
+          "use": {
+            "code": "affected",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status"
+          },
+          "value": "Affected"
+        }
+      ]
+    },
+    {
+      "code": "Non affected",
+      "display": "Non affected",
+      "designation": [
+        {
+          "use": {
+            "code": "non-affected",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status"
+          },
+          "value": "Non affected"
+        }
+      ]
+    },
+    {
+      "code": "Unknown",
+      "display": "Unknown",
+      "designation": [
+        {
+          "use": {
+            "code": "unknown",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status"
+          },
+          "value": "Unknown"
+        }
+      ]
+    }
+  ],
+  "count": 3
+}

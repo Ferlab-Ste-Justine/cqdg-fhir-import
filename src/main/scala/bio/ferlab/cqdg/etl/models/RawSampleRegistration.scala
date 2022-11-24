@@ -27,15 +27,13 @@ case class RawSampleRegistration(
 object RawSampleRegistration {
   val FILENAME = "sample_registration"
 
-  def apply(s: String, header: String): RawSampleRegistration = {
-    val line = s.split("\\t", -1)
-    val splitHeader = header.split("\\t+")
+  def apply(line: Array[String], header: Array[String]): RawSampleRegistration = {
     RawSampleRegistration (
-      line(splitHeader.indexOf("study_id")),
-      line(splitHeader.indexOf("submitter_participant_id")),
-      line(splitHeader.indexOf("submitter_biospecimen_id")),
-      line(splitHeader.indexOf("submitter_sample_id")),
-      line(splitHeader.indexOf("sample_type"))
+      line(header.indexOf("study_id")),
+      line(header.indexOf("submitter_participant_id")),
+      line(header.indexOf("submitter_biospecimen_id")),
+      line(header.indexOf("submitter_sample_id")),
+      line(header.indexOf("sample_type"))
     )
   }
 }

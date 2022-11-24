@@ -1,0 +1,18 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "CQDGDiagnosisVS",
+  "id": "cqdg-diagnosis-vs",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/cqdg-diagnosis-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://purl.obolibrary.org/obo/mondo.owl"
+      },
+      {
+        "system": "http://terminology.hl7.org/CodeSystem/icd10-CA"
+      }
+    ]
+  }
+}

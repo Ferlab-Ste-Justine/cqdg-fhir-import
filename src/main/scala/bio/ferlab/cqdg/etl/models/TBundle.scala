@@ -23,7 +23,7 @@ case class TBundle(resources: List[BundleEntryComponent]) {
     bundle.addEntry(be)
   }
 
-  def save()(implicit client: IGenericClient): ValidationResult[Bundle] = {
+  def execute()(implicit client: IGenericClient): ValidationResult[Bundle] = {
     LOGGER.info("################# Save Bundle ##################")
     try {
       val resp = client.transaction.withBundle(bundle).execute
@@ -56,6 +56,7 @@ case class TBundle(resources: List[BundleEntryComponent]) {
     }
 
   }
+
 
   def print()(implicit client: IGenericClient): String = {
     client.getFhirContext.newJsonParser.setPrettyPrint(true).encodeResourceToString(bundle)

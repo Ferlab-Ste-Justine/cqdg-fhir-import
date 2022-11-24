@@ -5,6 +5,7 @@ import bio.ferlab.cqdg.etl.utils.MetadataTestUtils.defaultMetadata
 import bio.ferlab.cqdg.etl.utils.MinioServerSuite
 import cats.data.NonEmptyList
 import cats.data.Validated.{Invalid, Valid}
+import org.apache.commons.codec.digest.DigestUtils
 import org.scalatest.{FlatSpec, Matchers}
 
 class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
@@ -22,10 +23,10 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
 
   private val rawFiles = Seq(
     rawFileEntry(s"file1.cram"),
-    rawFileEntry(s"file1.cram.md5sum"),
+    rawFileEntry(s"file1.cram.md5"),
     rawFileEntry(s"file1.crai"),
     rawFileEntry(s"file2.vcf"),
-    rawFileEntry(s"file1.vcf.md5sum"),
+    rawFileEntry(s"file1.vcf.md5"),
     rawFileEntry(s"file2.tbi"),
     rawFileEntry(s"file3.tgz")
   )
@@ -38,13 +39,13 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
       val expected = List(
         RawFileEntry(BUCKETNAME, s"$prefix/file1.crai", 10),
         RawFileEntry(BUCKETNAME, s"$prefix/file1.cram", 10),
-        RawFileEntry(BUCKETNAME, s"$prefix/file1.cram.md5sum", 13),
+        RawFileEntry(BUCKETNAME, s"$prefix/file1.cram.md5", 13),
         RawFileEntry(BUCKETNAME, s"$prefix/file2.vcf", 9),
-        RawFileEntry(BUCKETNAME, s"$prefix/file2.vcf.md5sum", 12),
+        RawFileEntry(BUCKETNAME, s"$prefix/file2.vcf.md5", 12),
         RawFileEntry(BUCKETNAME, s"$prefix/file3.vcf", 9),
-        RawFileEntry(BUCKETNAME, s"$prefix/file3.vcf.md5sum", 12),
+        RawFileEntry(BUCKETNAME, s"$prefix/file3.vcf.md5", 12),
         RawFileEntry(BUCKETNAME, s"$prefix/file4.vcf", 9),
-        RawFileEntry(BUCKETNAME, s"$prefix/file4.vcf.md5sum", 12),
+        RawFileEntry(BUCKETNAME, s"$prefix/file4.vcf.md5", 12),
         RawFileEntry(BUCKETNAME, s"$prefix/file5.json", 8)
       )
       fileEntries should contain theSameElementsAs expected
@@ -64,31 +65,31 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
 
 
 
-  //  "copyFiles" should "move files from one bucket to the other" in {
-  //    withS3Objects { (inputPrefix, outputPrefix) =>
-  //      transferFromResourceDirectory(inputPrefix, "good")
-  //      val files = Seq(
-  //        fileEntry(s"$inputPrefix/file1.cram", s"$outputPrefix/abc", "file1.cram"),
-  //        fileEntry(s"$inputPrefix/file1.crai", s"$outputPrefix/def", "file1.crai"),
-  //        fileEntry(s"$inputPrefix/file2.vcf", s"$outputPrefix/ghi", "file2.vcf")
-  //      )
-  //      CheckS3Data.copyFiles(files, outputBucket)
-  //      list(outputBucket, outputPrefix) should contain theSameElementsAs Seq(s"$outputPrefix/abc", s"$outputPrefix/def", s"$outputPrefix/ghi")
-  //    }
-  //  }
+    "copyFiles" should "move files from one bucket to the other" in {
+      withS3Objects { (inputPrefix, outputPrefix) =>
+        transferFromResourceDirectory(inputPrefix, "good")
+        val files = Seq(
+          fileEntry(s"$inputPrefix/file1.cram", s"$outputPrefix/abc", "file1.cram"),
+          fileEntry(s"$inputPrefix/file1.crai", s"$outputPrefix/def", "file1.crai"),
+          fileEntry(s"$inputPrefix/file2.vcf", s"$outputPrefix/ghi", "file2.vcf")
+        )
+        CheckS3Data.copyFiles(files, outputBucket)
+        list(outputBucket, outputPrefix) should contain theSameElementsAs Seq(s"$outputPrefix/abc", s"$outputPrefix/def", s"$outputPrefix/ghi")
+      }
+    }
 
-  //  "revert" should "move back files from one bucket to the other" in {
-  //    withS3Objects { (inputPrefix, outputPrefix) =>
-  //      transferFromResources(outputPrefix, "revert", outputBucket)
-  //      val files = Seq(
-  //        fileEntry(s"$inputPrefix/file1.cram", s"$outputPrefix/file1", "file1.cram"),
-  //        fileEntry(s"$inputPrefix/file1.crai", s"$outputPrefix/file2", "file1.crai"),
-  //        fileEntry(s"$inputPrefix/file2.vcf", s"$outputPrefix/file3", "file2.vcf")
-  //      )
-  //      CheckS3Data.revert(files, outputBucket)
-  //      list(outputBucket, outputPrefix) shouldBe empty
-  //    }
-  //  }
+    "revert" should "move back files from one bucket to the other" in {
+      withS3Objects { (inputPrefix, outputPrefix) =>
+        transferFromResources(outputPrefix, "revert", outputBucket)
+        val files = Seq(
+          fileEntry(s"$inputPrefix/file1.cram", s"$outputPrefix/file1", "file1.cram"),
+          fileEntry(s"$inputPrefix/file1.crai", s"$outputPrefix/file2", "file1.crai"),
+          fileEntry(s"$inputPrefix/file2.vcf", s"$outputPrefix/file3", "file2.vcf")
+        )
+        CheckS3Data.revert(files, outputBucket)
+        list(outputBucket, outputPrefix) shouldBe empty
+      }
+    }
 
 
   "validateFiles" should "return errors if input bucket contains files that are not present into metadata" in {
@@ -112,31 +113,29 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
   "loadFileEntries" should "return file entries based on raw data" in {
     withS3Objects { (inputPrefix, outputPrefix) =>
       transferFromResourceDirectory(inputPrefix, "good")
-      var i = 0
-      val generatorId = () => {
-        i = i + 1
-        s"id_$i"
-      }
-      val rawFiles = Seq(
+
+      val rawFiles = Seq (
         rawFileEntry(s"$inputPrefix/file1.cram"),
-        rawFileEntry(s"$inputPrefix/file1.cram.md5sum"),
+        rawFileEntry(s"$inputPrefix/file1.cram.md5"),
         rawFileEntry(s"$inputPrefix/file1.crai"),
         rawFileEntry(s"$inputPrefix/file2.vcf"),
-        rawFileEntry(s"$inputPrefix/file2.vcf.md5sum"),
+        rawFileEntry(s"$inputPrefix/file2.vcf.md5"),
         rawFileEntry(s"$inputPrefix/file3.vcf"),
-        rawFileEntry(s"$inputPrefix/file3.vcf.md5sum"),
+        rawFileEntry(s"$inputPrefix/file3.vcf.md5"),
         rawFileEntry(s"$inputPrefix/file4.vcf"),
-        rawFileEntry(s"$inputPrefix/file4.vcf.md5sum"),
+        rawFileEntry(s"$inputPrefix/file4.vcf.md5"),
         rawFileEntry(s"$inputPrefix/file5.tgz")
       )
 
-      CheckS3Data.loadFileEntries(defaultMetadata, rawFiles, outputPrefix, generatorId) shouldBe Seq(
-        fileEntry(s"$inputPrefix/file1.cram", s"$outputPrefix/id_1", "file1.cram", Some("md5 cram file")),
-        fileEntry(s"$inputPrefix/file1.crai", s"$outputPrefix/id_1.crai", "file1.crai"),
-        fileEntry(s"$inputPrefix/file2.vcf", s"$outputPrefix/id_2", "file2.vcf", Some("md5 vcf file")),
-        fileEntry(s"$inputPrefix/file3.vcf", s"$outputPrefix/id_3", "file3.vcf", Some("md5 vcf file")),
-        fileEntry(s"$inputPrefix/file4.vcf", s"$outputPrefix/id_4", "file4.vcf", Some("md5 vcf file")),
-        fileEntry(s"$inputPrefix/file5.tgz", s"$outputPrefix/id_5", "file5.tgz")
+      val runName = defaultMetadata.experiment.runName.get
+
+      CheckS3Data.loadFileEntries(defaultMetadata, rawFiles, "study1") should contain theSameElementsAs  Seq(
+        fileEntry(s"$inputPrefix/file1.crai", s"${DigestUtils.sha1Hex(List("file1.crai", runName, "study1").mkString("-"))}", "file1.crai"),
+        fileEntry(s"$inputPrefix/file1.cram", s"${DigestUtils.sha1Hex(List("file1.cram", runName, "study1").mkString("-"))}", "file1.cram", Some("md5 cram file")),
+        fileEntry(s"$inputPrefix/file2.vcf", s"${DigestUtils.sha1Hex(List("file2.vcf", runName, "study1").mkString("-"))}", "file2.vcf", Some("md5 vcf file")),
+        fileEntry(s"$inputPrefix/file3.vcf", s"${DigestUtils.sha1Hex(List("file3.vcf", runName, "study1").mkString("-"))}", "file3.vcf", Some("md5 vcf file")),
+        fileEntry(s"$inputPrefix/file4.vcf", s"${DigestUtils.sha1Hex(List("file4.vcf", runName, "study1").mkString("-"))}", "file4.vcf", Some("md5 vcf file")),
+        fileEntry(s"$inputPrefix/file5.tgz", s"${DigestUtils.sha1Hex(List("file5.tgz", runName, "study1").mkString("-"))}", "file5.tgz"),
       )
     }
   }

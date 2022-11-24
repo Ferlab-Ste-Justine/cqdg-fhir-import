@@ -1,0 +1,42 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "Population",
+  "id": "population",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/codesystem/population",
+  "concept": [
+    {
+      "code": "Pediatric",
+      "display": "Pediatric",
+      "designation": [
+        {
+          "use": {
+            "code": "pediatric",
+            "system": "http://fhir.cqdg.ferlab.bio/codesystem/population"
+          },
+          "value": "Pediatric"
+        }
+      ]
+    },
+    {
+      "code": "Adult",
+      "display": "Adult",
+      "designation": [
+        {
+          "use": {
+            "code": "pediatric-and-adult",
+            "system": "http://fhir.cqdg.ferlab.bio/codesystem/population"
+          },
+          "value": "Pediatric and Adult"
+        }
+      ]
+    },
+    {
+      "code": "Pediatric and Adult",
+      "display": "Pediatric and Adult"
+    }
+  ],
+  "count": 3
+}

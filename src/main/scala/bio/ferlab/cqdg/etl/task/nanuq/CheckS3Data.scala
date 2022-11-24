@@ -4,6 +4,7 @@ import bio.ferlab.cqdg.etl.isValid
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata, RawFileEntry}
 import bio.ferlab.cqdg.etl.s3.S3Utils.getContent
 import cats.data.ValidatedNel
+import org.apache.commons.codec.digest.DigestUtils
 import org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM
 import org.slf4j.{Logger, LoggerFactory}
 import software.amazon.awssdk.services.s3.S3Client
@@ -21,7 +22,6 @@ object CheckS3Data {
 
   def ls(bucket: String, prefix: String, maxKeys: Int = 4500)(implicit s3Client: S3Client): List[RawFileEntry] = {
     val lsRequest = ListObjectsV2Request.builder().bucket(bucket).maxKeys(maxKeys).prefix(prefix).build()
-
     nextBatch(s3Client, s3Client.listObjectsV2(lsRequest), maxKeys)
   }
 
@@ -38,7 +38,7 @@ object CheckS3Data {
 
   def validateFileEntries(rawFileEntries: Seq[RawFileEntry], fileEntries: Seq[FileEntry]): ValidatedNel[String, Seq[FileEntry]] = {
     LOGGER.info("################# Validate File entries ##################")
-    val fileEntriesNotInAnalysis = rawFileEntries.filterNot(r => r.isChecksum || fileEntries.exists(f => f.key == r.key))
+    val fileEntriesNotInAnalysis = rawFileEntries.filterNot(r => r.isMd5 || fileEntries.exists(f => f.key == r.key))
     val errorFilesNotExist = fileEntriesNotInAnalysis.map(f => s"File ${f.filename} not found in metadata JSON file.")
     isValid(fileEntries, errorFilesNotExist)
   }
@@ -55,15 +55,15 @@ object CheckS3Data {
     fileEntries
   }
 
-  def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], outputPrefix: String, generateId: () => String = () => UUID.randomUUID().toString)(implicit s3Client: S3Client): Seq[FileEntry] = {
-    val (checksums, files) = fileEntries.partition(_.isChecksum)
+  def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], studyId: String)(implicit s3Client: S3Client): Seq[FileEntry] = {
+    val (checksums, files) = fileEntries.partition(_.isMd5)
     val mapOfIds = m.analyses.flatMap { a =>
-      val cramId: String = s"$outputPrefix/${generateId()}"
-      val craiId: String = s"$cramId.crai"
-      val snvId: String = s"$outputPrefix/${generateId()}"
-      val cnvId: String = s"$outputPrefix/${generateId()}"
-      val svId: String = s"$outputPrefix/${generateId()}"
-      val qcId: String = s"$outputPrefix/${generateId()}"
+      val cramId: String = s"${DigestUtils.sha1Hex(List(a.files.cram, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val craiId: String = s"${DigestUtils.sha1Hex(List(a.files.crai, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val snvId: String = s"${DigestUtils.sha1Hex(List(a.files.snv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val cnvId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val svId: String = s"${DigestUtils.sha1Hex(List(a.files.sv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val qcId: String = s"${DigestUtils.sha1Hex(List(a.files.supplement, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
 
       Seq(
         a.files.cram -> (cramId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cram)),
@@ -73,7 +73,6 @@ object CheckS3Data {
         a.files.sv -> (svId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.sv)),
         a.files.supplement -> (qcId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.supplement))
       )
-
     }.toMap
     files
       .flatMap { f =>
@@ -102,14 +101,14 @@ object CheckS3Data {
 
   def copyFiles(files: Seq[FileEntry], bucketDest: String)(implicit s3Client: S3Client): Unit = {
     LOGGER.info("################# Copy Files ##################")
-    files.foreach { f =>
+    files.take(2).foreach { f => //FIXME remove the take 2
       val encodedUrl = URLEncoder.encode(f.bucket + "/" + f.key, StandardCharsets.UTF_8.toString)
       val cp = CopyObjectRequest.builder()
         .copySource(encodedUrl)
         .contentType(f.contentType)
         .contentDisposition(f.contentDisposition)
         .destinationBucket(bucketDest)
-        .destinationKey(f.id)
+        .destinationKey(s"files/${f.id}")
         .metadataDirective(MetadataDirective.REPLACE)
         .build()
 

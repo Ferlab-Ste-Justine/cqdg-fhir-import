@@ -1,0 +1,15 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "DataCategoryVS",
+  "id": "data-category-vs",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/data-category-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-category"
+      }
+    ]
+  }
+}

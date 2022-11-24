@@ -8,6 +8,7 @@ case class RawBiospecimen(
                            submitter_biospecimen_id: String,
                            age_biospecimen_collection: Option[Int],
                            biospecimen_tissue_source: String,
+                           tumor_normal_designation: Option[String]
                          ) extends RawResource {
 
 
@@ -28,17 +29,14 @@ case class RawBiospecimen(
 object RawBiospecimen {
   val FILENAME = "biospecimen"
 
-  def apply(s: String, header: String): RawBiospecimen = {
-    val line = s.split("\\t", -1)
-    val splitHeader = header.split("\\t+")
+  def apply(line: Array[String], header: Array[String]): RawBiospecimen = {
     RawBiospecimen (
-      line(splitHeader.indexOf("study_id")),
-      line(splitHeader.indexOf("submitter_participant_id")),
-      line(splitHeader.indexOf("submitter_biospecimen_id")),
-      if(splitHeader.indexOf("age_biospecimen_collection") <= line.length - 1 && line(splitHeader.indexOf("age_biospecimen_collection")).nonEmpty) {
-        Some(line(splitHeader.indexOf("age_biospecimen_collection")).toInt)
-      } else None,
-      line(splitHeader.indexOf("biospecimen_tissue_source"))
+      line(header.indexOf("study_id")),
+      line(header.indexOf("submitter_participant_id")),
+      line(header.indexOf("submitter_biospecimen_id")),
+      if(!line(header.indexOf("age_biospecimen_collection")).isBlank) Some(line(header.indexOf("age_biospecimen_collection")).toInt) else None,
+      line(header.indexOf("biospecimen_tissue_source")),
+      if(!line(header.indexOf("tumor_normal_designation")).isBlank) Some(line(header.indexOf("tumor_normal_designation"))) else None,
     )
   }
 }

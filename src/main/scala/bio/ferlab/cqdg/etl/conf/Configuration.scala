@@ -25,7 +25,9 @@ case class IdServerConf(endpoint: String, username: String, password: String)
 
 case class NanuqConf(endpoint: String, username: String, password: String)
 
-case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf, nanuq: NanuqConf)
+case class FerloadConf(url: String)
+
+case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf, nanuq: NanuqConf, ferload: FerloadConf)
 
 object Conf {
 

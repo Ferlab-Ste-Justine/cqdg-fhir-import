@@ -1,0 +1,25 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "DataCategory",
+  "id": "data-category",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-category",
+  "concept": [
+    {
+      "code": "Genomics",
+      "display": "Genomics",
+      "designation": [
+        {
+          "use": {
+            "code": "genomics",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-category"
+          },
+          "value": "Genomics"
+        }
+      ]
+    }
+  ],
+  "count": 1
+}

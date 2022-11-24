@@ -29,22 +29,14 @@ case class RawDiagnosis(
 object RawDiagnosis {
   val FILENAME = "diagnosis"
 
-  def apply(s: String, header: String): RawDiagnosis = {
-    val line = s.split("\\t", -1)
-    val splitHeader = header.split("\\t+")
+  def apply(line: Array[String], header: Array[String]): RawDiagnosis = {
     RawDiagnosis (
-      line(splitHeader.indexOf("study_id")),
-      line(splitHeader.indexOf("submitter_participant_id")),
-      line(splitHeader.indexOf("diagnosis_source_text")),
-      if(splitHeader.indexOf("diagnosis_ICD_code") <= line.length - 1 && line(splitHeader.indexOf("diagnosis_ICD_code")).nonEmpty) {
-        Some(line(splitHeader.indexOf("diagnosis_ICD_code")))
-      } else None,
-      if(splitHeader.indexOf("diagnosis_mondo_code") <= line.length - 1 && line(splitHeader.indexOf("diagnosis_mondo_code")).nonEmpty) {
-        Some(line(splitHeader.indexOf("diagnosis_mondo_code")))
-      } else None,
-      if(splitHeader.indexOf("age_at_diagnosis") <= line.length - 1 && line(splitHeader.indexOf("age_at_diagnosis")).nonEmpty) {
-        Some(line(splitHeader.indexOf("age_at_diagnosis")).toInt)
-      } else None
+      line(header.indexOf("study_id")),
+      line(header.indexOf("submitter_participant_id")),
+      line(header.indexOf("diagnosis_source_text")),
+      if(!line(header.indexOf("diagnosis_ICD_code")).isBlank) Some(line(header.indexOf("diagnosis_ICD_code"))) else None,
+      if(!line(header.indexOf("diagnosis_mondo_code")).isBlank) Some(line(header.indexOf("diagnosis_mondo_code"))) else None,
+      if(!line(header.indexOf("age_at_diagnosis")).isBlank) Some(line(header.indexOf("age_at_diagnosis")).toInt) else None
     )
   }
 }

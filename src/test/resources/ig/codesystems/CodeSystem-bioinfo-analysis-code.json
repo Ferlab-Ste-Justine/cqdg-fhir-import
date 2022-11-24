@@ -1,0 +1,77 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "BioinfoAnalysisCode",
+  "id": "bioinfo-analysis-code",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code",
+  "concept": [
+    {
+      "code": "Reads Alignement Bioinformatic Analysis",
+      "display": "Reads Alignement Bioinformatic Analysis",
+      "designation": [
+        {
+          "use": {
+            "code": "reads-alignement-bioinformatic-analysis",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+          },
+          "value": "Reads Alignement Bioinformatic Analysis"
+        }
+      ]
+    },
+    {
+      "code": "SNV Calling Bioinformatic Analysis",
+      "display": "SNV Calling Bioinformatic Analysis",
+      "designation": [
+        {
+          "use": {
+            "code": "snv-calling-bioinformatic-nalysis",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+          },
+          "value": "Reads Alignement Bioinformatic Analysis"
+        }
+      ]
+    },
+    {
+      "code": "Quality Control Bioinformatic Analysis",
+      "display": "Quality Control Bioinformatic Analysis",
+      "designation": [
+        {
+          "use": {
+            "code": "quality-control-bioinformatic-analysis",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+          },
+          "value": "Quality Control Bioinformatic Analysis"
+        }
+      ]
+    },
+    {
+      "code": "Germline Exome Bioinformatic Analysis",
+      "display": "Germline Exome Bioinformatic Analysis",
+      "designation": [
+        {
+          "use": {
+            "code": "germline-exome-bioinformatic-analysis",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+          },
+          "value": "Germline Exome Bioinformatic Analysis"
+        }
+      ]
+    },
+    {
+      "code": "Germline Genome Bioinformatic Analysis",
+      "display": "Germline Genome Bioinformatic Analysis",
+      "designation": [
+        {
+          "use": {
+            "code": "germline-genome-bioinformatic-analysis",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+          },
+          "value": "Germline Genome Bioinformatic Analysis"
+        }
+      ]
+    }
+  ],
+  "count": 5
+}

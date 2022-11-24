@@ -1,0 +1,51 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "TumorNormalDesignation",
+  "id": "tumor-normal-designation",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation",
+  "concept": [
+    {
+      "code": "Normal",
+      "display": "Normal",
+      "designation": [
+        {
+          "use": {
+            "code": "normal",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
+          },
+          "value": "Normal"
+        }
+      ]
+    },
+    {
+      "code": "Tumor",
+      "display": "Tumor",
+      "designation": [
+        {
+          "use": {
+            "code": "Tumor",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
+          },
+          "value": "Tumor"
+        }
+      ]
+    },
+    {
+      "code": "Not applicable",
+      "display": "Not applicable",
+      "designation": [
+        {
+          "use": {
+            "code": "not-applicable",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
+          },
+          "value": "Not applicable"
+        }
+      ]
+    }
+  ],
+  "count": 3
+}

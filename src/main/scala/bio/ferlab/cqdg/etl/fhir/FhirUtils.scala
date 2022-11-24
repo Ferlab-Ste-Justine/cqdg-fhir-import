@@ -1,12 +1,17 @@
 package bio.ferlab.cqdg.etl.fhir
 
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
-import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawParticipant, RawResource}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
+import bio.ferlab.cqdg.etl.isValid
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource}
+import ca.uhn.fhir.rest.client.api.IGenericClient
+import ca.uhn.fhir.rest.server.exceptions.{PreconditionFailedException, UnprocessableEntityException}
+import cats.data.ValidatedNel
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model._
 
 import scala.jdk.CollectionConverters._
 import scala.language.reflectiveCalls
+import scala.util.Try
 
 object FhirUtils {
 
@@ -14,23 +19,67 @@ object FhirUtils {
 
   object Constants {
 
-    val baseFhirServer = "https://fhir.cqdg.ferlab.bio"
+    val baseFhirServer = "http://fhir.cqdg.ferlab.bio"
 
     object CodingSystems {
       val SPECIMEN_TYPE = s"$baseFhirServer/CodeSystem/research-domain"
       val RELATIONSHIP_TO_PROBAND = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
       val PHENOTYPE_SYSTEM = "http://purl.obolibrary.org/obo/hp.owl"
-      val PHENOTYPE_CODE_SYSTEM = s"$baseFhirServer/CodeSystem/observation-code" //TODO RENAME
       val DIAGNOSIS_SYSTEM = "http://purl.obolibrary.org/obo/mondo.owl"
       val DISEASES_STATUS = s"$baseFhirServer/CodeSystem/disease-status"
       val NCIT_SYSTEM = "http://purl.obolibrary.org/obo/ncit.owl"
+      val DR_TYPE = s"$baseFhirServer/CodeSystem/data-type"
+      val ANALYSIS_TYPE = s"$baseFhirServer/CodeSystem/bioinfo-analysis-code"
+      val DR_CATEGORY = s"$baseFhirServer/CodeSystem/data-category"
+      val DR_FORMAT = s"$baseFhirServer/CodeSystem/document-format"
+      val EXPERIMENTAL_STRATEGY = s"$baseFhirServer/CodeSystem/experimental-strategy"
+      val GENOME_BUILD = s"$baseFhirServer/CodeSystem/genome-build"
+      val OBJECT_STORE = "http://objecstore.cqgc.qc.ca"
+      val CAUSE_OF_DEATH = s"$baseFhirServer/CodeSystem/cause-of-death"
+      val POPULATION = s"$baseFhirServer/CodeSystem/population"
+      val OBSERVATION_CATEGORY = s"${baseFhirServer}/CodeSystem/observation-code"
+      val TUMOR_NORMAL_DESIGNATION = s"${baseFhirServer}/CodeSystem/tumor-normal-designation"
     }
 
     object Extensions {
       val AGE_BIOSPECIMEN_COLLECTION = s"$baseFhirServer/StructureDefinition/Specimen/ageBiospecimenCollection"
+      val ACCESS_REQUIREMENTS_SD = s"$baseFhirServer/StructureDefinition/AccessRequirements"
+      val ACCESS_LIMITATIONS_SD = s"$baseFhirServer/StructureDefinition/AccessLimitations"
       val AGE_PARTICIPANT_AGE_RECRUITEMENT = s"$baseFhirServer/StructureDefinition/ResearchSubject/ageAtRecruitment"
+      val WORKFLOW = s"$baseFhirServer/StructureDefinition/workflow"
+      val SEQUENCING_EXPERIMENT = s"$baseFhirServer/StructureDefinition/sequencing-experiment"
+      val FULL_SIZE = s"$baseFhirServer/StructureDefinition/full-size"
+      val ETHNICITY_SD = s"$baseFhirServer/StructureDefinition/QCEthnicity"
+      val AGE_OF_DEATH = s"$baseFhirServer/StructureDefinition/Patient/age-of-death"
+      val POPULATION_URL = s"$baseFhirServer/StructureDefinition/ResearchStudy/population"
+      val QC_ETHNICITY_CS = s"$baseFhirServer/CodeSystem/qc-ethnicity"
+
     }
 
+    object Profiles {
+      val CQDG_PATIENT_PROFILE = s"$baseFhirServer/StructureDefinition/cqdg-patient"
+      val CQDG_OBSERVATION_PHENOTYPE_PROFILE = s"$baseFhirServer/StructureDefinition/CQDGObservationPhenotype"
+      val CQDG_OBSERVATION_DISEASE_STATUS_PROFILE = s"$baseFhirServer/StructureDefinition/CQDGObservationDiseaseStatus"
+      val CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE = s"$baseFhirServer/StructureDefinition/CQDGObservationSocialHistory"
+      val CQDG_DOC_REFERENCE_PROFILE = s"$baseFhirServer/StructureDefinition/cqdg-document-reference"
+      val CQDG_TASK_PROFILE = s"$baseFhirServer/StructureDefinition/cqgc-analysis-task"
+    }
+
+  }
+
+  def validateResource(r: Resource)(implicit client: IGenericClient): OperationOutcome = {
+    Try(client.validate().resource(r).execute().getOperationOutcome).recover {
+      case e: PreconditionFailedException => e.getOperationOutcome
+      case e: UnprocessableEntityException => e.getOperationOutcome
+    }.get.asInstanceOf[OperationOutcome]
+  }
+
+  def validateOutcomes[T](outcome: OperationOutcome, result: T)(err: OperationOutcome.OperationOutcomeIssueComponent => String): ValidatedNel[String, T] = {
+    val issues = outcome.getIssue.asScala.toSeq
+    val errors = issues.collect {
+      case o if o.getSeverity.ordinal() <= OperationOutcome.IssueSeverity.ERROR.ordinal => err(o)
+    }
+    isValid(result, errors)
   }
 
   def setCoding(code: String, rawResource: RawResource): Coding = {
@@ -42,28 +91,25 @@ object FhirUtils {
     coding.setCode(code)
   }
 
-  def generateMeta(codes: Seq[String]): Meta = {
+  def generateMeta(codes: Seq[String], profile: Option[String]): Meta = {
     val meta = new Meta()
 
     codes.foreach ( c => {
       val coding = new Coding()
       coding.setCode(c)
       meta.addTag(coding)
-    } )
+      profile.map(meta.addProfile)
+    })
     meta
   }
 
-  def setAgeExtension(value: Long, unit: String, rawResource: RawResource): Extension = {
+  def setAgeExtension(value: Long, unit: String, url: String): Extension = {
     val age = new Age
     val extension = new Extension
     age.setUnit(unit)
     age.setValue(value)
+    extension.setUrl(url)
 
-    rawResource match {
-      case _: RawBiospecimen => extension.setUrl(Extensions.AGE_BIOSPECIMEN_COLLECTION)
-      case _: RawParticipant => extension.setUrl("http://fhir.cqdg.ferlab.bio/StructureDefinition/ResearchSubject/ageAtRecruitment")
-      case _ => throw new MatchError(s"unknown resource type ${rawResource.getClass.getName}")
-    }
     extension.setValue(age)
     extension
   }
@@ -90,14 +136,26 @@ object FhirUtils {
 
   }
 
+  def bundleCreate(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map {
+    fhirResource =>
+      val be = new BundleEntryComponent()
+
+      be.setFullUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
+        .setResource(fhirResource)
+        .getRequest
+        .setUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
+        .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.PUT)
+      be
+  }
+
   implicit class ResourceExtension(v: Resource) {
     def toReference: Reference = {
       new Reference(IdType.of(v).toUnqualifiedVersionless)
     }
 
-    def setSimpleMeta(studyId: String, release: String, args: String *): Resource = {
-      val codes = Seq( s"study:$studyId", s"release:$release") ++ args
-      v.setMeta(generateMeta(codes))
+    def setSimpleMeta(studyId: String, version: String, profile: Option[String], args: String*): Resource = {
+      val codes = Seq(s"study:$studyId", s"study_version:$version") ++ args
+      v.setMeta(generateMeta(codes, profile))
     }
 
     //FIXME should be codes in lieu of display???? - TBD
@@ -121,8 +179,13 @@ object FhirUtils {
         case a if a.isInstanceOf[Specimen] => a.asInstanceOf[Specimen].setType(codeableConcept)
         case _ => throw new MatchError(s"Setting code for unsupported resource type: ${v.getResourceType}")
       }
-
     }
   }
 
+
+  implicit class IdTypeExtension(v: IdType) {
+    def toReference(): Reference = new Reference(v.toUnqualifiedVersionless)
+
+
+  }
 }

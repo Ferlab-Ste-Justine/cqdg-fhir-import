@@ -1,0 +1,120 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "cqdg-specimen",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
+      "valueString": "Clinical.Diagnostics"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
+      "valueCode": "patient"
+    }
+  ],
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-specimen",
+  "version": "0.1.0",
+  "name": "CQDGSpecimen",
+  "status": "active",
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "rim",
+      "uri": "http://hl7.org/v3",
+      "name": "RIM Mapping"
+    },
+    {
+      "identity": "w5",
+      "uri": "http://hl7.org/fhir/fivews",
+      "name": "FiveWs Pattern Mapping"
+    },
+    {
+      "identity": "v2",
+      "uri": "http://hl7.org/v2",
+      "name": "HL7 v2 Mapping"
+    }
+  ],
+  "kind": "resource",
+  "abstract": false,
+  "type": "Specimen",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Specimen",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Specimen.extension",
+        "path": "Specimen.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "ordered": false,
+          "rules": "open"
+        }
+      },
+      {
+        "id": "Specimen.extension:ageBiospecimenCollection",
+        "path": "Specimen.extension",
+        "sliceName": "ageBiospecimenCollection",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AgeAt"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Specimen.extension:cqdg_biospecimen_id",
+        "path": "Specimen.extension",
+        "sliceName": "cqdg_biospecimen_id",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/specific-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Specimen.extension:cqdg_sample_id",
+        "path": "Specimen.extension",
+        "sliceName": "cqdg_sample_id",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/specific-id"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "Specimen.type.coding.system",
+        "path": "Specimen.type.coding.system",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://purl.obolibrary.org/obo/ncit.owl"
+        }
+      },
+      {
+        "id": "Specimen.collection.bodySite.coding.system",
+        "path": "Specimen.collection.bodySite.coding.system",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://purl.obolibrary.org/obo/ncit.owl"
+        }
+      }
+    ]
+  }
+}

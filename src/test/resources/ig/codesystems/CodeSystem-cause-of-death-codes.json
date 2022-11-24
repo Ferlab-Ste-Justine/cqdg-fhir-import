@@ -1,0 +1,116 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "CauseOfDeathCodes",
+  "id": "cause-of-death-codes",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes",
+  "concept": [
+    {
+      "code": "Cancer",
+      "display": "Cancer",
+      "designation": [
+        {
+          "use": {
+            "code": "cancer",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
+          },
+          "value": "Cancer"
+        }
+      ]
+    },
+    {
+      "code": "Heart disease",
+      "display": "Heart disease",
+      "designation": [
+        {
+          "use": {
+            "code": "heart-desease",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
+          },
+          "value": "Heart disease"
+        }
+      ]
+    },
+    {
+      "code": "Cerebrovascular disease",
+      "display": "Cerebrovascular disease",
+      "designation": [
+        {
+          "use": {
+            "code": "cerebrovascular-disease",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
+          },
+          "value": "Cerebrovascular disease"
+        }
+      ]
+    },
+    {
+      "code": "Accidental death",
+      "display": "Accidental death",
+      "designation": [
+        {
+          "use": {
+            "code": "accidental-death",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
+          },
+          "value": "Accidental death"
+        }
+      ]
+    },
+    {
+      "code": "Chronic lower respiratory diseases",
+      "display": "Chronic lower respiratory diseases",
+      "designation": [
+        {
+          "use": {
+            "code": "chronic-lower-respiratory-diseases",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
+          },
+          "value": "Chronic lower respiratory diseases"
+        }
+      ]
+    },
+    {
+      "code": "Influenza and pneumonia",
+      "display": "Influenza and pneumonia",
+      "designation": [
+        {
+          "use": {
+            "code": "influenza-and-pneumonia",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
+          },
+          "value": "Influenza and pneumonia"
+        }
+      ]
+    },
+    {
+      "code": "Other reasons",
+      "display": "Other reasonsa",
+      "designation": [
+        {
+          "use": {
+            "code": "other-reason",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
+          },
+          "value": "Other reasons"
+        }
+      ]
+    },
+    {
+      "code": "Unknown",
+      "display": "Unknown",
+      "designation": [
+        {
+          "use": {
+            "code": "unknown",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
+          },
+          "value": "Unknown"
+        }
+      ]
+    }
+  ],
+  "count": 8
+}

@@ -1,0 +1,125 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "cqdg-research-study",
+  "extension": [
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
+      "valueString": "Specialized.Public Health &amp; Research"
+    },
+    {
+      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
+      "valueCode": "business"
+    }
+  ],
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-research-study",
+  "version": "0.1.0",
+  "name": "CQDGResearchStudy",
+  "status": "active",
+  "description": "A research study in CQDG",
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "BRIDG5.1",
+      "uri": "https://bridgmodel.nci.nih.gov",
+      "name": "BRIDG 5.1 Mapping"
+    },
+    {
+      "identity": "v2",
+      "uri": "http://hl7.org/v2",
+      "name": "HL7 v2 Mapping"
+    },
+    {
+      "identity": "rim",
+      "uri": "http://hl7.org/v3",
+      "name": "RIM Mapping"
+    },
+    {
+      "identity": "clinicaltrials-gov",
+      "uri": "http://clinicaltrials.gov",
+      "name": "ClinicalTrials.gov Mapping"
+    },
+    {
+      "identity": "w5",
+      "uri": "http://hl7.org/fhir/fivews",
+      "name": "FiveWs Pattern Mapping"
+    }
+  ],
+  "kind": "resource",
+  "abstract": false,
+  "type": "ResearchStudy",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/ResearchStudy",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "ResearchStudy.extension",
+        "path": "ResearchStudy.extension",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "url"
+            }
+          ],
+          "ordered": false,
+          "rules": "open"
+        }
+      },
+      {
+        "id": "ResearchStudy.extension:population",
+        "path": "ResearchStudy.extension",
+        "sliceName": "population",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/population-info"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ResearchStudy.extension:accessLimitations",
+        "path": "ResearchStudy.extension",
+        "sliceName": "accessLimitations",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessLimitations"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ResearchStudy.extension:accessRequirements",
+        "path": "ResearchStudy.extension",
+        "sliceName": "accessRequirements",
+        "min": 0,
+        "max": "*",
+        "type": [
+          {
+            "code": "Extension",
+            "profile": [
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessRequirements"
+            ]
+          }
+        ]
+      },
+      {
+        "id": "ResearchStudy.category",
+        "path": "ResearchStudy.category",
+        "max": "1"
+      },
+      {
+        "id": "ResearchStudy.category.coding",
+        "path": "ResearchStudy.category.coding",
+        "max": "1"
+      }
+    ]
+  }
+}

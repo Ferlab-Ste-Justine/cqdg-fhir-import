@@ -9,6 +9,7 @@ import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectReq
 import software.amazon.awssdk.services.s3.{S3Client, S3Configuration}
 
 import java.net.URI
+import scala.io.Source
 
 object S3Utils {
 
@@ -40,6 +41,18 @@ object S3Utils {
       .build()
 
     new String(s3Client.getObject(objectRequest).readAllBytes())
+  }
+
+  def getContentTSV(bucket: String, key: String)(implicit s3Client: S3Client): List[Array[String]] = {
+    val objectRequest = GetObjectRequest
+      .builder()
+      .key(key)
+      .bucket(bucket)
+      .build()
+
+    Source.fromInputStream(s3Client.getObject(objectRequest)).getLines.map { line =>
+      line.split("\t").map(s =>  s.replace("\"\"", "").trim)
+    }.toList
   }
 
   def writeContent(bucket: String, key: String, content: String)(implicit s3Client: S3Client): Unit = {

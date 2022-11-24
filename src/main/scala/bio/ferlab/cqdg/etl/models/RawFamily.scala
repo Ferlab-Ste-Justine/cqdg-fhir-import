@@ -32,19 +32,14 @@ case class RawFamily(
 object RawFamily {
   val FILENAME = "family_relationship"
 
-  def apply(s: String, header: String): RawFamily = {
-    val line = s.split("\\t", -1)
-    val splitHeader = header.split("\\t+")
-
+  def apply(line: Array[String], header: Array[String]): RawFamily = {
     RawFamily(
-      study_id = line(splitHeader.indexOf("study_id")),
-      submitter_family_id = line(splitHeader.indexOf("submitter_family_id")),
-      submitter_participant_id = line(splitHeader.indexOf("submitter_participant_id")),
-      family_type = line(splitHeader.indexOf("family_type")),
-      relationship_to_proband = line(splitHeader.indexOf("relationship_to_proband")),
-      if(splitHeader.indexOf("is_affected") <= line.length - 1 && line(splitHeader.indexOf("is_affected")).nonEmpty) {
-        Some(line(splitHeader.indexOf("is_affected")))
-      } else None,
+      study_id = line(header.indexOf("study_id")),
+      submitter_family_id = line(header.indexOf("submitter_family_id")),
+      submitter_participant_id = line(header.indexOf("submitter_participant_id")),
+      family_type = line(header.indexOf("family_type")),
+      relationship_to_proband = line(header.indexOf("relationship_to_proband")),
+      if(!line(header.indexOf("is_affected")).isBlank) Some(line(header.indexOf("is_affected"))) else None,
     )
   }
 

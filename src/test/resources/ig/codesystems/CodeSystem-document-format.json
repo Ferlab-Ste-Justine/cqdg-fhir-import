@@ -1,0 +1,72 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "DocumentForamt",
+  "id": "document-format",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/document-format",
+  "concept": [
+    {
+      "code": "CRAM",
+      "display": "CRAM",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "CRAM"
+        }
+      ]
+    },
+    {
+      "code": "CRAI",
+      "display": "CRAI Index File",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "CRAI"
+        }
+      ]
+    },
+    {
+      "code": "VCF",
+      "display": "VCF",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "VCF"
+        }
+      ]
+    },
+    {
+      "code": "TGZ",
+      "display": "TGZ Archive File",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "TGZ"
+        }
+      ]
+    },
+    {
+      "code": "gVCF",
+      "display": "gVCF File",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "gVCF"
+        }
+      ]
+    },
+    {
+      "code": "TBI",
+      "display": "TBI Index File",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "TBI"
+        }
+      ]
+    }
+  ],
+  "count": 6
+}
