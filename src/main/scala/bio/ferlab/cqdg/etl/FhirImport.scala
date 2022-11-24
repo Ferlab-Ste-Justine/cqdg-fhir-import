@@ -9,7 +9,7 @@ import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
 import bio.ferlab.cqdg.etl.s3.S3Utils
-import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent}
+import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContent, getContentTSV}
 import bio.ferlab.cqdg.etl.task.HashIdMap
 import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources}
 import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
@@ -75,7 +75,6 @@ object FhirImport extends App {
       CheckS3Data.loadRawFileEntries(inputBucket, p)
     }).toSeq
 
-
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
       metadata.map { m: Metadata =>
         val seq = CheckS3Data.loadFileEntries(m, rawFileEntries, study)
@@ -94,7 +93,7 @@ object FhirImport extends App {
       try {
         // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
         writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
-        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
+//        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
         val result = TBundle(bundle ++ bundleList).execute()
         if (result.isInvalid) {
           CheckS3Data.revert(files, outputBucket)
@@ -116,7 +115,7 @@ object FhirImport extends App {
 
     RESOURCES.map(r => {
       if(bucketKeys.exists(key => key.endsWith(s"$r.tsv"))){
-        val rawResource = getRawResource(getContent(bucket, s"$prefix/$version-$study/$release/$r.tsv"), r)
+        val rawResource = getRawResource(getContentTSV(bucket, s"$prefix/$version-$study/$release/$r.tsv"), r)
         r -> rawResource
       } else {
         r -> Nil
@@ -142,10 +141,9 @@ object FhirImport extends App {
     })
   }
 
-  def getRawResource(content: String, _type: String): List[RawResource] = {
-    val lines = content.split("\n")
-    val header = lines.head
-    val rows = lines.tail
+  def getRawResource(content: List[Array[String]], _type: String): List[RawResource] = {
+    val header = content.head
+    val rows = content.tail
     rows.map { l =>
       _type match {
         case "participant" => RawParticipant(l, header)
@@ -156,8 +154,9 @@ object FhirImport extends App {
         case "sample_registration" => RawSampleRegistration(l, header)
         case "family_relationship" => RawFamily(l, header)
       }
-    }.toList
+    }
   }
+
   def writeAheadLog(inputBucket: String, reportPath: String, bundle: TBundle, files: Seq[FileEntry])(implicit s3: S3Client, client: IGenericClient): Unit = {
     S3Utils.writeContent(inputBucket, s"$reportPath/bundle.json", bundle.print())
     val filesToCSV = files.map(f => s"${f.key},${f.id}").mkString("\n")
@@ -174,9 +173,13 @@ object FhirImport extends App {
   private def getHashMapping(rawResource: Seq[RawResource], resourceType: String)(implicit idService: IIdServer): Map[String, RawResource] = {
     val resourceWithHashIds = Map(rawResource map { a => a.getHash -> a }: _*)
     val resourceHashes = resourceWithHashIds.keySet map (a => a -> resourceType)
-    val payload = Json.stringify(Json.toJson(resourceHashes.toMap))
 
-    val resp = Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
+    val resp = (0 until resourceHashes.size by ID_SERVICE_BATCH_SIZE).flatMap { x =>
+      val slicedResourceHashes = resourceHashes.slice(x, x + ID_SERVICE_BATCH_SIZE)
+      val payload = Json.stringify(Json.toJson(slicedResourceHashes.toMap))
+      Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
+    }.toList
+
     resourceWithHashIds.map(r => {
       val (hash, resource) = r
       val id = resp.find(e => e.hash == hash).get.internal_id

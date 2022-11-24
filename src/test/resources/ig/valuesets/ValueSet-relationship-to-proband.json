@@ -5,7 +5,7 @@
   "id": "relationship-to-proband",
   "title": "Research domain value set",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/relationship-to-proband",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/relationship-to-proband",
   "compose": {
     "include": [
       {

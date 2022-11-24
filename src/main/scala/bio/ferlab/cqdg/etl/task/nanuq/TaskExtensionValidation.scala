@@ -81,8 +81,14 @@ object TaskExtensionValidation {
     val workflowExtension = new Extension(Extensions.WORKFLOW)
     workflow.name.foreach { name => workflowExtension.addExtension(new Extension("workflowName", new StringType(name))) }
     workflow.genomeBuild.foreach { genomeBuild =>
+      // TBD - genomic build is not conform to the IG...
+      val conformGenomicBuild = genomeBuild match {
+        case a if a.contains("GRCh38") => "GRCh38"
+        case _ => genomeBuild
+      }
+
       val code = new Coding()
-      code.setCode(genomeBuild).setSystem(CodingSystems.GENOME_BUILD)
+      code.setCode(conformGenomicBuild).setSystem(CodingSystems.GENOME_BUILD)
       workflowExtension.addExtension(new Extension("genomeBuild", code))
     }
     workflow.version.foreach { version => workflowExtension.addExtension(new Extension("workflowVersion", new StringType(version))) }
@@ -94,6 +100,8 @@ object TaskExtensionValidation {
     experiment.runName.foreach { v => expExtension.addExtension(new Extension("runName", new StringType(v))) }
 
     experiment.runAlias.foreach { v => expExtension.addExtension(new Extension("runAlias", new StringType(v))) }
+    experiment.isPairedEnd.foreach { v => expExtension.addExtension(new Extension("isPairedEnd", new BooleanType(v))) }
+    experiment.readLength.foreach { v => expExtension.addExtension(new Extension("readLength", new StringType(v))) }
     experiment.experimentalStrategy.foreach { v =>
       val code = new Coding()
       code.setCode(v).setSystem(CodingSystems.EXPERIMENTAL_STRATEGY)

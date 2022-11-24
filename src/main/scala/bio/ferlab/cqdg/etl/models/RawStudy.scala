@@ -11,8 +11,7 @@ case class RawStudy(
                     domain: List[String] = Nil,
                     population: Option[String],
                     access_limitations: Option[String],
-                    access_requirements: List[String] = Nil,
-                    biospecimen_access: Boolean
+                    access_requirements: List[String] = Nil
                   ) extends RawResource {
 
 
@@ -23,8 +22,7 @@ case class RawStudy(
       s"keyword=${keyword.mkString(";")}|" +
       s"access_authority=$access_authority|" +
       s"domain=${domain.mkString(";")}|" +
-      s"population=${population.mkString(";")}|" +
-      s"biospecimen_access=$biospecimen_access"
+      s"population=${population.mkString(";")}|"
   }
 
   override def getHash: String = {
@@ -35,34 +33,17 @@ case class RawStudy(
 object RawStudy {
   val FILENAME = "study"
 
-  def apply(s: String, header: String): RawStudy = {
-    val line = s.split("\\t", -1)
-    val splitHeader = header.split("\\t+")
-
+  def apply(line: Array[String], header: Array[String]): RawStudy = {
     RawStudy(
-      study_id = line(splitHeader.indexOf("study_id")),
-      name = line(splitHeader.indexOf("name")),
-      description = line(splitHeader.indexOf("description")),
-      keyword = line(splitHeader.indexOf("keyword")).split(";").map(_.trim).toList,
-      access_authority = splitHeader.indexOf("access_authority") match {
-        case -1 => None
-        case v => Some(line(v))
-      },
-      domain = line(splitHeader.indexOf("domain")).split(";").map(_.trim).toList,
-      population = splitHeader.indexOf("population") match {
-        case -1 => None
-        case v => Some(line(v))
-      },
-      access_limitations = splitHeader.indexOf("access_limitations") match {
-        case -1 => None
-        case v => Some(line(v))
-      },
-      access_requirements = line(splitHeader.indexOf("access_requirements")).split(";").map(_.trim).toList,
-      biospecimen_access = line(splitHeader.indexOf("biospecimen_access")).toLowerCase().trim match {
-        case "true"|"1" => true
-        case "false"|"0" => false
-        case _ => throw new IllegalArgumentException(s"Invalid biospecimen_access type:${splitHeader.indexOf("biospecimen_access")}")
-      },
+      study_id = line(header.indexOf("study_id")),
+      name = line(header.indexOf("name")),
+      description = line(header.indexOf("description")),
+      keyword = line(header.indexOf("keyword")).split(";").map(_.trim).toList,
+      access_authority = if(!line(header.indexOf("access_authority")).isBlank) Some(line(header.indexOf("access_authority"))) else None,
+      domain = line(header.indexOf("domain")).split(";").map(_.trim).toList,
+      population = if(!line(header.indexOf("population")).isBlank) Some(line(header.indexOf("population"))) else None,
+      access_limitations = if(!line(header.indexOf("access_limitations")).isBlank) Some(line(header.indexOf("access_limitations"))) else None,
+      access_requirements = line(header.indexOf("access_requirements")).split(";").map(_.trim).toList,
     )
   }
 }

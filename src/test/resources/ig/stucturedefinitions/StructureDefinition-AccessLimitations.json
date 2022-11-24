@@ -1,7 +1,7 @@
 {
   "resourceType": "StructureDefinition",
   "id": "AccessLimitations",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/AccessLimitations",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessLimitations",
   "version": "0.1.0",
   "name": "AccessLimitations",
   "status": "active",
@@ -35,7 +35,7 @@
       {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/AccessLimitations"
+        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessLimitations"
       },
       {
         "id": "Extension.valueCoding",
@@ -53,7 +53,7 @@
         "path": "Extension.valueCoding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/access-limitation-vs"
+          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/access-limitation-vs"
         }
       }
     ]

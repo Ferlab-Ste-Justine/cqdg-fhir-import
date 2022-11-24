@@ -11,7 +11,7 @@
       "valueCode": "patient"
     }
   ],
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/cqdg-observation-group",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-observation-group",
   "version": "0.1.0",
   "name": "CQDGObservationGroup",
   "status": "active",

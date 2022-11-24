@@ -4,7 +4,7 @@
   "name": "BioinfoAnalysisVS",
   "id": "bioinfo-analysis-vs",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/bioinfo-analysis-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/bioinfo-analysis-vs",
   "compose": {
     "include": [
       {

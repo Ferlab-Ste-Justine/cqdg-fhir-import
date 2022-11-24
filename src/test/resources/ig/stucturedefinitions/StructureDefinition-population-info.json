@@ -1,7 +1,7 @@
 {
   "resourceType": "StructureDefinition",
   "id": "population-info",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/population-info",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/population-info",
   "version": "0.1.0",
   "name": "PopulationInfo",
   "status": "active",
@@ -29,7 +29,7 @@
       {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/population-info"
+        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/population-info"
       },
       {
         "id": "Extension.valueCoding",
@@ -47,7 +47,7 @@
         "path": "Extension.valueCoding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/population-vs"
+          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/population-vs"
         }
       },
       {
@@ -55,7 +55,7 @@
         "path": "Extension.valueCoding.code",
         "binding": {
           "strength": "required",
-          "valueSet": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/population-vs"
+          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/population-vs"
         }
       }
     ]

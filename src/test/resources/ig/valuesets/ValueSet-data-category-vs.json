@@ -4,7 +4,7 @@
   "name": "DataCategoryVS",
   "id": "data-category-vs",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/data-category-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/data-category-vs",
   "compose": {
     "include": [
       {

@@ -4,7 +4,7 @@
   "name": "SampleTypeTissueSourceVS",
   "id": "sample-type-tissue-source-vs",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/sample-type-tissue-source-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/sample-type-tissue-source-vs",
   "compose": {
     "include": [
       {

@@ -11,7 +11,7 @@
       "valueCode": "not-classified"
     }
   ],
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/cqdg-task",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-task",
   "version": "0.1.0",
   "name": "CQDGTask",
   "title": "profile task",

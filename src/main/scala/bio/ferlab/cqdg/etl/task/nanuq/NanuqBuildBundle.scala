@@ -1,6 +1,6 @@
 package bio.ferlab.cqdg.etl.task.nanuq
 
-import bio.ferlab.cqdg.etl.ValidationResult
+import bio.ferlab.cqdg.etl.{ID_SERVICE_BATCH_SIZE, ValidationResult}
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{IdTypeExtension, bundleCreate}
@@ -28,8 +28,12 @@ object NanuqBuildBundle {
     LOGGER.info("################# Validate Resources ##################")
 
     val mapFiles = files.map(f => (f.filename, f)).toMap
-    val filesPayload = Json.stringify(Json.toJson(mapFiles.map{ case(_, file) => file.id -> "file" }))
-    val fileIdMap = Json.parse(idService.getCQDGIds(filesPayload)).as[List[HashIdMap]]
+
+    val fileIdMap = (0 until mapFiles.size by ID_SERVICE_BATCH_SIZE).flatMap { x =>
+      val slicedResourceHashes = mapFiles.slice(x, x + ID_SERVICE_BATCH_SIZE)
+      val filesPayload = Json.stringify(Json.toJson(slicedResourceHashes.map{ case(_, file) => file.id -> "file" }))
+      Json.parse(idService.getCQDGIds(filesPayload)).as[List[HashIdMap]]
+    }.toList
 
     val bundleListPerMetadata = metadataList.map(m => {
       val taskExtensions =  validateTaskExtension(m)

@@ -4,7 +4,7 @@
   "name": "FileFormat",
   "id": "file-format",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/file-format",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/file-format",
   "compose": {
     "include": [
       {

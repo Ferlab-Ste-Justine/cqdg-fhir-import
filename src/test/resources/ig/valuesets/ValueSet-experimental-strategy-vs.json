@@ -4,7 +4,7 @@
   "name": "CQDGFamilyTypeVS",
   "id": "experimental-strategy-vs",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/experimental-strategy-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/experimental-strategy-vs",
   "compose": {
     "include": [
       {

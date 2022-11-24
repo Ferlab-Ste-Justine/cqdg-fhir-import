@@ -31,6 +31,7 @@ case class Experiment(
                        runAlias: Option[String],
                        flowcellId: Option[String],
                        isPairedEnd: Option[Boolean],
+                       readLength: Option[String],
                        experimentalStrategy: Option[String],
                        captureKit: Option[String],
                        baitDefinition: Option[String]

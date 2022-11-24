@@ -1,7 +1,7 @@
 {
   "resourceType": "StructureDefinition",
   "id": "specific-id",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/specific-id",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/specific-id",
   "version": "0.1.0",
   "name": "SpecificID",
   "status": "active",
@@ -29,7 +29,7 @@
       {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/specific-id"
+        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/specific-id"
       }
     ]
   }

@@ -4,7 +4,7 @@
   "name": "GenomeBuildVS",
   "id": "genome-build-vs",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/genome-build-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/genome-build-vs",
   "compose": {
     "include": [
       {

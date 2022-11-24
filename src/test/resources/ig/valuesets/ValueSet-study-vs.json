@@ -5,7 +5,7 @@
   "id": "study-vs",
   "title": "Study domain value set",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/study-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/study-vs",
   "compose": {
     "include": [
       {

@@ -46,7 +46,27 @@
           "value": "TGZ"
         }
       ]
+    },
+    {
+      "code": "gVCF",
+      "display": "gVCF File",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "gVCF"
+        }
+      ]
+    },
+    {
+      "code": "TBI",
+      "display": "TBI Index File",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "TBI"
+        }
+      ]
     }
   ],
-  "count": 4
+  "count": 6
 }

@@ -19,7 +19,7 @@ object FhirUtils {
 
   object Constants {
 
-    val baseFhirServer = "https://fhir.cqdg.ferlab.bio"
+    val baseFhirServer = "http://fhir.cqdg.ferlab.bio"
 
     object CodingSystems {
       val SPECIMEN_TYPE = s"$baseFhirServer/CodeSystem/research-domain"
@@ -43,14 +43,26 @@ object FhirUtils {
 
     object Extensions {
       val AGE_BIOSPECIMEN_COLLECTION = s"$baseFhirServer/StructureDefinition/Specimen/ageBiospecimenCollection"
+      val ACCESS_REQUIREMENTS_SD = s"$baseFhirServer/StructureDefinition/AccessRequirements"
+      val ACCESS_LIMITATIONS_SD = s"$baseFhirServer/StructureDefinition/AccessLimitations"
       val AGE_PARTICIPANT_AGE_RECRUITEMENT = s"$baseFhirServer/StructureDefinition/ResearchSubject/ageAtRecruitment"
       val WORKFLOW = s"$baseFhirServer/StructureDefinition/workflow"
       val SEQUENCING_EXPERIMENT = s"$baseFhirServer/StructureDefinition/sequencing-experiment"
       val FULL_SIZE = s"$baseFhirServer/StructureDefinition/full-size"
-      val ETHNICITY = s"$baseFhirServer/StructureDefinition/Patient/Ethnicity"
+      val ETHNICITY_SD = s"$baseFhirServer/StructureDefinition/QCEthnicity"
       val AGE_OF_DEATH = s"$baseFhirServer/StructureDefinition/Patient/age-of-death"
       val POPULATION_URL = s"$baseFhirServer/StructureDefinition/ResearchStudy/population"
+      val QC_ETHNICITY_CS = s"$baseFhirServer/CodeSystem/qc-ethnicity"
 
+    }
+
+    object Profiles {
+      val CQDG_PATIENT_PROFILE = s"$baseFhirServer/StructureDefinition/cqdg-patient"
+      val CQDG_OBSERVATION_PHENOTYPE_PROFILE = s"$baseFhirServer/StructureDefinition/CQDGObservationPhenotype"
+      val CQDG_OBSERVATION_DISEASE_STATUS_PROFILE = s"$baseFhirServer/StructureDefinition/CQDGObservationDiseaseStatus"
+      val CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE = s"$baseFhirServer/StructureDefinition/CQDGObservationSocialHistory"
+      val CQDG_DOC_REFERENCE_PROFILE = s"$baseFhirServer/StructureDefinition/cqdg-document-reference"
+      val CQDG_TASK_PROFILE = s"$baseFhirServer/StructureDefinition/cqgc-analysis-task"
     }
 
   }
@@ -79,14 +91,15 @@ object FhirUtils {
     coding.setCode(code)
   }
 
-  def generateMeta(codes: Seq[String]): Meta = {
+  def generateMeta(codes: Seq[String], profile: Option[String]): Meta = {
     val meta = new Meta()
 
     codes.foreach ( c => {
       val coding = new Coding()
       coding.setCode(c)
       meta.addTag(coding)
-    } )
+      profile.map(meta.addProfile)
+    })
     meta
   }
 
@@ -140,9 +153,9 @@ object FhirUtils {
       new Reference(IdType.of(v).toUnqualifiedVersionless)
     }
 
-    def setSimpleMeta(studyId: String, version: String, args: String*): Resource = {
+    def setSimpleMeta(studyId: String, version: String, profile: Option[String], args: String*): Resource = {
       val codes = Seq(s"study:$studyId", s"study_version:$version") ++ args
-      v.setMeta(generateMeta(codes))
+      v.setMeta(generateMeta(codes, profile))
     }
 
     //FIXME should be codes in lieu of display???? - TBD

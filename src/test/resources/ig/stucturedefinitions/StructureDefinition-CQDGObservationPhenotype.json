@@ -11,7 +11,7 @@
       "valueCode": "patient"
     }
   ],
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/CQDGObservationPhenotype",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/CQDGObservationPhenotype",
   "version": "0.1.0",
   "name": "CQDGObservationPhenotype",
   "status": "active",
@@ -51,7 +51,7 @@
   "kind": "resource",
   "abstract": false,
   "type": "Observation",
-  "baseDefinition": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/cqdg-observation-group",
+  "baseDefinition": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-observation-group",
   "derivation": "constraint",
   "differential": {
     "element": [
@@ -79,7 +79,7 @@
           {
             "code": "Extension",
             "profile": [
-              "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/AgeAt"
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AgeAt"
             ]
           }
         ]
@@ -94,7 +94,7 @@
           {
             "code": "Extension",
             "profile": [
-              "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/BooleanValue"
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/BooleanValue"
             ]
           }
         ]

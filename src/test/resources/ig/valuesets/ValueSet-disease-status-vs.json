@@ -4,7 +4,7 @@
   "name": "DiseaseStatusVS",
   "id": "disease-status-vs",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/disease-status-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/disease-status-vs",
   "compose": {
     "include": [
       {

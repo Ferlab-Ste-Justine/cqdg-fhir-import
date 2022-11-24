@@ -11,7 +11,7 @@
       "valueCode": "business"
     }
   ],
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/cqdg-group",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-group",
   "version": "1.0.0",
   "name": "CQDG_Group",
   "status": "active",
@@ -41,7 +41,7 @@
         "path": "Group.code.coding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/family-type-vs"
+          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/family-type-vs"
         }
       }
     ]

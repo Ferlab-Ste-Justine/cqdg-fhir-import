@@ -4,7 +4,7 @@
   "name": "PhenotypeVS",
   "id": "phenotype-vs",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/phenotype-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/phenotype-vs",
   "compose": {
     "include": [
       {

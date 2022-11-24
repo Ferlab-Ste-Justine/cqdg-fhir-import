@@ -4,6 +4,7 @@ package bio.ferlab.cqdg.etl.models.nanuq
 import bio.ferlab.cqdg.etl.ValidationResult
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.CQDG_DOC_REFERENCE_PROFILE
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, validateOutcomes}
 import bio.ferlab.cqdg.etl.models.nanuq.TDocumentAttachment.{idFromList, valid}
@@ -46,7 +47,7 @@ trait TDocumentReference extends DocumentReferenceType {
 
   private def buildBase(studyId: String, release: String)(implicit ferloadConf: FerloadConf) = {
     val dr = new DocumentReference()
-    dr.setSimpleMeta(studyId, release)
+    dr.setSimpleMeta(studyId, release, Some(CQDG_DOC_REFERENCE_PROFILE))
     dr.getMasterIdentifier.setSystem(CodingSystems.OBJECT_STORE).setValue(id)
     dr.setStatus(DocumentReferenceStatus.CURRENT)
     dr.getType.addCoding()
@@ -82,7 +83,7 @@ object TDocumentReference {
 
 trait DocumentReferenceType {
   val documentType: String
-  val category: String = "GENO"
+  val category: String = "Genomics"
   val id: String
 }
 
@@ -92,7 +93,7 @@ case class SequencingAlignment(document: Seq[TDocumentAttachment]) extends TDocu
 }
 
 object SequencingAlignment {
-  val documentType: String = "ALIR"
+  val documentType: String = "Aligned Reads"
   val label: String = "Sequencing Alignment (CRAM and CRAI)"
   implicit case object builder extends ToReference[SequencingAlignment] {
     override val label: String = SequencingAlignment.label
@@ -129,7 +130,7 @@ case class CopyNumberVariant(document: Seq[TDocumentAttachment]) extends TDocume
 }
 
 object CopyNumberVariant {
-  val documentType: String = "GCNV"
+  val documentType: String = "Germline CNV"
   val label = "Copy Number Variant"
   implicit case object builder extends ToReference[CopyNumberVariant] {
     override val label: String = CopyNumberVariant.label
@@ -147,7 +148,7 @@ case class StructuralVariant(document: Seq[TDocumentAttachment]) extends TDocume
 }
 
 object StructuralVariant {
-  val documentType: String = "GSV"
+  val documentType: String = "Germline Structural Variant"
   val label = "Structural Variant"
   implicit case object builder extends ToReference[StructuralVariant] {
     override val label: String = StructuralVariant.label
@@ -165,7 +166,7 @@ case class SupplementDocument(document: Seq[TDocumentAttachment]) extends TDocum
 }
 
 object SupplementDocument {
-  val documentType: String = "SSUP"
+  val documentType: String = "Sequencing Data Supplement"
   val label = "Supplement"
   implicit case object builder extends ToReference[SupplementDocument] {
     override val label: String = SupplementDocument.label

@@ -4,7 +4,7 @@
   "name": "DataTypeVS",
   "id": "data-type-vs",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/data-type-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/data-type-vs",
   "compose": {
     "include": [
       {

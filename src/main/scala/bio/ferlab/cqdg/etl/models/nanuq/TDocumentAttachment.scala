@@ -65,7 +65,7 @@ case class SNV(objectStoreId: String, title: String, md5: Option[String], size: 
 
 object SNV {
   implicit case object builder extends ToAttachment[SNV] {
-    override def label: String = "vcf"
+    override def label: String = "gVCF"
 
     override def analysisFileName: Analysis => String = a => a.files.snv
 

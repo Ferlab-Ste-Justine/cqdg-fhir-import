@@ -6,30 +6,30 @@
   "title": "Access limitation value set",
   "description": "Restriction on access",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/access-limitation-vs",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/access-limitation-vs",
   "compose": {
     "include": [
       {
         "system": "http://purl.obolibrary.org/obo/duo.owl",
         "concept": [
           {
-            "code": "0000004",
+            "code": "DUO:0000004",
             "display": "No restriction"
           },
           {
-            "code": "0000006",
+            "code": "DUO:0000006",
             "display": "health or medical or biomedical research"
           },
           {
-            "code": "0000007",
+            "code": "DUO:0000007",
             "display": "disease specific research"
           },
           {
-            "code": "0000011",
+            "code": "DUO:0000011",
             "display": "population origins or ancestry research"
           },
           {
-            "code": "0000042",
+            "code": "DUO:0000042",
             "display": "general research use"
           }
         ]

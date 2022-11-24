@@ -1,6 +1,7 @@
 package bio.ferlab.cqdg.etl.models.nanuq
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.CQDG_TASK_PROFILE
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.ResourceExtension
 import bio.ferlab.cqdg.etl.models.nanuq.TTask._
 import org.hl7.fhir.r4.model.Task.{ParameterComponent, TaskOutputComponent}
@@ -19,7 +20,7 @@ case class TTask(taskExtensions: TaskExtensions) {
   def buildResource(patient: Reference, sample: Reference, drr: DocumentReferencesResources, id: String)(studyId: String, version: String): Resource = {
     val t = AnalysisTask()
 
-    t.setSimpleMeta(studyId, version)
+    t.setSimpleMeta(studyId, version, Some(CQDG_TASK_PROFILE))
 
     t.getCode.addCoding()
       .setSystem(CodingSystems.ANALYSIS_TYPE)

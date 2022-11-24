@@ -11,7 +11,7 @@
       "valueCode": "patient"
     }
   ],
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/cqdg-condition",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-condition",
   "version": "1.0.0",
   "name": "CQDG_Condition",
   "status": "active",

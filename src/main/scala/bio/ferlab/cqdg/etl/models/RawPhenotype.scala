@@ -28,20 +28,14 @@ case class RawPhenotype(
 object RawPhenotype {
   val FILENAME = "phenotype"
 
-  def apply(s: String, header: String): RawPhenotype = {
-    val line = s.split("\\t", -1)
-    val splitHeader = header.split("\\t+")
+  def apply(line: Array[String], header: Array[String]): RawPhenotype = {
     RawPhenotype(
-      line(splitHeader.indexOf("study_id")),
-      line(splitHeader.indexOf("submitter_participant_id")),
-      line(splitHeader.indexOf("phenotype_source_text")),
-      if(splitHeader.indexOf("phenotype_HPO_code") <= line.length - 1 && line(splitHeader.indexOf("phenotype_HPO_code")).nonEmpty) {
-        Some(line(splitHeader.indexOf("phenotype_HPO_code")))
-      } else None,
-      line(splitHeader.indexOf("age_at_phenotype")).toInt,
-      if(splitHeader.indexOf("phenotype_observed") <= line.length - 1 && line(splitHeader.indexOf("phenotype_observed")).nonEmpty) {
-        Some(line(splitHeader.indexOf("phenotype_observed")).trim.toLowerCase)
-      } else None,
+      line(header.indexOf("study_id")),
+      line(header.indexOf("submitter_participant_id")),
+      line(header.indexOf("phenotype_source_text")),
+      if(!line(header.indexOf("phenotype_HPO_code")).isBlank) Some(line(header.indexOf("phenotype_HPO_code"))) else None,
+      line(header.indexOf("age_at_phenotype")).toInt,
+      if(!line(header.indexOf("phenotype_observed")).isBlank) Some(line(header.indexOf("phenotype_observed"))) else None,
     )
   }
 }

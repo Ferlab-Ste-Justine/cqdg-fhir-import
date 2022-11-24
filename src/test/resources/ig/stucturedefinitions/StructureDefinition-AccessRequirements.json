@@ -1,7 +1,7 @@
 {
   "resourceType": "StructureDefinition",
   "id": "AccessRequirements",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/AccessRequirements",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessRequirements",
   "version": "0.1.0",
   "name": "AccessRequirements",
   "status": "active",
@@ -35,7 +35,7 @@
       {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/AccessRequirements"
+        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessRequirements"
       },
       {
         "id": "Extension.valueCoding",
@@ -53,7 +53,7 @@
         "path": "Extension.valueCoding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/access-requirement-vs"
+          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/access-requirement-vs"
         }
       }
     ]

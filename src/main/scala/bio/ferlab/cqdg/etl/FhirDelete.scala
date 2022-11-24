@@ -1,6 +1,5 @@
 package bio.ferlab.cqdg.etl
 
-import bio.ferlab.cqdg.etl.FhirImport.args
 import bio.ferlab.cqdg.etl.conf.Conf
 import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.bundleDelete
@@ -9,7 +8,6 @@ import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import org.hl7.fhir.r4.model.Bundle
 
-import scala.collection.mutable.ListBuffer
 import scala.jdk.CollectionConverters._
 
 
@@ -31,11 +29,10 @@ object FhirDelete extends App {
       allEntries
     })
 
-    if(bundleComponentList.nonEmpty) {
-      val deleteBundle = bundleDelete(bundleComponentList.map(b => b.getResource)).toList
-      TBundle(deleteBundle).delete()
-    }
+    val deleteBundle = bundleDelete(bundleComponentList.map(b => b.getResource)).toList
+    val response = TBundle(deleteBundle).delete()
 
+    response
   })
 
   def getQueryTotal(query: String)(implicit fhirClient: IGenericClient): Int = {
@@ -69,11 +66,4 @@ object FhirDelete extends App {
     } while (entriesNumber == batchSize && i * batchSize <= maxSize)
     bundleList
   }
-
-
-
-
-
-
-
 }

@@ -11,7 +11,7 @@
       "valueCode": "patient"
     }
   ],
-  "url": "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/cqdg-specimen",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-specimen",
   "version": "0.1.0",
   "name": "CQDGSpecimen",
   "status": "active",
@@ -64,7 +64,7 @@
           {
             "code": "Extension",
             "profile": [
-              "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/AgeAt"
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AgeAt"
             ]
           }
         ]
@@ -79,7 +79,7 @@
           {
             "code": "Extension",
             "profile": [
-              "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/specific-id"
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/specific-id"
             ]
           }
         ]
@@ -94,7 +94,7 @@
           {
             "code": "Extension",
             "profile": [
-              "https://fhir.qa.cqdg.ferlab.bio//StructureDefinition/specific-id"
+              "http://fhir.cqdg.ferlab.bio/StructureDefinition/specific-id"
             ]
           }
         ]

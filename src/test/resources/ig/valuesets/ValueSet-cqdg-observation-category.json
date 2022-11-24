@@ -5,7 +5,7 @@
   "id": "cqdg-observation-category",
   "title": "CQDG observation value set",
   "version": "0.1.0",
-  "url": "https://fhir.qa.cqdg.ferlab.bio//ValueSet/cqdg-observation-category",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/cqdg-observation-category",
   "compose": {
     "include": [
       {
