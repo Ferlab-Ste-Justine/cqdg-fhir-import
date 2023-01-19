@@ -367,7 +367,7 @@ object SimpleBuildBundle {
       specimen.setSubject(reference.setReference(s"Patient/${parentId.get}"))
     }
 
-    specimen.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
+    specimen.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_biospecimen_id)
     specimen.setId(resourceId)
 
     // ************ type.coding[x].code ***********************
@@ -376,7 +376,6 @@ object SimpleBuildBundle {
     typeCoding.setCode(resource.biospecimen_tissue_source).setSystem(CodingSystems.NCIT_SYSTEM)
     typeCodeableConcept.setCoding(List(typeCoding).asJava)
     specimen.setType(typeCodeableConcept)
-    //FIXME should send code not display??
 
     if(resource.age_biospecimen_collection.isDefined){
       val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, "days", AGE_BIOSPECIMEN_COLLECTION)
@@ -420,7 +419,13 @@ object SimpleBuildBundle {
     val reference = new Reference()
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
 
-    specimen.setSimpleCodes(None, SimpleCode(code = resource.sample_type, system = Some(NCIT_SYSTEM)))
+    // ************ type.coding[x].code ***********************
+    val typeCoding = new Coding()
+    val typeCodeableConcept = new CodeableConcept()
+    typeCoding.setCode(resource.sample_type).setSystem(CodingSystems.NCIT_SYSTEM)
+    typeCodeableConcept.setCoding(List(typeCoding).asJava)
+    specimen.setType(typeCodeableConcept)
+
 
     if(parentId.isDefined){
       specimen.setSubject(reference.setReference(s"Patient/${parentId.get}"))
@@ -439,7 +444,7 @@ object SimpleBuildBundle {
     specimen.addIdentifier()
       .setSystem(s"$baseFhirServer/fhir/Specimen")
       .setValue(resourceId)
-    specimen.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
+    specimen.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_sample_id)
     specimen
   }
 

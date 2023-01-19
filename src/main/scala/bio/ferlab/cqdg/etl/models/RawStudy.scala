@@ -38,7 +38,9 @@ object RawStudy {
       study_id = line(header.indexOf("study_id")),
       name = line(header.indexOf("name")),
       description = line(header.indexOf("description")),
-      keyword = line(header.indexOf("keyword")).split(";").map(_.trim).toList,
+      //lots of cleanup here, data from tsv is not clean. Fix in clinical data,
+      keyword = line(header.indexOf("keyword")).replaceAll("^\\W|\\W$", "")
+        .split(";").map(_.trim).filter(_.nonEmpty).toList,
       access_authority = if(!line(header.indexOf("access_authority")).isBlank) Some(line(header.indexOf("access_authority"))) else None,
       domain = line(header.indexOf("domain")).split(";").map(_.trim).toList,
       population = if(!line(header.indexOf("population")).isBlank) Some(line(header.indexOf("population"))) else None,

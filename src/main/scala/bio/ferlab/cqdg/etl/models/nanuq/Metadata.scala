@@ -54,6 +54,8 @@ object Workflow {
 case class Analysis(
                      ldmSampleId: String,
                      labAliquotId: String,
+                     specimenType: String,
+                     sampleType: String,
                      files: FilesAnalysis
                    )
 

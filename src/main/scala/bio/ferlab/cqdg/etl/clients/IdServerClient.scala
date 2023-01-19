@@ -11,7 +11,7 @@ class IdServerClient extends BaseHttpClient with IIdServer{
   val idServerEndpoint: String = idServerConfig.getString("endpoint")
 
   override def getCQDGIds(payload: String): String = {
-    val url = s"${idServerEndpoint}/batch"
+    val url = s"${idServerEndpoint}/batch/create"
 
     val httpRequest = new HttpPost(url)
     httpRequest.addHeader(HttpHeaders.CONTENT_TYPE, ContentType.APPLICATION_JSON.getMimeType)

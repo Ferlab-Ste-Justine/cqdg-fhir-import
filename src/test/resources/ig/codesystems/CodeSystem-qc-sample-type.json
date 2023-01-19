@@ -1,0 +1,74 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "QCSampleType",
+  "id": "qc-sample-type",
+  "title": "Sample Type Code System",
+  "description": "Tissue sample types",
+  "version": "0.1.0",
+  "url": "http://purl.obolibrary.org/obo/ncit.owl",
+  "concept": [
+    {
+      "code": "NCIT:C449",
+      "display": "DNA",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "DNA"
+        }
+      ]
+    },
+    {
+      "code": "NCIT:C812",
+      "display": "Ribonucleic Acid",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "Ribonucleic Acid"
+        }
+      ]
+    },
+    {
+      "code": "NCIT:C12434",
+      "display": "Blood",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "Blood"
+        }
+      ]
+    },
+    {
+      "code": "NCIT:C13275",
+      "display": "Saliva",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "Saliva"
+        }
+      ]
+    },
+    {
+      "code": "NCIT:C164014",
+      "display": "Solid Tissue Specimen",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "Solid Tissue Specimen"
+        }
+      ]
+    },
+    {
+      "code": "NCIT:C12431",
+      "display": "Bone Marrow",
+      "designation": [
+        {
+          "language": "fr",
+          "value": "Bone Marrow"
+        }
+      ]
+    }
+  ],
+  "count": 6
+}

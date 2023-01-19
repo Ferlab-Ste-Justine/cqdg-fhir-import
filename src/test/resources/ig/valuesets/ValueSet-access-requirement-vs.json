@@ -85,9 +85,6 @@
             "display": "non-commercial use only"
           }
         ]
-      },
-      {
-        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/access-requirements"
       }
     ]
   }

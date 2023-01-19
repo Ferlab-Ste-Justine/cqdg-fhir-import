@@ -24,7 +24,7 @@ object NanuqBuildBundle {
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
 
-  def validate(metadataList: Seq[Metadata], files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]], release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
+  def validate(metadataList: Seq[Metadata], files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]], release: String, removeMissing: Boolean)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
     LOGGER.info("################# Validate Resources ##################")
 
     val mapFiles = files.map(f => (f.filename, f)).toMap
@@ -35,13 +35,16 @@ object NanuqBuildBundle {
       Json.parse(idService.getCQDGIds(filesPayload)).as[List[HashIdMap]]
     }.toList
 
+    val listLabAliquotDouble = metadataList.flatMap(m => m.analyses.map(a => a.labAliquotId)).groupBy(identity).collect { case (x, List(_,_,_*)) => x }
+
     val bundleListPerMetadata = metadataList.map(m => {
       val taskExtensions =  validateTaskExtension(m)
 
       val allAnalysis = m.analyses
 
       val studyId = allRawResources("study").keySet.head
-      val hashLabAliquotIds = allAnalysis.map(a => a.labAliquotId).map(aliquot => DigestUtils.sha1Hex(List(studyId, aliquot).mkString("-")) -> aliquot)
+      val hashLabAliquotIds = allAnalysis.map(a => a.labAliquotId).map(aliquot =>
+        DigestUtils.sha1Hex(List(studyId, aliquot, m.experiment.runName.getOrElse("")).mkString("-")) -> aliquot)
 
       val payload = Json.stringify(Json.toJson(hashLabAliquotIds.map{ case(hash, _) => hash -> "sequencing_experiment"}.toMap))
 
@@ -51,7 +54,20 @@ object NanuqBuildBundle {
         case (aliquotId, Some(hash: HashIdMap)) => aliquotId -> hash.internal_id
       }.toMap
 
-      val allResources: ValidatedNel[String, List[BundleEntryComponent]] = allAnalysis.toList.flatMap { a =>
+      val filteredAnalysis = if (removeMissing) {
+        /*  we will remove any Analysis that:
+              1. has the same LabAliquotId as another analysis in the list
+              2. if the files associated with this analysis are not in S3
+            it will not generate an error */
+        allAnalysis.toList.filter { a =>
+          val analysisFile = Seq(a.files.snv, a.files.sv, a.files.crai, a.files.cram, a.files.cnv, a.files.supplement)
+          mapFiles.keySet.exists(analysisFile.contains) || !listLabAliquotDouble.toList.contains(a.labAliquotId)
+        }
+      } else {
+        allAnalysis.toList
+      }
+
+      val allResources: ValidatedNel[String, List[BundleEntryComponent]] = filteredAnalysis.flatMap { a =>
 
         //todo Check that submitter_sample_id in Raw are in the Metadata analysis (fail other) - or vice versa
         //part 1 : TDB / part: we Ignore yes

@@ -4,3 +4,4 @@ project/project/*
 .idea
 target
 /src/main/scala/bio/ferlab/cqdg/etl/FhirDeleteAll.scala
+/src/main/scala/bio/ferlab/cqdg/etl/FhirAddIG.scala

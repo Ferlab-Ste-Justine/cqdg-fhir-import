@@ -21,6 +21,7 @@ lazy val root = (project in file("."))
     libraryDependencies += "ca.uhn.hapi.fhir" % "hapi-fhir-client" % "5.4.2",
     libraryDependencies += "ca.uhn.hapi.fhir" % "hapi-fhir-structures-r4" % "5.4.2",
     libraryDependencies += "ca.uhn.hapi.fhir" % "org.hl7.fhir.r4" % "5.0.0",
+    libraryDependencies += "ca.uhn.hapi.fhir" % "hapi-fhir-server" % "5.4.2",
     libraryDependencies += "com.github.pureconfig" %% "pureconfig" % "0.17.1",
     libraryDependencies += "org.typelevel" %% "cats-core" % "2.3.1",
     libraryDependencies +=
