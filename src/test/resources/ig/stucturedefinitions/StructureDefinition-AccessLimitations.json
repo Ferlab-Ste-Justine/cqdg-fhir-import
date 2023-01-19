@@ -1,0 +1,61 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "AccessLimitations",
+  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessLimitations",
+  "version": "0.1.0",
+  "name": "AccessLimitations",
+  "status": "active",
+  "description": "Limitation of access to studies.",
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "rim",
+      "uri": "http://hl7.org/v3",
+      "name": "RIM Mapping"
+    }
+  ],
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Element"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "definition": "Limitation of access to studies."
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessLimitations"
+      },
+      {
+        "id": "Extension.valueCoding",
+        "path": "Extension.valueCoding",
+        "min": 0,
+        "max": "1",
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ]
+      },
+      {
+        "id": "Extension.valueCoding.system",
+        "path": "Extension.valueCoding.system",
+        "binding": {
+          "strength": "required",
+          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/access-limitation-vs"
+        }
+      }
+    ]
+  }
+}

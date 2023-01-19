@@ -1,0 +1,16 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "SampleTypeTissueSourceVS",
+  "id": "sample-type-tissue-source-vs",
+  "title": "CQDG Tissue Source Value Set",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/sample-type-tissue-source-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://purl.obolibrary.org/obo/ncit.owl"
+      }
+    ]
+  }
+}

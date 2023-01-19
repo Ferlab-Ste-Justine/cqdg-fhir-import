@@ -1,0 +1,15 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "DataTypeVS",
+  "id": "data-type-vs",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/data-type-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-type"
+      }
+    ]
+  }
+}

@@ -1,0 +1,78 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "CQDGObservationCode",
+  "id": "cqdg-observation-code",
+  "description": "CQDG Observation categories",
+  "version": "0.1.0",
+  "url": "http://hl7.org/fhir/CodeSystem/observation-code",
+  "concept": [
+    {
+      "code": "Family Relationship",
+      "display": "Family Relationship",
+      "designation": [
+        {
+          "use": {
+            "code": "family-relashionship",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+          },
+          "value": "Social history observation"
+        }
+      ]
+    },
+    {
+      "code": "Tumor Normal Designation",
+      "display": "Tumor Normal Designation",
+      "designation": [
+        {
+          "use": {
+            "code": "tumor-normal-designation",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+          },
+          "value": "Histological Diagnosis"
+        }
+      ]
+    },
+    {
+      "code": "Disease Status",
+      "display": "Disease Status",
+      "designation": [
+        {
+          "use": {
+            "code": "disease-status",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+          },
+          "value": "Disease Status observation"
+        }
+      ]
+    },
+    {
+      "code": "Phenotype",
+      "display": "Phenotype",
+      "designation": [
+        {
+          "use": {
+            "code": "phenotype",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+          },
+          "value": "Phenotype observation"
+        }
+      ]
+    },
+    {
+      "code": "Cause of Death",
+      "display": "Cause of Death",
+      "designation": [
+        {
+          "use": {
+            "code": "cause-of-death",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+          },
+          "value": "Cause of death"
+        }
+      ]
+    }
+  ],
+  "count": 5
+}

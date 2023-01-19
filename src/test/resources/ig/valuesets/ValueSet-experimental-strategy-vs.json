@@ -1,0 +1,15 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "CQDGFamilyTypeVS",
+  "id": "experimental-strategy-vs",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/experimental-strategy-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/experimental-strategy"
+      }
+    ]
+  }
+}

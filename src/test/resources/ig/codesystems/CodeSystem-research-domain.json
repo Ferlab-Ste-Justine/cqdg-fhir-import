@@ -1,0 +1,202 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "ResearchDomain",
+  "id": "research-domain",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain",
+  "concept": [
+    {
+      "code": "Aging",
+      "display": "Aging study",
+      "designation": [
+        {
+          "use": {
+            "code": "aging",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Aging study"
+        }
+      ]
+    },
+    {
+      "code": "Birth Defect",
+      "display": "Birth defect study",
+      "designation": [
+        {
+          "use": {
+            "code": "birth-defect",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Birth defect study"
+        }
+      ]
+    },
+    {
+      "code": "Cancer",
+      "display": "Cancer study",
+      "designation": [
+        {
+          "use": {
+            "code": "cancer",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "cancer study"
+        }
+      ]
+    },
+    {
+      "code": "Circulatory and Respiratory Health",
+      "display": "Circulatory and Respiratory Health study",
+      "designation": [
+        {
+          "use": {
+            "code": "circulatory-and-respiratory-health",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Circulatory and Respiratory Health study"
+        }
+      ]
+    },
+    {
+      "code": "General Health",
+      "display": "General Health",
+      "definition": "General Health study",
+      "designation": [
+        {
+          "use": {
+            "code": "general-health",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "General Health study"
+        }
+      ]
+    },
+    {
+      "code": "Infection and Immunity",
+      "display": "Infection and Immunity study",
+      "designation": [
+        {
+          "use": {
+            "code": "infection-and-immunity",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Infection and Immunity study"
+        }
+      ]
+    },
+    {
+      "code": "Musculoskeletal Health and Arthritis",
+      "display": "Musculoskeletal Health and Arthritis study",
+      "designation": [
+        {
+          "use": {
+            "code": "musculoskeletal-health-and-arthritis",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Musculoskeletal Health and Arthritis study"
+        }
+      ]
+    },
+    {
+      "code": "Neurodevelopmental Conditions",
+      "display": "Neurodevelopmental Conditions",
+      "definition": "Neurodevelopmental Conditions study",
+      "designation": [
+        {
+          "use": {
+            "code": "neurodevelopmental-conditions",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Neurodevelopmental Conditions study"
+        }
+      ]
+    },
+    {
+      "code": "Neurosciences, Mental Health and Addiction",
+      "display": "Neurosciences, Mental Health and Addiction",
+      "definition": "Neurosciences, Mental Health and Addiction study",
+      "designation": [
+        {
+          "use": {
+            "code": "neurosciences-mental-health-and-addiction",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Neurosciences, Mental Health and Addiction study"
+        }
+      ]
+    },
+    {
+      "code": "Nutrition, Metabolism and Diabetes",
+      "display": "Nutrition, Metabolism and Diabetes",
+      "definition": "Nutrition, Metabolism and Diabetes study",
+      "designation": [
+        {
+          "use": {
+            "code": "nutrition-metabolism-and-diabetes",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Nutrition, Metabolism and Diabetes study"
+        }
+      ]
+    },
+    {
+      "code": "Population Genomics",
+      "display": "Population Genomics",
+      "definition": "Population Genomics study",
+      "designation": [
+        {
+          "use": {
+            "code": "population-genomics",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Population Genomics study"
+        }
+      ]
+    },
+    {
+      "code": "Rare Diseases",
+      "display": "Rare Diseases",
+      "definition": "Rare Diseases study",
+      "designation": [
+        {
+          "use": {
+            "code": "rare-diseases",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Rare Diseases study"
+        }
+      ]
+    },
+    {
+      "code": "Not Applicable",
+      "display": "Not Applicable",
+      "definition": "Not Applicable study",
+      "designation": [
+        {
+          "use": {
+            "code": "not-applicable",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Not Applicable study"
+        }
+      ]
+    },
+    {
+      "code": "Other",
+      "display": "Other",
+      "definition": "Other study",
+      "designation": [
+        {
+          "use": {
+            "code": "other",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+          },
+          "value": "Other study"
+        }
+      ]
+    }
+  ],
+  "count": 14
+}

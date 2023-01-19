@@ -1,0 +1,90 @@
+{
+  "resourceType": "CodeSystem",
+  "status": "active",
+  "content": "complete",
+  "name": "DataType",
+  "id": "data-type",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-type",
+  "concept": [
+    {
+      "code": "Aligned Reads",
+      "display": "Aligned Reads",
+      "designation": [
+        {
+          "use": {
+            "code": "aligned-reads",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-type"
+          },
+          "value": "Aligned Reads"
+        }
+      ]
+    },
+    {
+      "code": "SNV",
+      "display": "SNV",
+      "designation": [
+        {
+          "use": {
+            "code": "snv",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+          },
+          "value": "SNV"
+        }
+      ]
+    },
+    {
+      "code": "Germline CNV",
+      "display": "Germline CNV",
+      "designation": [
+        {
+          "use": {
+            "code": "germline-cnv",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+          },
+          "value": "Germline CNV"
+        }
+      ]
+    },
+    {
+      "code": "Sequencing Data Supplement",
+      "display": "Sequencing Data Supplement",
+      "designation": [
+        {
+          "use": {
+            "code": "sequencing-data-supplement",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+          },
+          "value": "Sequencing Data Supplement"
+        }
+      ]
+    },
+    {
+      "code": "Sequencing Data Index",
+      "display": "Sequencing Data Index",
+      "designation": [
+        {
+          "use": {
+            "code": "sequencing-data-index",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+          },
+          "value": "Sequencing Data Index"
+        }
+      ]
+    },
+    {
+      "code": "Germline Structural Variant",
+      "display": "Germline Structural Variant",
+      "designation": [
+        {
+          "use": {
+            "code": "germline-structural-variant",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+          },
+          "value": "Germline Structural Variant"
+        }
+      ]
+    }
+  ],
+  "count": 6
+}

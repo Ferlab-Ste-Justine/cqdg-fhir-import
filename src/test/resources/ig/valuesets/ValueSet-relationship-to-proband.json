@@ -1,0 +1,16 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "RelationshipToProband",
+  "id": "relationship-to-proband",
+  "title": "Research domain value set",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/relationship-to-proband",
+  "compose": {
+    "include": [
+      {
+        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+      }
+    ]
+  }
+}

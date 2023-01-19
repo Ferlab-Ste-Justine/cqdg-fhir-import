@@ -1,0 +1,16 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "CQDGObservationCategory",
+  "id": "cqdg-observation-category",
+  "title": "CQDG observation value set",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/cqdg-observation-category",
+  "compose": {
+    "include": [
+      {
+        "system": "http://hl7.org/fhir/CodeSystem/observation-code"
+      }
+    ]
+  }
+}

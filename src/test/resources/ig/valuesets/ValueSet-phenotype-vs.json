@@ -1,0 +1,15 @@
+{
+  "resourceType": "ValueSet",
+  "status": "active",
+  "name": "PhenotypeVS",
+  "id": "phenotype-vs",
+  "version": "0.1.0",
+  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/phenotype-vs",
+  "compose": {
+    "include": [
+      {
+        "system": "http://purl.obolibrary.org/obo/hp.owl"
+      }
+    ]
+  }
+}

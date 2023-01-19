@@ -8,6 +8,7 @@
     "runAlias": "runAliasExample",
     "flowcellId": "0",
     "isPairedEnd": true,
+    "readLength": "151,8,8,151",
     "fragmentSize": 100,
     "experimentalStrategy": "WXS",
     "captureKit": "RocheKapaHyperExome",
@@ -36,12 +37,11 @@
       "labAliquotId": "nanuq_sample_id",
       "files": {
         "cram": "file1.cram",
-        "crai": "file1.crai",
-        "snv_vcf": "file2.vcf",
-        "snv_tbi": "file2.tbi",
-        "cnv_vcf": "file4.vcf",
-        "cnv_tbi": "file4.tbi",
-        "supplement": "file3.json"
+        "crai": "file1.cram.crai",
+        "snv": "file2.gvcf.gz",
+        "cnv": "file3.cnv.vcf.gz",
+        "sv": "file4.sv.vcf.gz",
+        "supplement": "file5.json"
       }
     }
   ]

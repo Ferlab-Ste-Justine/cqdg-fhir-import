@@ -7,16 +7,18 @@ object MetadataTestUtils {
 
   val defaultFilesAnalysis: FilesAnalysis = FilesAnalysis(
     cram = "file1.cram",
-    crai = "file1.crai",
-    snv = "file2.vcf",
-    cnv = "file3.vcf",
-    sv = "file4.vcf",
+    crai = "file1.cram.crai",
+    snv = "file2.gvcf.gz",
+    cnv = "file3.cnv.vcf.gz",
+    sv = "file4.sv.vcf.gz",
     supplement = "file5.tgz"
   )
   val defaultAnalysis: Analysis = Analysis(
     ldmSampleId = "submitted_sample_id",
-    labAliquotID = "nanuq_sample_id",
-    files = defaultFilesAnalysis
+    labAliquotId = "nanuq_sample_id",
+    files = defaultFilesAnalysis,
+    specimenType = "specimenType",
+    sampleType = "sampleType"
   )
   val defaultExperiment: Experiment = Experiment(
     platform = Some("Illumina"),
@@ -25,12 +27,14 @@ object MetadataTestUtils {
     runDate = Some("2014-09-21T11:50:23-05:00"),
     runAlias = Some("runAliasExample"),
     flowcellId = Some("0"),
-    //    isPairedEnd = Some(true),
+    isPairedEnd = Some(true),
+    readLength = Some("12,12,12,12"),
     //    fragmentSize = Some(100),
     experimentalStrategy = Some("WXS"),
     captureKit = Some("RocheKapaHyperExome"),
     baitDefinition = Some("KAPA_HyperExome_hg38_capture_targets")
   )
+
   val defaultWorkflow: Workflow = Workflow(
     name = Some("Dragen"),
     version = Some("1.1.0"),
@@ -38,11 +42,9 @@ object MetadataTestUtils {
   )
   val defaultMetadata: Metadata = Metadata(
     defaultExperiment,
-    //    defaultWorkflow,
+    defaultWorkflow,
     analyses = Seq(
       defaultAnalysis
     )
-
   )
-
 }
