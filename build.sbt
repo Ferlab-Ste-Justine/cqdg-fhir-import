@@ -27,3 +27,26 @@ lazy val root = (project in file("."))
     libraryDependencies +=
       "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4"
   )
+
+excludeDependencies ++= Seq(
+  ExclusionRule("commons-logging", "commons-logging"),
+  ExclusionRule("org.slf4j", "jcl-over-slf4j"),
+)
+
+Test / fork := true
+Test / testForkedParallel := false
+
+assembly / assemblyMergeStrategy:= {
+  case PathList("META-INF", "mailcap") => MergeStrategy.first
+  case PathList("META-INF", xs@_*) => MergeStrategy.discard
+  case PathList("module-info.class") => MergeStrategy.discard
+  case x =>
+    val oldStrategy = (assembly / assemblyMergeStrategy).value
+    oldStrategy(x)
+}
+
+
+
+assembly / test := {}
+parallelExecution / test := false
+assembly / assemblyJarName:= "cqdg-fhir-import.jar"
