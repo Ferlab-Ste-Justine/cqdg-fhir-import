@@ -22,6 +22,7 @@ trait TDocumentReference extends DocumentReferenceType {
 
   def validateBaseResource(studyId: String, release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf): OperationOutcome = {
     val baseResource = buildBase(studyId, release)
+    println("Validate DocumentRef")
     FhirUtils.validateResource(baseResource)
   }
 
