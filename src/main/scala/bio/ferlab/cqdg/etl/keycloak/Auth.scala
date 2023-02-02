@@ -37,6 +37,7 @@ class Auth(conf: KeycloakConf) {
       val expiresIn = resp.getExpiresIn
       expiresAt = Time.currentTime() + expiresIn - 5
       rpt = resp.getToken
+      println(s"New Token: $rpt")
     }
     f(accessToken, rpt)
   }
