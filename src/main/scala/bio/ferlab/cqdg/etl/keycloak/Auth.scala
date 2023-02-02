@@ -23,6 +23,13 @@ class Auth(conf: KeycloakConf) {
   private var accessToken = ""
 
   def withToken[T](f: (String, String) => T): T = {
+    println("start WITH TOKEN")
+    println(this.rpt)
+    println(s"expiresAt: $expiresAt")
+    println(s"CurrentTime: ${Time.currentTime()}")
+    println(s"check: ${expiresAt < Time.currentTime()}")
+    println("end WITH TOKEN")
+
 
     if (expiresAt == 0 || expiresAt < Time.currentTime()) {
       accessToken = authzClient.obtainAccessToken().getToken
