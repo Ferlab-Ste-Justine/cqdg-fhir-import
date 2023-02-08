@@ -373,7 +373,8 @@ object SimpleBuildBundle {
     // ************ type.coding[x].code ***********************
     val typeCoding = new Coding()
     val typeCodeableConcept = new CodeableConcept()
-    typeCoding.setCode(resource.biospecimen_tissue_source).setSystem(CodingSystems.NCIT_SYSTEM)
+//    typeCoding.setCode(resource.biospecimen_tissue_source).setSystem(CodingSystems.NCIT_SYSTEM)
+    typeCoding.setCode("NCIT:C449").setSystem(CodingSystems.NCIT_SYSTEM)
     typeCodeableConcept.setCoding(List(typeCoding).asJava)
     specimen.setType(typeCodeableConcept)
 
@@ -422,7 +423,8 @@ object SimpleBuildBundle {
     // ************ type.coding[x].code ***********************
     val typeCoding = new Coding()
     val typeCodeableConcept = new CodeableConcept()
-    typeCoding.setCode(resource.sample_type).setSystem(CodingSystems.NCIT_SYSTEM)
+    typeCoding.setCode("NCIT:C12434").setSystem(CodingSystems.NCIT_SYSTEM)
+//    typeCoding.setCode(resource.sample_type).setSystem(CodingSystems.NCIT_SYSTEM)
     typeCodeableConcept.setCoding(List(typeCoding).asJava)
     specimen.setType(typeCodeableConcept)
 
