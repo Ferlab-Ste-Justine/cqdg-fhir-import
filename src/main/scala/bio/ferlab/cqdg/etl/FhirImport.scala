@@ -99,7 +99,9 @@ object FhirImport extends App {
         writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
 //        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
         val allBundle = bundle ++ bundleList
-        bundle.map(b => b.getResource).filter(r => r.getResourceType.name() == "DocumentReference")
+
+        val test = bundle.map(b => b.getResource).filter(r => r.getResourceType.name() == "DocumentReference")
+        println(s"doc bundle length: ${test.length}")
 
         if(allBundle.size > 5000) {
           TBundle.saveByFragments(allBundle).head //FIXME
