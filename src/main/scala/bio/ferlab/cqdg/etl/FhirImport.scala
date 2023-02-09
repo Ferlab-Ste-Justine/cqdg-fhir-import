@@ -75,6 +75,9 @@ object FhirImport extends App {
       CheckS3Data.loadRawFileEntries(inputBucket, p)
     }).toSeq
 
+    //TODO remove
+    println(s"Number of RawFiles : ${rawFileEntries.length}")
+
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
       metadata.map { m: Metadata =>
         val seq = CheckS3Data.loadFileEntries(m, rawFileEntries, study)
@@ -89,12 +92,14 @@ object FhirImport extends App {
         .mapN((bundle, files) => (bundle, files))
     })
 
+
     val results = bundleListWithFiles.andThen({ case (bundle, files) =>
       try {
         // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
         writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
 //        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
         val allBundle = bundle ++ bundleList
+        bundle.map(b => b.getResource).filter(r => r.getResourceType.name() == "DocumentReference")
 
         if(allBundle.size > 5000) {
           TBundle.saveByFragments(allBundle).head //FIXME
