@@ -35,7 +35,6 @@ object TaskExtensionValidation {
     val fakeTask = AnalysisTask()
     fakeTask.addExtension(workflowExt)
     fakeTask.addExtension(experimentExtWithoutRunDate)
-    println("Validate task")
     val outcome = FhirUtils.validateResource(fakeTask)
     val issues = outcome.getIssue.asScala.toSeq
     val errors = issues.collect {

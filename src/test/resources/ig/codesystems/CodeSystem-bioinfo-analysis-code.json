@@ -8,7 +8,7 @@
   "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code",
   "concept": [
     {
-      "code": "Reads Alignement Bioinformatic Analysis",
+      "code": "RABA",
       "display": "Reads Alignement Bioinformatic Analysis",
       "designation": [
         {
@@ -21,7 +21,7 @@
       ]
     },
     {
-      "code": "SNV Calling Bioinformatic Analysis",
+      "code": "SNVC",
       "display": "SNV Calling Bioinformatic Analysis",
       "designation": [
         {
@@ -34,7 +34,7 @@
       ]
     },
     {
-      "code": "Quality Control Bioinformatic Analysis",
+      "code": "QCBA",
       "display": "Quality Control Bioinformatic Analysis",
       "designation": [
         {
@@ -47,7 +47,7 @@
       ]
     },
     {
-      "code": "Germline Exome Bioinformatic Analysis",
+      "code": "GEBA",
       "display": "Germline Exome Bioinformatic Analysis",
       "designation": [
         {
@@ -60,7 +60,7 @@
       ]
     },
     {
-      "code": "Germline Genome Bioinformatic Analysis",
+      "code": "GGBA",
       "display": "Germline Genome Bioinformatic Analysis",
       "designation": [
         {
