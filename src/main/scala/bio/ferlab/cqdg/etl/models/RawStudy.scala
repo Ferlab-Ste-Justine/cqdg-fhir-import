@@ -1,5 +1,6 @@
 package bio.ferlab.cqdg.etl.models
 
+import bio.ferlab.cqdg.etl.getOptionalLineValue
 import org.apache.commons.codec.digest.DigestUtils
 
 case class RawStudy(
@@ -41,10 +42,10 @@ object RawStudy {
       //lots of cleanup here, data from tsv is not clean. Fix in clinical data,
       keyword = line(header.indexOf("keyword")).replaceAll("^\\W|\\W$", "")
         .split(";").map(_.trim).filter(_.nonEmpty).toList,
-      access_authority = if(!line(header.indexOf("access_authority")).isBlank) Some(line(header.indexOf("access_authority"))) else None,
+      getOptionalLineValue(line, header, "access_authority"),
       domain = line(header.indexOf("domain")).split(";").map(_.trim).toList,
-      population = if(!line(header.indexOf("population")).isBlank) Some(line(header.indexOf("population"))) else None,
-      access_limitations = if(!line(header.indexOf("access_limitations")).isBlank) Some(line(header.indexOf("access_limitations"))) else None,
+      getOptionalLineValue(line, header, "population"),
+      getOptionalLineValue(line, header, "access_limitations"),
       access_requirements = line(header.indexOf("access_requirements")).split(";").map(_.trim).toList,
     )
   }

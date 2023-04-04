@@ -206,7 +206,7 @@ object SimpleBuildBundle {
       .setValue(resourceId)
     study.setTitle(resource.name)
     study.setDescription(resource.description)
-    study.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.study_id)
+    study.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.study_id.toUpperCase)
 
     //************ Access Authority **********************
     if(resource.access_authority.isDefined) {

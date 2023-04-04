@@ -1,5 +1,6 @@
 package bio.ferlab.cqdg.etl.models
 
+import bio.ferlab.cqdg.etl.getOptionalLineValue
 import org.apache.commons.codec.digest.DigestUtils
 
 case class RawBiospecimen(
@@ -34,9 +35,9 @@ object RawBiospecimen {
       line(header.indexOf("study_id")),
       line(header.indexOf("submitter_participant_id")),
       line(header.indexOf("submitter_biospecimen_id")),
-      if(!line(header.indexOf("age_biospecimen_collection")).isBlank) Some(line(header.indexOf("age_biospecimen_collection")).toInt) else None,
+      getOptionalLineValue(line, header, "age_biospecimen_collection").map(_.toInt),
       line(header.indexOf("biospecimen_tissue_source")),
-      if(!line(header.indexOf("tumor_normal_designation")).isBlank) Some(line(header.indexOf("tumor_normal_designation"))) else None,
+      getOptionalLineValue(line, header, "tumor_normal_designation"),
     )
   }
 }

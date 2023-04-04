@@ -1,14 +1,17 @@
 package bio.ferlab.cqdg.etl.fhir
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
-import bio.ferlab.cqdg.etl.isValid
-import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource}
+import bio.ferlab.cqdg.etl.{CODE_SYS_FILES, IG_REPO_GH, IG_RESOURCES, STRUCT_DEF_FILES, VALUE_SET_FILES, isValid}
+import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource, TBundle}
+import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import ca.uhn.fhir.rest.server.exceptions.{PreconditionFailedException, UnprocessableEntityException}
 import cats.data.ValidatedNel
 import org.hl7.fhir.r4.model.Bundle.BundleEntryComponent
 import org.hl7.fhir.r4.model._
 
+import java.net.URL
+import scala.io.Source
 import scala.jdk.CollectionConverters._
 import scala.language.reflectiveCalls
 import scala.util.Try
@@ -124,7 +127,7 @@ object FhirUtils {
   }
 
   def getContactPointSystem(str: String): ContactPoint.ContactPointSystem = {
-    val emailR = "^[\\w.-]+@[\\w-]+\\.[a-zA-Z]+$"
+    val emailR = "^[\\w.\\-]+@[\\w-.]+\\.[a-zA-Z]+$"
     val urlR = "^http[\\w]*://.*$"
     val phoneR = "^[0-9-/|#]{6,}"
 
@@ -146,6 +149,40 @@ object FhirUtils {
         .setUrl(s"${fhirResource.getResourceType.name()}/${fhirResource.getIdElement.getValue}")
         .setMethod(org.hl7.fhir.r4.model.Bundle.HTTPVerb.PUT)
       be
+  }
+
+  def updateIG(gh_token: String)(implicit IGenericClient: IGenericClient) = {
+    val ctx = FhirContext.forR4
+    val parser = ctx.newJsonParser
+
+    val resources = IG_RESOURCES.flatMap(resource => {
+      val (resourceType, list) =  resource match {
+        case "CodeSystem" => (classOf[CodeSystem], CODE_SYS_FILES)
+        case "ValueSet" => (classOf[ValueSet], VALUE_SET_FILES)
+        case "StructureDefinition" => (classOf[StructureDefinition], STRUCT_DEF_FILES)
+      }
+
+      list.map(p => {
+        val parsed = parser.parseResource(resourceType, downloadIGFile(p, gh_token))
+        val id = parsed.getIdElement.getValue.replace(s"${parsed.getResourceType.name()}/", "")
+        parsed.setId(id)
+      })
+
+    })
+
+    val bundle = bundleCreate(resources)
+    TBundle(bundle.toList).execute()
+  }
+
+  private def downloadIGFile(fileName:String, token: String): String = {
+      val connection = new URL(s"$IG_REPO_GH/$fileName.json").openConnection
+      connection.setRequestProperty("Accept", "application/vnd.github.v3.raw")
+      connection.setRequestProperty("Authorization", s"token $token")
+
+      val source = Source.fromInputStream(connection.getInputStream)
+      val content = source.mkString
+      source.close()
+      content
   }
 
   implicit class ResourceExtension(v: Resource) {

@@ -31,7 +31,7 @@ case object FhirServerContainer extends OurContainer {
     "KEYCLOAK_ENABLED" -> "false",
     "HAPI_FHIR_REUSE_CACHED_SEARCH_RESULTS_MILLIS" -> "0"
   )
-  val name = "clin-pipeline-fhir-test"
+  val name = "cqdg-pipeline-fhir-test"
 
   val port = 8080
   val container: GenericContainer = GenericContainer(

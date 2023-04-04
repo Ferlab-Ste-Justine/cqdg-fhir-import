@@ -60,7 +60,7 @@ object CRAI {
 }
 
 case class SNV(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
-  override val format: String = "VCF"
+  override val format: String = "gVCF"
 }
 
 object SNV {

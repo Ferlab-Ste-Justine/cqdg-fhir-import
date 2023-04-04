@@ -27,6 +27,78 @@ package object etl {
 
   val PROBAND = "Is the proband"
 
+  val IG_REPO_GH = "https://raw.githubusercontent.com/Ferlab-Ste-Justine/cqdg-FHIR/master/fsh-generated/resources"
+  val IG_RESOURCES: Seq[String] = Seq("CodeSystem", "ValueSet", "StructureDefinition")
+
+  val CODE_SYS_FILES: Seq[String] = Seq(
+    "CodeSystem-bioinfo-analysis-code",
+    "CodeSystem-cause-of-death-codes",
+    "CodeSystem-cqdg-observation-code",
+    "CodeSystem-cqdg-study-cs",
+    "CodeSystem-data-category",
+    "CodeSystem-data-type",
+    "CodeSystem-disease-status-cs",
+    "CodeSystem-document-format",
+    "CodeSystem-duo-codes",
+    "CodeSystem-experimental-strategy",
+    "CodeSystem-family-type",
+    "CodeSystem-genome-build",
+    "CodeSystem-population",
+    "CodeSystem-qc-ethnicity",
+    "CodeSystem-qc-sample-type",
+    "CodeSystem-research-domain",
+    "CodeSystem-tumor-normal-designation",
+    "CodeSystem-v3-role-code",
+  )
+
+  val STRUCT_DEF_FILES: Seq[String] = Seq(
+    "StructureDefinition-AccessLimitations",
+    "StructureDefinition-AccessRequirements",
+    "StructureDefinition-AgeAt",
+    "StructureDefinition-BooleanValue",
+    "StructureDefinition-CQDGObservationCauseOfDeath",
+    "StructureDefinition-CQDGObservationDiseaseStatus",
+    "StructureDefinition-CQDGObservationPhenotype",
+    "StructureDefinition-CQDGObservationSocialHistory",
+    "StructureDefinition-CQDGObservationTumorNormalDesignation",
+    "StructureDefinition-QCEthnicity",
+    "StructureDefinition-cqdg-condition",
+    "StructureDefinition-cqdg-document-reference",
+    "StructureDefinition-cqdg-group",
+    "StructureDefinition-cqdg-observation-group",
+    "StructureDefinition-cqdg-patient",
+    "StructureDefinition-cqdg-research-study",
+    "StructureDefinition-cqdg-specimen",
+    "StructureDefinition-cqdg-task",
+    "StructureDefinition-population-info",
+    "StructureDefinition-specific-id",
+  )
+
+  val VALUE_SET_FILES: Seq[String] = Seq(
+    "ValueSet-access-limitation-vs",
+    "ValueSet-access-requirement-vs",
+    "ValueSet-bioinfo-analysis-vs",
+    "ValueSet-cause-of-death-vs",
+    "ValueSet-cqdg-diagnosis-vs",
+    "ValueSet-cqdg-observation-category",
+    "ValueSet-data-category-vs",
+    "ValueSet-data-type-vs",
+    "ValueSet-disease-status-vs",
+    "ValueSet-experimental-strategy-vs",
+    "ValueSet-family-type-vs",
+    "ValueSet-file-format",
+    "ValueSet-genome-build-vs",
+    "ValueSet-phenotype-vs",
+    "ValueSet-population-vs",
+    "ValueSet-qc-ethnicity-vs",
+    "ValueSet-relationship-to-proband",
+    "ValueSet-sample-type-tissue-source-vs",
+    "ValueSet-study-domain",
+    "ValueSet-study-vs",
+    "ValueSet-tumor-normal-designation-vs",
+  )
+
+
   val ID_SERVICE_BATCH_SIZE = 1000
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
@@ -100,5 +172,13 @@ package object etl {
       case Nil => f.validNel[E]
       case s => NonEmptyList.fromList(s.toList).get.invalid[A]
     }
+  }
+
+  def getOptionalLineValue(line: Array[String], header: Array[String], column: String): Option[String] = {
+    if (line.length - 1 >= header.indexOf(column)) {
+      if (line(header.indexOf(column)).nonEmpty) {
+        Some(line(header.indexOf(column)))
+      } else None
+    } else None
   }
 }
