@@ -4,7 +4,7 @@ import bio.ferlab.cqdg.etl.clients.{IIdServer, IdServerClient, NanuqClient}
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
 import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.bundleCreate
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.{bundleCreate, updateIG}
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
@@ -50,6 +50,8 @@ object FhirImport extends App {
 
         auth.withToken { (_, rpt) => rpt }
 
+        updateIG(conf.github.token)
+
         withReport(inputBucket, metadataInputPrefixMap.keySet) { reportPath =>
           run(bucket, prefix, version, study, release, inputBucket, metadataInputPrefixMap, reportPath, outputBucket, removeMissing.toBoolean) //todo add output Prefix
         }
@@ -74,9 +76,6 @@ object FhirImport extends App {
     val rawFileEntries = inputPrefixMetadataMap.keySet.flatMap(p => {
       CheckS3Data.loadRawFileEntries(inputBucket, p)
     }).toSeq
-
-    //TODO remove
-    println(s"Number of RawFiles : ${rawFileEntries.length}")
 
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
       metadata.map { m: Metadata =>

@@ -65,7 +65,6 @@ object FhirTestUtils {
 
     Seq(
       "codesystems/CodeSystem-cqdg-study-cs.json",
-      "codesystems/CodeSystem-access-requirements-codes.json",
       "codesystems/CodeSystem-bioinfo-analysis-code.json",
       "codesystems/CodeSystem-cause-of-death-codes.json",
       "codesystems/CodeSystem-cqdg-observation-code.json",

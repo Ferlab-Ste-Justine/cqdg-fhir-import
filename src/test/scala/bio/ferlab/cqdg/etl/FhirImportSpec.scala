@@ -98,7 +98,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val observedPhenotype = phenotypes.find(p => p.getInterpretation.asScala.exists(c => c.getCoding.asScala.exists(code => code.getCode == "POS")))
       val nonObservedPhenotype = phenotypes.find(p => p.getInterpretation.asScala.exists(c => c.getCoding.asScala.exists(code => code.getCode == "NEG")))
       observedPhenotype should be (Symbol("defined"))
-      observedPhenotype.get.getId should include("PHE0000002")
+      observedPhenotype.get.getId should include("PHE0000001")
       nonObservedPhenotype.get.getId should include("PHE0000003")
 
       // ################## FAMILY #######################
@@ -125,7 +125,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       searchBioSpecimen.length shouldBe 3
       // Observation
       val tumorNormalDesignation = read(observations, classOf[Observation]).filter(p => p.getCode.getCoding.asScala.exists(c => c.getCode == "Tumor Normal Designation"))
-      tumorNormalDesignation.size shouldBe 2
+      tumorNormalDesignation.size shouldBe 3
 
       val searchDiagnosis = searchFhir("Condition")
       searchDiagnosis.getTotal shouldBe 3

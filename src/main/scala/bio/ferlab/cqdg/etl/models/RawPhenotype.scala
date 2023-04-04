@@ -1,5 +1,6 @@
 package bio.ferlab.cqdg.etl.models
 
+import bio.ferlab.cqdg.etl.getOptionalLineValue
 import org.apache.commons.codec.digest.DigestUtils
 
 case class RawPhenotype(
@@ -33,9 +34,9 @@ object RawPhenotype {
       line(header.indexOf("study_id")),
       line(header.indexOf("submitter_participant_id")),
       line(header.indexOf("phenotype_source_text")),
-      if(!line(header.indexOf("phenotype_HPO_code")).isBlank) Some(line(header.indexOf("phenotype_HPO_code"))) else None,
+      getOptionalLineValue(line, header, "phenotype_HPO_code"),
       line(header.indexOf("age_at_phenotype")).toInt,
-      if(!line(header.indexOf("phenotype_observed")).isBlank) Some(line(header.indexOf("phenotype_observed"))) else None,
+      getOptionalLineValue(line, header, "phenotype_observed"),
     )
   }
 }

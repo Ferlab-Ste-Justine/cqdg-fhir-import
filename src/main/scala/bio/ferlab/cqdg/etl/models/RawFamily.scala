@@ -1,6 +1,6 @@
 package bio.ferlab.cqdg.etl.models
 
-import bio.ferlab.cqdg.etl.PROBAND
+import bio.ferlab.cqdg.etl.{PROBAND, getOptionalLineValue}
 import org.apache.commons.codec.digest.DigestUtils
 
 import scala.annotation.tailrec
@@ -39,7 +39,7 @@ object RawFamily {
       submitter_participant_id = line(header.indexOf("submitter_participant_id")),
       family_type = line(header.indexOf("family_type")),
       relationship_to_proband = line(header.indexOf("relationship_to_proband")),
-      if(!line(header.indexOf("is_affected")).isBlank) Some(line(header.indexOf("is_affected"))) else None,
+      getOptionalLineValue(line, header, "is_affected"),
     )
   }
 

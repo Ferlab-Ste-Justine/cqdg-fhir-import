@@ -1,5 +1,6 @@
 package bio.ferlab.cqdg.etl.models
 
+import bio.ferlab.cqdg.etl.getOptionalLineValue
 import org.apache.commons.codec.digest.DigestUtils
 
 case class RawDiagnosis(
@@ -34,9 +35,9 @@ object RawDiagnosis {
       line(header.indexOf("study_id")),
       line(header.indexOf("submitter_participant_id")),
       line(header.indexOf("diagnosis_source_text")),
-      if(!line(header.indexOf("diagnosis_ICD_code")).isBlank) Some(line(header.indexOf("diagnosis_ICD_code"))) else None,
-      if(!line(header.indexOf("diagnosis_mondo_code")).isBlank) Some(line(header.indexOf("diagnosis_mondo_code"))) else None,
-      if(!line(header.indexOf("age_at_diagnosis")).isBlank) Some(line(header.indexOf("age_at_diagnosis")).toInt) else None
+      getOptionalLineValue(line, header, "diagnosis_ICD_code"),
+      getOptionalLineValue(line, header, "diagnosis_mondo_code"),
+      getOptionalLineValue(line, header, "age_at_diagnosis").map(_.toInt),
     )
   }
 }
