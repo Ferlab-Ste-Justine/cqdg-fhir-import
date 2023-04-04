@@ -301,7 +301,7 @@ object SimpleBuildBundle {
       extension.setValue(codeableConceptEthnicity)
     }
 
-    resource.vital_status match {
+    resource.vital_status.toLowerCase match {
       case "alive" => patient.setDeceased(new BooleanType().setValue(false))
       case "deceased" => patient.setDeceased(new BooleanType().setValue(true))
       case _ =>

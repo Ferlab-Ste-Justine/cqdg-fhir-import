@@ -41,11 +41,11 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
         RawFileEntry(BUCKETNAME, s"$prefix/file1.cram", 10),
         RawFileEntry(BUCKETNAME, s"$prefix/file1.cram.md5", 13),
         RawFileEntry(BUCKETNAME, s"$prefix/file2.gvcf.gz", 9),
-        RawFileEntry(BUCKETNAME, s"$prefix/file2.gvcf.gz.md5", 12),
+        RawFileEntry(BUCKETNAME, s"$prefix/file2.vcf.md5", 12),
         RawFileEntry(BUCKETNAME, s"$prefix/file3.cnv.vcf.gz", 9),
-        RawFileEntry(BUCKETNAME, s"$prefix/file3.cnv.vcf.gz.md5", 12),
+        RawFileEntry(BUCKETNAME, s"$prefix/file3.vcf.md5", 12),
         RawFileEntry(BUCKETNAME, s"$prefix/file4.sv.vcf.gz", 9),
-        RawFileEntry(BUCKETNAME, s"$prefix/file4.sv.vcf.gz.md5", 12),
+        RawFileEntry(BUCKETNAME, s"$prefix/file4.vcf.md5", 12),
         RawFileEntry(BUCKETNAME, s"$prefix/file5.json", 8)
       )
       fileEntries should contain theSameElementsAs expected
@@ -116,14 +116,10 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
 
       val rawFiles = Seq (
         rawFileEntry(s"$inputPrefix/file1.cram"),
-        rawFileEntry(s"$inputPrefix/file1.cram.md5"),
         rawFileEntry(s"$inputPrefix/file1.cram.crai"),
         rawFileEntry(s"$inputPrefix/file2.gvcf.gz"),
-        rawFileEntry(s"$inputPrefix/file2.gvcf.gz.md5"),
         rawFileEntry(s"$inputPrefix/file3.cnv.vcf.gz"),
-        rawFileEntry(s"$inputPrefix/file3.cnv.vcf.gz.md5"),
         rawFileEntry(s"$inputPrefix/file4.sv.vcf.gz"),
-        rawFileEntry(s"$inputPrefix/file4.sv.vcf.gz.md5"),
         rawFileEntry(s"$inputPrefix/file5.tgz")
       )
 
@@ -131,10 +127,10 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
 
       CheckS3Data.loadFileEntries(defaultMetadata, rawFiles, "study1") should contain theSameElementsAs  Seq(
         fileEntry(s"$inputPrefix/file1.cram.crai", s"${DigestUtils.sha1Hex(List("file1.cram.crai", runName, "study1").mkString("-"))}", "file1.cram.crai"),
-        fileEntry(s"$inputPrefix/file1.cram", s"${DigestUtils.sha1Hex(List("file1.cram", runName, "study1").mkString("-"))}", "file1.cram", Some("md5 cram file")),
-        fileEntry(s"$inputPrefix/file2.gvcf.gz", s"${DigestUtils.sha1Hex(List("file2.gvcf.gz", runName, "study1").mkString("-"))}", "file2.gvcf.gz", Some("md5 vcf file")),
-        fileEntry(s"$inputPrefix/file3.cnv.vcf.gz", s"${DigestUtils.sha1Hex(List("file3.cnv.vcf.gz", runName, "study1").mkString("-"))}", "file3.cnv.vcf.gz", Some("md5 vcf file")),
-        fileEntry(s"$inputPrefix/file4.sv.vcf.gz", s"${DigestUtils.sha1Hex(List("file4.sv.vcf.gz", runName, "study1").mkString("-"))}", "file4.sv.vcf.gz", Some("md5 vcf file")),
+        fileEntry(s"$inputPrefix/file1.cram", s"${DigestUtils.sha1Hex(List("file1.cram", runName, "study1").mkString("-"))}", "file1.cram"),
+        fileEntry(s"$inputPrefix/file2.gvcf.gz", s"${DigestUtils.sha1Hex(List("file2.gvcf.gz", runName, "study1").mkString("-"))}", "file2.gvcf.gz"),
+        fileEntry(s"$inputPrefix/file3.cnv.vcf.gz", s"${DigestUtils.sha1Hex(List("file3.cnv.vcf.gz", runName, "study1").mkString("-"))}", "file3.cnv.vcf.gz"),
+        fileEntry(s"$inputPrefix/file4.sv.vcf.gz", s"${DigestUtils.sha1Hex(List("file4.sv.vcf.gz", runName, "study1").mkString("-"))}", "file4.sv.vcf.gz"),
         fileEntry(s"$inputPrefix/file5.tgz", s"${DigestUtils.sha1Hex(List("file5.tgz", runName, "study1").mkString("-"))}", "file5.tgz"),
       )
     }
