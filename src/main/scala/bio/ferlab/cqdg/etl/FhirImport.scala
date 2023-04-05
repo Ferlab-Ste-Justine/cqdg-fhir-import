@@ -50,7 +50,7 @@ object FhirImport extends App {
 
         auth.withToken { (_, rpt) => rpt }
 
-        updateIG(conf.github.token)
+        updateIG()
 
         withReport(inputBucket, metadataInputPrefixMap.keySet) { reportPath =>
           run(bucket, prefix, version, study, release, inputBucket, metadataInputPrefixMap, reportPath, outputBucket, removeMissing.toBoolean) //todo add output Prefix

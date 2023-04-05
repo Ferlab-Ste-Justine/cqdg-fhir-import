@@ -151,7 +151,7 @@ object FhirUtils {
       be
   }
 
-  def updateIG(gh_token: String)(implicit IGenericClient: IGenericClient) = {
+  def updateIG()(implicit IGenericClient: IGenericClient) = {
     val ctx = FhirContext.forR4
     val parser = ctx.newJsonParser
 
@@ -163,7 +163,7 @@ object FhirUtils {
       }
 
       list.map(p => {
-        val parsed = parser.parseResource(resourceType, downloadIGFile(p, gh_token))
+        val parsed = parser.parseResource(resourceType, downloadIGFile(p))
         val id = parsed.getIdElement.getValue.replace(s"${parsed.getResourceType.name()}/", "")
         parsed.setId(id)
       })
@@ -174,10 +174,9 @@ object FhirUtils {
     TBundle(bundle.toList).execute()
   }
 
-  private def downloadIGFile(fileName:String, token: String): String = {
+  private def downloadIGFile(fileName:String): String = {
       val connection = new URL(s"$IG_REPO_GH/$fileName.json").openConnection
       connection.setRequestProperty("Accept", "application/vnd.github.v3.raw")
-      connection.setRequestProperty("Authorization", s"token $token")
 
       val source = Source.fromInputStream(connection.getInputStream)
       val content = source.mkString
