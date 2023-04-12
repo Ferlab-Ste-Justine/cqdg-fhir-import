@@ -4,6 +4,7 @@ import bio.ferlab.cqdg.etl.isValid
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata, RawFileEntry}
 import bio.ferlab.cqdg.etl.s3.S3Utils.getContent
 import cats.data.ValidatedNel
+import com.decodified.scalassh.SshClient
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM
 import org.slf4j.{Logger, LoggerFactory}
@@ -15,6 +16,7 @@ import java.nio.charset.StandardCharsets
 import java.util.UUID
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
+import scala.util.Success
 
 object CheckS3Data {
 
@@ -55,22 +57,48 @@ object CheckS3Data {
     fileEntries
   }
 
+  def loadRawFileEntriesNarval(bucket: String, prefix: String)(implicit sshClient: SshClient): Seq[RawFileEntry] = {
+    val keys = sshClient.exec(
+      s"""search_dir=projects/def-vferrett-ab/COMMON/michaud/WGS-EE/${prefix}
+        |for entry in "$$search_dir"/*
+        |do
+        | echo "$$entry"
+        |done""".stripMargin) match {
+      case Success(value) => value.stdOutAsString().split("\n").toSeq
+      case _ => Nil
+    }
+
+    keys.map(k => RawFileEntry(bucket, k, 0))
+  }
+
   def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], studyId: String)(implicit s3Client: S3Client): Seq[FileEntry] = {
     val (checksums, files) = fileEntries.partition(_.isMd5)
     val mapOfIds = m.analyses.flatMap { a =>
       val cramId: String = s"${DigestUtils.sha1Hex(List(a.files.cram, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val craiId: String = s"${DigestUtils.sha1Hex(List(a.files.crai, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val snvId: String = s"${DigestUtils.sha1Hex(List(a.files.snv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val snvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.snv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val cnvId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val cnvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val svId: String = s"${DigestUtils.sha1Hex(List(a.files.sv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val svTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.sv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val segBwId: String = s"${DigestUtils.sha1Hex(List(a.files.seg_bw, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val hardFilteredBafBwId: String = s"${DigestUtils.sha1Hex(List(a.files.hard_filtered_baf_bw, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val rohBedId: String = s"${DigestUtils.sha1Hex(List(a.files.roh_bed, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val qcId: String = s"${DigestUtils.sha1Hex(List(a.files.supplement, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
 
       Seq(
         a.files.cram -> (cramId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cram)),
         a.files.crai -> (craiId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.crai)),
         a.files.snv -> (snvId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.snv)),
+        a.files.snv_tbi -> (snvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.snv_tbi)),
         a.files.cnv -> (cnvId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cnv)),
+        a.files.cnv_tbi -> (cnvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cnv_tbi)),
         a.files.sv -> (svId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.sv)),
+        a.files.sv_tbi -> (svTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.sv_tbi)),
+        a.files.seg_bw -> (segBwId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.seg_bw)),
+        a.files.hard_filtered_baf_bw -> (hardFilteredBafBwId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.hard_filtered_baf_bw)),
+        a.files.roh_bed -> (rohBedId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.roh_bed)),
         a.files.supplement -> (qcId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.supplement))
       )
     }.toMap

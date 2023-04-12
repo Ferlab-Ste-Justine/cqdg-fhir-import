@@ -39,7 +39,7 @@ object RawParticipant {
       line(header.indexOf("study_id")),
       line(header.indexOf("submitter_participant_id")),
       getOptionalLineValue(line, header, "age_at_recruitment"),
-      line(header.indexOf("sex")),
+      line(header.indexOf("genre")),
       getOptionalLineValue(line, header, "ethnicity"),
       line(header.indexOf("vital_status")),
       getOptionalLineValue(line, header, "cause_of_death"),

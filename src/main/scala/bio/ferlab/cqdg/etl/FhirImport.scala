@@ -1,5 +1,7 @@
 package bio.ferlab.cqdg.etl
 
+import bio.ferlab.cqdg.etl
+import bio.ferlab.cqdg.etl.RunType.RunType
 import bio.ferlab.cqdg.etl.clients.{IIdServer, IdServerClient, NanuqClient}
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
@@ -49,31 +51,17 @@ object FhirImport extends App {
         implicit val idService: IdServerClient = new IdServerClient()
         implicit val ferloadConf: FerloadConf = conf.ferload
         implicit val nanuqClient: NanuqClient = new NanuqClient(conf.nanuq)
-        val sshClient = new SshClient(
+        implicit val runType: etl.RunType.Value = runNames match {
+          case Array() => RunType.NARVAL
+          case _ => RunType.NANUK
+        }
+        implicit val sshClient: SshClient = new SshClient(
           new HostConfig(
             login = PasswordLogin(conf.narval.username, SimplePasswordProducer(conf.narval.password)),
             conf.narval.endpoint)
         )
-        //        SSH(conf.narval.endpoint, HostConfig(PasswordLogin(conf.narval.username, PasswordProducer.fromString(conf.narval.password)))) { client: SshClient =>
-        //          val res = for {
-        //            result <- client.exec("cd nearline && ls -a")
-        //          } yield (result)
-        //
-        //          println(res.get.stdOutAsString())
-        //          println("TOTOOT")
-        //        }
 
-        val metadataInputPrefixMap = getMatadataPerRuns(runNames)
-
-        sshClient.exec("cd nearline && ls -a") match {
-          case Success(value) => println(value.stdOutAsString())
-          case _ =>
-        }
-
-
-//        val metadataInputPrefixMap = runNames.map(r => {
-//          s"genorefq_wgs_data/$r" -> nanuqClient.fetch(r).andThen(Metadata.validateMetadata)
-//        }).toMap
+        val metadataInputPrefixMap = getMatadataPerRuns(bucket, prefix, study, version, runType)
 
 
         val inputBucket = conf.aws.bucketName
@@ -86,7 +74,12 @@ object FhirImport extends App {
 
         updateIG()
 
-        withReport(inputBucket, metadataInputPrefixMap.keySet) { reportPath =>
+        val reportBucket = runType match {
+          case RunType.NARVAL => bucket
+          case RunType.NANUK => inputBucket
+        }
+
+        withReport(reportBucket, metadataInputPrefixMap.keySet) { reportPath =>
           run(bucket, prefix, version, study, release, inputBucket, metadataInputPrefixMap, reportPath, outputBucket, removeMissing.toBoolean) //todo add output Prefix
         }
       }
@@ -95,7 +88,7 @@ object FhirImport extends App {
 
   def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String,
           inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, outputBucket: String, removeMissing: Boolean)
-         (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
+         (implicit s3: S3Client, client: IGenericClient, sshClient: SshClient, idService: IIdServer, ferloadConf: FerloadConf, runType: RunType): ValidationResult[Bundle] = {
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
@@ -108,7 +101,10 @@ object FhirImport extends App {
     val bundleList = bundleCreate(resources)
 
     val rawFileEntries = inputPrefixMetadataMap.keySet.flatMap(p => {
-      CheckS3Data.loadRawFileEntries(inputBucket, p)
+      runType match {
+        case RunType.NANUK => CheckS3Data.loadRawFileEntries(inputBucket, p)
+        case RunType.NARVAL => CheckS3Data.loadRawFileEntriesNarval(inputBucket, p)
+      }
     }).toSeq
 
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
@@ -128,13 +124,15 @@ object FhirImport extends App {
 
     val results = bundleListWithFiles.andThen({ case (bundle, files) =>
       try {
+
         // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
-        writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
+        runType match {
+          case RunType.NANUK => writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
+          case RunType.NARVAL => writeAheadLog(s"$outputBucket", s"$prefix/$version-$study/$release/$reportPath", TBundle(bundle), files)
+        }
+
 //        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
         val allBundle = bundle ++ bundleList
-
-        val test = bundle.map(b => b.getResource).filter(r => r.getResourceType.name() == "DocumentReference")
-        println(s"doc bundle length: ${test.length}")
 
         if(allBundle.size > 5000) {
           TBundle.saveByFragments(allBundle).head //FIXME
@@ -155,11 +153,12 @@ object FhirImport extends App {
     results
   }
 
-  private def getMatadataPerRuns(runs: Array[String])(implicit nanuqClient: NanuqClient, s3Client: S3Client) = {
+  private def getMatadataPerRuns(bucket: String, prefix: String, study: String, version: String, runType: RunType)
+                                (implicit nanuqClient: NanuqClient, s3Client: S3Client) = {
 
-    runs match {
-      case Array() =>
-        val lines = S3Utils.getLinesContent("cqdg-qa-app-clinical-data-service", "clinical-data/e2adb961-4f58-4e13-a24f-6725df802e2c/1-T-DEE/T-DEE_epilepsy_IGN_P04.ndjson")
+    runType match {
+      case RunType.NARVAL =>
+        val lines = S3Utils.getLinesContent(bucket, s"$prefix/$version-$study/test_michaid.ndjson")
 
         lines.map(line => {
           val lookupRunName = Json.parse(line) \ "experiment" \ "runName"
@@ -168,7 +167,7 @@ object FhirImport extends App {
             case JsUndefined() => "" -> s"Nanuq returned an empty body".invalidNel //fixme
           }
         }).toMap
-      case _ => runNames.map(r => {
+      case RunType.NANUK => runNames.map(r => {
         s"genorefq_wgs_data/$r" -> nanuqClient.fetch(r).andThen(Metadata.validateMetadata)
       }).toMap
     }
