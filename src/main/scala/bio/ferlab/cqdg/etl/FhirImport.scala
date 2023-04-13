@@ -74,12 +74,7 @@ object FhirImport extends App {
 
         updateIG()
 
-        val reportBucket = runType match {
-          case RunType.NARVAL => bucket
-          case RunType.NANUK => inputBucket
-        }
-
-        withReport(reportBucket, metadataInputPrefixMap.keySet) { reportPath =>
+        withReport(bucket, s"$prefix/$version-$study/$release/${metadataInputPrefixMap.keySet.head}") { reportPath =>
           run(bucket, prefix, version, study, release, inputBucket, metadataInputPrefixMap, reportPath, outputBucket, removeMissing.toBoolean) //todo add output Prefix
         }
       }
@@ -128,10 +123,10 @@ object FhirImport extends App {
         // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
         runType match {
           case RunType.NANUK => writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
-          case RunType.NARVAL => writeAheadLog(s"$outputBucket", s"$prefix/$version-$study/$release/$reportPath", TBundle(bundle), files)
+          case RunType.NARVAL => writeAheadLog(outputBucket, reportPath, TBundle(bundle), files)
         }
 
-//        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
+        //        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
         val allBundle = bundle ++ bundleList
 
         if(allBundle.size > 5000) {
@@ -154,11 +149,18 @@ object FhirImport extends App {
   }
 
   private def getMatadataPerRuns(bucket: String, prefix: String, study: String, version: String, runType: RunType)
-                                (implicit nanuqClient: NanuqClient, s3Client: S3Client) = {
+                                (implicit nanuqClient: NanuqClient, s3Client: S3Client, sshClient: SshClient) = {
 
     runType match {
       case RunType.NARVAL =>
-        val lines = S3Utils.getLinesContent(bucket, s"$prefix/$version-$study/test_michaid.ndjson")
+        val lines = sshClient.exec(
+          s"""input="projects/def-vferrett-ab/COMMON/michaud/pruned_T-DEE_epilepsy_IGN_P04.ndjson"
+             |while IFS= read -r line; do
+             |    echo $$line
+             |done < $$input""".stripMargin) match {
+          case Success(value) => value.stdOutAsString().split("\n").toSeq
+          case _ => Nil
+        }
 
         lines.map(line => {
           val lookupRunName = Json.parse(line) \ "experiment" \ "runName"

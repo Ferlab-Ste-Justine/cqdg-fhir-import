@@ -68,7 +68,7 @@ object CheckS3Data {
       case _ => Nil
     }
 
-    keys.map(k => RawFileEntry(bucket, k, 0))
+    keys.map(k => RawFileEntry(bucket, k, 0)) //FIXME Size is 0 as we dont have access to files (links only)
   }
 
   def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], studyId: String)(implicit s3Client: S3Client): Seq[FileEntry] = {

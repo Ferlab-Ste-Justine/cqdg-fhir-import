@@ -93,7 +93,7 @@ case class SequencingAlignment(document: Seq[TDocumentAttachment]) extends TDocu
 }
 
 object SequencingAlignment {
-  val documentType: String = "Aligned Reads"
+  val documentType: String = "Aligned-reads"
   val label: String = "Sequencing Alignment (CRAM and CRAI)"
   implicit case object builder extends ToReference[SequencingAlignment] {
     override val label: String = SequencingAlignment.label
@@ -130,7 +130,7 @@ case class CopyNumberVariant(document: Seq[TDocumentAttachment]) extends TDocume
 }
 
 object CopyNumberVariant {
-  val documentType: String = "Germline CNV"
+  val documentType: String = "Germline-CNV"
   val label = "Copy Number Variant"
   implicit case object builder extends ToReference[CopyNumberVariant] {
     override val label: String = CopyNumberVariant.label
@@ -148,7 +148,7 @@ case class StructuralVariant(document: Seq[TDocumentAttachment]) extends TDocume
 }
 
 object StructuralVariant {
-  val documentType: String = "Germline Structural Variant"
+  val documentType: String = "Germline-structural-variant"
   val label = "Structural Variant"
   implicit case object builder extends ToReference[StructuralVariant] {
     override val label: String = StructuralVariant.label
@@ -166,7 +166,7 @@ case class SupplementDocument(document: Seq[TDocumentAttachment]) extends TDocum
 }
 
 object SupplementDocument {
-  val documentType: String = "Sequencing Data Supplement"
+  val documentType: String = "Sequencing-data-supplement"
   val label = "Supplement"
   implicit case object builder extends ToReference[SupplementDocument] {
     override val label: String = SupplementDocument.label

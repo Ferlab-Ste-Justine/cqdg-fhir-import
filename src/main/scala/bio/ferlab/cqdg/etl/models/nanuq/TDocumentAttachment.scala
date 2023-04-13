@@ -102,6 +102,47 @@ object SV {
   }
 }
 
+case class SV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+  override val format: String = "TBI"
+}
+
+object SV_TBI {
+  implicit case object builder extends ToAttachment[SV_TBI] {
+    override def label: String = "sv tbi"
+
+    override def analysisFileName: Analysis => String = a => a.files.sv_tbi
+
+    override def buildFile: FileEntry => SV_TBI = f => SV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+  }
+}
+
+case class CNV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+  override val format: String = "TBI"
+}
+
+object CNV_TBI {
+  implicit case object builder extends ToAttachment[CNV_TBI] {
+    override def label: String = "cnv tbi"
+
+    override def analysisFileName: Analysis => String = a => a.files.cnv_tbi
+
+    override def buildFile: FileEntry => CNV_TBI = f => CNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+  }
+}
+
+case class SNV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+  override val format: String = "TBI"
+}
+
+object SNV_TBI {
+  implicit case object builder extends ToAttachment[SNV_TBI] {
+    override def label: String = "snv tbi"
+
+    override def analysisFileName: Analysis => String = a => a.files.snv_tbi
+
+    override def buildFile: FileEntry => SNV_TBI = f => SNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+  }
+}
 
 case class Supplement(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
   override val format: String = "TGZ"
