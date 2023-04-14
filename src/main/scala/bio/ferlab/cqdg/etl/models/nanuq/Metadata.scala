@@ -67,14 +67,11 @@ case class FilesAnalysis(
                           cram: String,
                           crai: String,
                           snv: String,
-                          snv_tbi: String,
+                          snv_tbi: Option[String],
                           cnv: String,
-                          cnv_tbi: String,
+                          cnv_tbi: Option[String],
                           sv: String,
-                          sv_tbi: String,
-                          seg_bw: String,
-                          hard_filtered_baf_bw: String,
-                          roh_bed: String,
+                          sv_tbi: Option[String],
                           supplement: String
                         )
 

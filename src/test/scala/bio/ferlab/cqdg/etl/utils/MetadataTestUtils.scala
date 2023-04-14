@@ -7,11 +7,14 @@ object MetadataTestUtils {
 
   val defaultFilesAnalysis: FilesAnalysis = FilesAnalysis(
     cram = "file1.cram",
-    crai = "file1.cram.crai",
+    crai = "file2.cram.crai",
     snv = "file2.gvcf.gz",
+    snv_tbi = None,
     cnv = "file3.cnv.vcf.gz",
-    sv = "file4.sv.vcf.gz",
-    supplement = "file5.tgz"
+    cnv_tbi = None,
+    sv = "file4.gvcf.gz",
+    sv_tbi = None,
+    supplement = "file5.tgz",
   )
   val defaultAnalysis: Analysis = Analysis(
     ldmSampleId = "submitted_sample_id",

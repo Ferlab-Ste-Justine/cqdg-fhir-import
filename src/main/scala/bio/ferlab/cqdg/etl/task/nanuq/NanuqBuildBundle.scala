@@ -60,7 +60,18 @@ object NanuqBuildBundle {
               2. if the files associated with this analysis are not in S3
             it will not generate an error */
         allAnalysis.toList.filter { a =>
-          val analysisFile = Seq(a.files.snv, a.files.sv, a.files.crai, a.files.cram, a.files.cnv, a.files.supplement)
+          val analysisFile = Seq(
+            a.files.snv,
+            a.files.sv,
+            a.files.crai,
+            a.files.cram,
+            a.files.cnv,
+            a.files.supplement
+          ) ++ Seq(
+            a.files.snv_tbi,
+            a.files.cnv_tbi,
+            a.files.snv_tbi,
+          ).flatten
           mapFiles.keySet.exists(analysisFile.contains) || !listLabAliquotDouble.toList.contains(a.labAliquotId)
         }
       } else {

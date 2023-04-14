@@ -110,7 +110,7 @@ object SV_TBI {
   implicit case object builder extends ToAttachment[SV_TBI] {
     override def label: String = "sv tbi"
 
-    override def analysisFileName: Analysis => String = a => a.files.sv_tbi
+    override def analysisFileName: Analysis => String = a => a.files.sv_tbi.get
 
     override def buildFile: FileEntry => SV_TBI = f => SV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
@@ -124,7 +124,7 @@ object CNV_TBI {
   implicit case object builder extends ToAttachment[CNV_TBI] {
     override def label: String = "cnv tbi"
 
-    override def analysisFileName: Analysis => String = a => a.files.cnv_tbi
+    override def analysisFileName: Analysis => String = a => a.files.cnv_tbi.get
 
     override def buildFile: FileEntry => CNV_TBI = f => CNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
@@ -138,7 +138,7 @@ object SNV_TBI {
   implicit case object builder extends ToAttachment[SNV_TBI] {
     override def label: String = "snv tbi"
 
-    override def analysisFileName: Analysis => String = a => a.files.snv_tbi
+    override def analysisFileName: Analysis => String = a => a.files.snv_tbi.get
 
     override def buildFile: FileEntry => SNV_TBI = f => SNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
