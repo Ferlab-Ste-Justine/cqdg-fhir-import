@@ -1,6 +1,6 @@
 package bio.ferlab.cqdg.etl.models.nanuq
 
-import cats.data.ValidatedNel
+import cats.data.{NonEmptySet, ValidatedNel}
 import cats.implicits._
 
 trait TDocumentAttachment {
@@ -13,7 +13,9 @@ trait TDocumentAttachment {
 }
 
 object TDocumentAttachment {
-  def valid[T <: TDocumentAttachment](files: Map[String, FileEntry], a: Analysis)(implicit toAttachment: ToAttachment[T]): ValidatedNel[String, T] = toAttachment.validateFile(files, a)
+  def valid[T <: TDocumentAttachment](files: Map[String, FileEntry], a: Analysis)(implicit toAttachment: ToAttachment[T]): Option[ValidatedNel[String, T]] = Some(toAttachment.validateFile(files, a))
+
+  def validOpt[T <: TDocumentAttachment](files: Map[String, FileEntry], a: Analysis)(implicit toAttachmentOpt: ToOptAttachment[T]): Option[ValidatedNel[String, T]] = toAttachmentOpt.validateFile(files, a)
 
   def idFromList[T <: TDocumentAttachment : Manifest](attachments: Seq[TDocumentAttachment]): String = attachments.collectFirst { case a: T => a.objectStoreId }.get
 }
@@ -28,6 +30,24 @@ trait ToAttachment[T <: TDocumentAttachment] {
   def validateFile(files: Map[String, FileEntry], a: Analysis): ValidatedNel[String, T] = {
     val key = analysisFileName(a)
     files.get(key).map(f => buildFile(f).validNel[String]).getOrElse(s"File $key does not exist : type=$label, sample=${a.ldmSampleId}".invalidNel[T])
+  }
+}
+
+trait ToOptAttachment[T <: TDocumentAttachment] {
+  def label: String
+
+  def analysisFileName: Analysis => Option[String]
+
+  def buildFile: FileEntry => T
+
+  def validateFile(files: Map[String, FileEntry], a: Analysis): Option[ValidatedNel[String, T]] = {
+    val key = analysisFileName(a)
+
+    key match {
+      case Some(value) => Some(files.get(value).map(f => buildFile(f).validNel[String]).getOrElse(s"File $key does not exist : type=$label, sample=${a.ldmSampleId}".invalidNel[T]))
+      case None => None
+    }
+
   }
 }
 
@@ -107,10 +127,10 @@ case class SV_TBI(objectStoreId: String, title: String, md5: Option[String], siz
 }
 
 object SV_TBI {
-  implicit case object builder extends ToAttachment[SV_TBI] {
+  implicit case object builder extends ToOptAttachment[SV_TBI] {
     override def label: String = "sv tbi"
 
-    override def analysisFileName: Analysis => String = a => a.files.sv_tbi.get
+    override def analysisFileName: Analysis => Option[String] = a => a.files.sv_tbi
 
     override def buildFile: FileEntry => SV_TBI = f => SV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
@@ -121,10 +141,10 @@ case class CNV_TBI(objectStoreId: String, title: String, md5: Option[String], si
 }
 
 object CNV_TBI {
-  implicit case object builder extends ToAttachment[CNV_TBI] {
+  implicit case object builder extends ToOptAttachment[CNV_TBI] {
     override def label: String = "cnv tbi"
 
-    override def analysisFileName: Analysis => String = a => a.files.cnv_tbi.get
+    override def analysisFileName: Analysis => Option[String] = a => a.files.cnv_tbi
 
     override def buildFile: FileEntry => CNV_TBI = f => CNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
@@ -135,10 +155,10 @@ case class SNV_TBI(objectStoreId: String, title: String, md5: Option[String], si
 }
 
 object SNV_TBI {
-  implicit case object builder extends ToAttachment[SNV_TBI] {
+  implicit case object builder extends ToOptAttachment[SNV_TBI] {
     override def label: String = "snv tbi"
 
-    override def analysisFileName: Analysis => String = a => a.files.snv_tbi.get
+    override def analysisFileName: Analysis => Option[String] = a => a.files.snv_tbi
 
     override def buildFile: FileEntry => SNV_TBI = f => SNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }

@@ -13,7 +13,7 @@
       "designation": [
         {
           "use": {
-            "code": "aging",
+            "code": "Aging",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Aging study"
@@ -21,12 +21,12 @@
       ]
     },
     {
-      "code": "Birth Defect",
+      "code": "Birth-Defect",
       "display": "Birth defect study",
       "designation": [
         {
           "use": {
-            "code": "birth-defect",
+            "code": "Birth-Defect",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Birth defect study"
@@ -39,7 +39,7 @@
       "designation": [
         {
           "use": {
-            "code": "cancer",
+            "code": "Cancer",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "cancer study"
@@ -47,12 +47,12 @@
       ]
     },
     {
-      "code": "Circulatory and Respiratory Health",
+      "code": "Circulatory-and-Respiratory-Health",
       "display": "Circulatory and Respiratory Health study",
       "designation": [
         {
           "use": {
-            "code": "circulatory-and-respiratory-health",
+            "code": "Circulatory-and-Respiratory-Health",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Circulatory and Respiratory Health study"
@@ -60,13 +60,13 @@
       ]
     },
     {
-      "code": "General Health",
+      "code": "General-Health",
       "display": "General Health",
       "definition": "General Health study",
       "designation": [
         {
           "use": {
-            "code": "general-health",
+            "code": "General-Health",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "General Health study"
@@ -74,12 +74,12 @@
       ]
     },
     {
-      "code": "Infection and Immunity",
+      "code": "Infection-and-Immunity",
       "display": "Infection and Immunity study",
       "designation": [
         {
           "use": {
-            "code": "infection-and-immunity",
+            "code": "Infection-and-Immunity",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Infection and Immunity study"
@@ -87,12 +87,12 @@
       ]
     },
     {
-      "code": "Musculoskeletal Health and Arthritis",
+      "code": "Musculoskeletal-Health-and-Arthritis",
       "display": "Musculoskeletal Health and Arthritis study",
       "designation": [
         {
           "use": {
-            "code": "musculoskeletal-health-and-arthritis",
+            "code": "Musculoskeletal-Health-and-Arthritis",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Musculoskeletal Health and Arthritis study"
@@ -100,13 +100,13 @@
       ]
     },
     {
-      "code": "Neurodevelopmental Conditions",
+      "code": "Neurodevelopmental-Conditions",
       "display": "Neurodevelopmental Conditions",
       "definition": "Neurodevelopmental Conditions study",
       "designation": [
         {
           "use": {
-            "code": "neurodevelopmental-conditions",
+            "code": "Neurodevelopmental-Conditions",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Neurodevelopmental Conditions study"
@@ -114,13 +114,13 @@
       ]
     },
     {
-      "code": "Neurosciences, Mental Health and Addiction",
+      "code": "Neurosciences-Mental-Health-and-Addiction",
       "display": "Neurosciences, Mental Health and Addiction",
       "definition": "Neurosciences, Mental Health and Addiction study",
       "designation": [
         {
           "use": {
-            "code": "neurosciences-mental-health-and-addiction",
+            "code": "Neurosciences-Mental-Health-and-Addiction",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Neurosciences, Mental Health and Addiction study"
@@ -128,13 +128,13 @@
       ]
     },
     {
-      "code": "Nutrition, Metabolism and Diabetes",
+      "code": "Nutrition-Metabolism-and-Diabetes",
       "display": "Nutrition, Metabolism and Diabetes",
       "definition": "Nutrition, Metabolism and Diabetes study",
       "designation": [
         {
           "use": {
-            "code": "nutrition-metabolism-and-diabetes",
+            "code": "Nutrition-Metabolism-and-Diabetes",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Nutrition, Metabolism and Diabetes study"
@@ -142,13 +142,13 @@
       ]
     },
     {
-      "code": "Population Genomics",
+      "code": "Population-Genomics",
       "display": "Population Genomics",
       "definition": "Population Genomics study",
       "designation": [
         {
           "use": {
-            "code": "population-genomics",
+            "code": "Population-Genomics",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Population Genomics study"
@@ -156,13 +156,13 @@
       ]
     },
     {
-      "code": "Rare Diseases",
+      "code": "Rare-Diseases",
       "display": "Rare Diseases",
       "definition": "Rare Diseases study",
       "designation": [
         {
           "use": {
-            "code": "rare-diseases",
+            "code": "Rare-Diseases",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Rare Diseases study"
@@ -170,13 +170,13 @@
       ]
     },
     {
-      "code": "Not Applicable",
+      "code": "Not-Applicable",
       "display": "Not Applicable",
       "definition": "Not Applicable study",
       "designation": [
         {
           "use": {
-            "code": "not-applicable",
+            "code": "Not-Applicable",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Not Applicable study"
@@ -190,7 +190,7 @@
       "designation": [
         {
           "use": {
-            "code": "other",
+            "code": "Other",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
           },
           "value": "Other study"
@@ -198,5 +198,9 @@
       ]
     }
   ],
+  "title": "Research Domain",
+  "experimental": false,
+  "description": "Research domain",
+  "caseSensitive": false,
   "count": 14
 }

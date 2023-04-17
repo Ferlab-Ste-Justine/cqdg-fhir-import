@@ -7,7 +7,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.CQDG_DOC_REFERENCE_PROFILE
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, validateOutcomes}
-import bio.ferlab.cqdg.etl.models.nanuq.TDocumentAttachment.{idFromList, valid}
+import bio.ferlab.cqdg.etl.models.nanuq.TDocumentAttachment.{idFromList, valid, validOpt}
 import bio.ferlab.cqdg.etl.task.HashIdMap
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.implicits._
@@ -100,7 +100,7 @@ object SequencingAlignment {
 
     protected override def build(documents: Seq[TDocumentAttachment]): SequencingAlignment = SequencingAlignment(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[CRAM], valid[CRAI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[CRAM], valid[CRAI])
 
   }
 }
@@ -118,7 +118,7 @@ object VariantCalling {
 
     protected override def build(documents: Seq[TDocumentAttachment]): VariantCalling = VariantCalling(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[SNV], valid[SNV_TBI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[SNV], validOpt[SNV_TBI])
 
 
   }
@@ -137,7 +137,7 @@ object CopyNumberVariant {
 
     protected override def build(documents: Seq[TDocumentAttachment]): CopyNumberVariant = CopyNumberVariant(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[CNV], valid[CNV_TBI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[CNV], validOpt[CNV_TBI])
 
   }
 }
@@ -155,7 +155,7 @@ object StructuralVariant {
 
     protected override def build(documents: Seq[TDocumentAttachment]): StructuralVariant = StructuralVariant(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[SV], valid[SV_TBI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[SV], validOpt[SV_TBI])
 
   }
 }
@@ -173,7 +173,7 @@ object SupplementDocument {
 
     protected override def build(documents: Seq[TDocumentAttachment]): SupplementDocument = SupplementDocument(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[Supplement])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[Supplement])
   }
 }
 
@@ -182,10 +182,10 @@ trait ToReference[T <: TDocumentReference] {
 
   protected def build(documents: Seq[TDocumentAttachment]): T
 
-  def attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]]
+  def attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]]
 
   def attach(files: Map[String, FileEntry], a: Analysis): Seq[ValidationResult[TDocumentAttachment]] =
-    attachments.map(v => v(files, a))
+    attachments.flatMap(v => v(files, a))
 
   def validate(files: Map[String, FileEntry], a: Analysis, studyId: String, release: String)(implicit client: IGenericClient, ferloadConf: FerloadConf): ValidationResult[T] = {
     attach(files, a).toList.sequence

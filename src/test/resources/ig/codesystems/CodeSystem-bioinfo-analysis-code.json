@@ -13,7 +13,7 @@
       "designation": [
         {
           "use": {
-            "code": "reads-alignement-bioinformatic-analysis",
+            "code": "RABA",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Reads Alignement Bioinformatic Analysis"
@@ -26,7 +26,7 @@
       "designation": [
         {
           "use": {
-            "code": "snv-calling-bioinformatic-nalysis",
+            "code": "SNVC",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Reads Alignement Bioinformatic Analysis"
@@ -39,7 +39,7 @@
       "designation": [
         {
           "use": {
-            "code": "quality-control-bioinformatic-analysis",
+            "code": "QCBA",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Quality Control Bioinformatic Analysis"
@@ -52,7 +52,7 @@
       "designation": [
         {
           "use": {
-            "code": "germline-exome-bioinformatic-analysis",
+            "code": "GEBA",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Germline Exome Bioinformatic Analysis"
@@ -65,7 +65,7 @@
       "designation": [
         {
           "use": {
-            "code": "germline-genome-bioinformatic-analysis",
+            "code": "GGBA",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Germline Genome Bioinformatic Analysis"
@@ -73,5 +73,9 @@
       ]
     }
   ],
+  "title": "Bioinformatics analysis code",
+  "experimental": false,
+  "description": "Bioinformatics analysis code",
+  "caseSensitive": true,
   "count": 5
 }

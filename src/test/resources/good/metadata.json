@@ -1,47 +1,32 @@
 {
   "submissionSchema": "CQGC_Germline",
-  "experiment": {
-    "platform": "Illumina",
-    "sequencerId": "NB552318",
-    "runName": "runNameExample",
-    "runDate": "2014-09-21T11:50:23-05:00",
-    "runAlias": "runAliasExample",
-    "flowcellId": "0",
-    "isPairedEnd": true,
-    "readLength": "151,8,8,151",
-    "fragmentSize": 100,
-    "experimentalStrategy": "WXS",
-    "captureKit": "RocheKapaHyperExome",
-    "baitDefinition": "KAPA_HyperExome_hg38_capture_targets"
+  "experiment":{
+    "flowcellId":"HJNNJDSX2",
+    "runDate":"2021-08-17T08:44:36-0400",
+    "readLength":"151,8,8,151",
+    "runName":"1615",
+    "isPairedEnd":true,
+    "platform":"Illumina NovaSeq 6000 S4 PE150",
+    "experimentalStrategy":"WGS"
   },
-  "workflow": {
-    "name": "Dragen",
-    "version": "1.1.0",
-    "genomeBuild": "GRCh38"
+  "workflow":{
+    "genomeBuild":"Homo_sapiens: GATK GRCh38 ver:0",
+    "name":"Dragen",
+    "version":"SW null"
   },
   "analyses": [
     {
-      "patient": {
-        "clinId": "_PATIENT_ID_",
-        "firstName": "John",
-        "lastName": "Doe",
-        "sex": "male"
-      },
-      "ldm": "_ORGANIZATION_ALIAS_",
-      "ldmSampleId": "_LDM_SAMPLE_ID_",
-      "ldmSpecimenId": "_LDM_SPECIMEN_ID_",
-      "specimenType": "NBL",
-      "sampleType": "NBL",
-      "bodySite": "can be null",
-      "clinServiceRequestId": "_SERVICE_REQUEST_ID_",
-      "labAliquotId": "nanuq_sample_id",
+      "ldmSampleId":"sample07779",
+      "specimenType":"NBL",
+      "sampleType":"DNA",
+      "labAliquotId":"MPS12346928-C04",
       "files": {
-        "cram": "file1.cram",
-        "crai": "file1.cram.crai",
-        "snv": "file2.gvcf.gz",
-        "cnv": "file3.cnv.vcf.gz",
-        "sv": "file4.sv.vcf.gz",
-        "supplement": "file5.json"
+        "sv":"file5.sv.vcf.gz",
+        "cram":"file1.cram",
+        "supplement":"file6.zip",
+        "crai":"file2.cram.crai",
+        "cnv":"file3.cnv.vcf.gz",
+        "snv":"file4.gvcf.gz"
       }
     }
   ]

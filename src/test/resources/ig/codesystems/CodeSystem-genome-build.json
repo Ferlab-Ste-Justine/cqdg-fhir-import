@@ -21,5 +21,9 @@
       ]
     }
   ],
+  "title": "Genome Build",
+  "experimental": false,
+  "description": "Genome build",
+  "caseSensitive": true,
   "count": 1
 }

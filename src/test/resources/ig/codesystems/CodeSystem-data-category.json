@@ -13,7 +13,7 @@
       "designation": [
         {
           "use": {
-            "code": "genomics",
+            "code": "Genomics",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-category"
           },
           "value": "Genomics"
@@ -21,5 +21,9 @@
       ]
     }
   ],
+  "title": "Data category",
+  "experimental": false,
+  "description": "Data category",
+  "caseSensitive": true,
   "count": 1
 }

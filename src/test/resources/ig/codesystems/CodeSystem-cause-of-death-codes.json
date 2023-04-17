@@ -13,7 +13,7 @@
       "designation": [
         {
           "use": {
-            "code": "cancer",
+            "code": "Cancer",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
           },
           "value": "Cancer"
@@ -21,12 +21,12 @@
       ]
     },
     {
-      "code": "Heart disease",
+      "code": "Heart-disease",
       "display": "Heart disease",
       "designation": [
         {
           "use": {
-            "code": "heart-desease",
+            "code": "Heart-disease",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
           },
           "value": "Heart disease"
@@ -34,12 +34,12 @@
       ]
     },
     {
-      "code": "Cerebrovascular disease",
+      "code": "Cerebrovascular-disease",
       "display": "Cerebrovascular disease",
       "designation": [
         {
           "use": {
-            "code": "cerebrovascular-disease",
+            "code": "Cerebrovascular-disease",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
           },
           "value": "Cerebrovascular disease"
@@ -47,12 +47,12 @@
       ]
     },
     {
-      "code": "Accidental death",
+      "code": "Accidental-death",
       "display": "Accidental death",
       "designation": [
         {
           "use": {
-            "code": "accidental-death",
+            "code": "Accidental-death",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
           },
           "value": "Accidental death"
@@ -60,12 +60,12 @@
       ]
     },
     {
-      "code": "Chronic lower respiratory diseases",
+      "code": "Chronic-lower-respiratory-diseases",
       "display": "Chronic lower respiratory diseases",
       "designation": [
         {
           "use": {
-            "code": "chronic-lower-respiratory-diseases",
+            "code": "Chronic-lower-respiratory-diseases",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
           },
           "value": "Chronic lower respiratory diseases"
@@ -73,12 +73,12 @@
       ]
     },
     {
-      "code": "Influenza and pneumonia",
+      "code": "Influenza-and-pneumonia",
       "display": "Influenza and pneumonia",
       "designation": [
         {
           "use": {
-            "code": "influenza-and-pneumonia",
+            "code": "Influenza-and-pneumonia",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
           },
           "value": "Influenza and pneumonia"
@@ -86,12 +86,12 @@
       ]
     },
     {
-      "code": "Other reasons",
-      "display": "Other reasonsa",
+      "code": "Other-reasons",
+      "display": "Other reasons",
       "designation": [
         {
           "use": {
-            "code": "other-reason",
+            "code": "Other-reasons",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
           },
           "value": "Other reasons"
@@ -104,7 +104,7 @@
       "designation": [
         {
           "use": {
-            "code": "unknown",
+            "code": "Unknown",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death-codes"
           },
           "value": "Unknown"
@@ -112,5 +112,9 @@
       ]
     }
   ],
+  "title": "Codes for cause of death",
+  "experimental": false,
+  "description": "Codes for cause of death",
+  "caseSensitive": true,
   "count": 8
 }

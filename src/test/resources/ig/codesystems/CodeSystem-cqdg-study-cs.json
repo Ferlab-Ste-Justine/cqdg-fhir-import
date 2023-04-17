@@ -1,6 +1,6 @@
 {
   "resourceType": "CodeSystem",
-  "status": "draft",
+  "status": "active",
   "content": "complete",
   "name": "CQDGStudyCS",
   "id": "cqdg-study-cs",
@@ -14,7 +14,7 @@
       "designation": [
         {
           "use": {
-            "code": "internal-label",
+            "code": "Cartagène",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-study-cs"
           },
           "value": "Étude CARTaGENE"
@@ -22,12 +22,12 @@
       ]
     },
     {
-      "code": "Developmental and Epileptic Encephalopathies",
+      "code": "Developmental-and-Epileptic-Encephalopathies",
       "display": "Developmental and Epileptic Encephalopathies",
       "designation": [
         {
           "use": {
-            "code": "internal-label",
+            "code": "Developmental-and-Epileptic-Encephalopathies",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-study-cs"
           },
           "value": "Étude CARTaGENE"
@@ -41,7 +41,7 @@
       "designation": [
         {
           "use": {
-            "code": "internal-label",
+            "code": "Other",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-study-cs"
           },
           "value": "Autre étude"
@@ -49,24 +49,9 @@
       ]
     }
   ],
-  "identifier": [
-    {
-      "value": "research-domain"
-    }
-  ],
-  "experimental": true,
-  "publisher": "FerLab",
-  "contact": [
-    {
-      "name": "FerLab FHIR project team",
-      "telecom": [
-        {
-          "system": "url",
-          "value": "http://hl7.org/fhir"
-        }
-      ]
-    }
-  ],
+  "title": "CQDG study code system",
+  "description": "CQDG study code system",
+  "experimental": false,
   "caseSensitive": true,
   "count": 3
 }

@@ -13,7 +13,7 @@
       "designation": [
         {
           "use": {
-            "code": "normal",
+            "code": "Normal",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
           },
           "value": "Normal"
@@ -34,12 +34,12 @@
       ]
     },
     {
-      "code": "Not applicable",
+      "code": "Not-applicable",
       "display": "Not applicable",
       "designation": [
         {
           "use": {
-            "code": "not-applicable",
+            "code": "Not-applicable",
             "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
           },
           "value": "Not applicable"
@@ -47,5 +47,9 @@
       ]
     }
   ],
+  "title": "Tumor normal designation",
+  "experimental": false,
+  "description": "Tumor normal designation",
+  "caseSensitive": true,
   "count": 3
 }
