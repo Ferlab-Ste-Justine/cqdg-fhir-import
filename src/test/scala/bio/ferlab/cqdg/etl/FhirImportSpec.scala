@@ -3,7 +3,7 @@ package bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl.RunType.RunType
 import bio.ferlab.cqdg.etl.clients.IIdServer
-import bio.ferlab.cqdg.etl.conf.FerloadConf
+import bio.ferlab.cqdg.etl.conf.{Conf, FerloadConf}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.CAUSE_OF_DEATH
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions.{AGE_OF_DEATH, POPULATION_URL}
 import bio.ferlab.cqdg.etl.models._
@@ -64,7 +64,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       val metaDataMap = Map(inputPrefix + "/files" -> metadata)
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, metaDataMap, "reportPath", outputBucket, true)
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, "reportPath", "",  metaDataMap, "", true)
 
       result.isValid shouldBe true
 

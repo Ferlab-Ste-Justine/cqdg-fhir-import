@@ -70,20 +70,22 @@ object FhirImport extends App {
 
         updateIG()
 
+        val inputBucket = conf.aws.bucketName
+        val outputBucket = conf.aws.outputBucketName
+        val outputPrefix = conf.aws.outputPrefix
+        val narvalProjectRoot = conf.narval.projectsFolder
+
         withReport(bucket, s"$prefix/$version-$study/$release/${metadataInputPrefixMap.keySet.head}") { reportPath =>
-          run(bucket, prefix, version, study, release, conf, metadataInputPrefixMap, reportPath, removeMissing.toBoolean)
+          run(bucket, prefix, version, study, release, inputBucket, outputBucket, outputPrefix, narvalProjectRoot, metadataInputPrefixMap, reportPath, removeMissing.toBoolean)
         }
       }
     }
   }
 
-  def run(bucket: String, prefix: String, version: String, study: String, release: String, conf: Conf,
-          inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean)
+  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String,
+          outputBucket: String, outputPrefix: String, narvalProjectRoot: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean)
          (implicit s3: S3Client, client: IGenericClient, sshClient: SshClient, idService: IIdServer, ferloadConf: FerloadConf, runType: RunType): ValidationResult[Bundle] = {
 
-    val inputBucket = conf.aws.bucketName
-    val outputBucket = conf.aws.outputBucketName
-    val outputPrefix = conf.aws.outputPrefix
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
@@ -98,7 +100,7 @@ object FhirImport extends App {
     val rawFileEntries = inputPrefixMetadataMap.keySet.flatMap(p => {
       runType match {
         case RunType.NANUK => CheckS3Data.loadRawFileEntries(inputBucket, p)
-        case RunType.NARVAL => CheckS3Data.loadRawFileEntriesNarval(conf.narval.projectsFolder, p)
+        case RunType.NARVAL => CheckS3Data.loadRawFileEntriesNarval(narvalProjectRoot, p)
       }
     }).toSeq
 
