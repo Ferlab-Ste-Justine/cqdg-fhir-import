@@ -3,7 +3,7 @@ package bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl.RunType.RunType
 import bio.ferlab.cqdg.etl.clients.{IIdServer, IdServerClient, NanuqClient}
-import bio.ferlab.cqdg.etl.conf.FerloadConf
+import bio.ferlab.cqdg.etl.conf.{Conf, FerloadConf}
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
 import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{bundleCreate, updateIG}
@@ -30,14 +30,15 @@ import scala.util.Success
 object FhirImport extends App {
 
   val prefix = args(0)
-  val bucket = args(1)
-  val version = args(2)
-  val release = args(3)
-  val study = args(4)
-  val removeMissing = args(5)
+  val prefixFiles = args(1)
+  val bucket = args(2)
+  val version = args(3)
+  val release = args(4)
+  val study = args(5)
+  val removeMissing = args(6)
 
   var runName = ""
-  if (args.length > 6) {
+  if (args.length > 7) {
     runName = args.last
   }
 
@@ -61,12 +62,7 @@ object FhirImport extends App {
             conf.narval.endpoint)
         )
 
-        val metadataInputPrefixMap = getMatadataPerRuns(bucket, prefix, study, version, runType)
-
-
-        val inputBucket = conf.aws.bucketName
-        val outputBucket = conf.aws.outputBucketName
-        val outputPrefix = conf.aws.outputPrefix
+        val metadataInputPrefixMap = getMatadataPerRuns(conf.narval.projectsFolder, prefixFiles, runType)
 
         val auth: Auth = new AuthTokenInterceptor(conf.keycloak).auth
 
@@ -75,15 +71,19 @@ object FhirImport extends App {
         updateIG()
 
         withReport(bucket, s"$prefix/$version-$study/$release/${metadataInputPrefixMap.keySet.head}") { reportPath =>
-          run(bucket, prefix, version, study, release, inputBucket, metadataInputPrefixMap, reportPath, outputBucket, removeMissing.toBoolean) //todo add output Prefix
+          run(bucket, prefix, version, study, release, conf, metadataInputPrefixMap, reportPath, removeMissing.toBoolean)
         }
       }
     }
   }
 
-  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String,
-          inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, outputBucket: String, removeMissing: Boolean)
+  def run(bucket: String, prefix: String, version: String, study: String, release: String, conf: Conf,
+          inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean)
          (implicit s3: S3Client, client: IGenericClient, sshClient: SshClient, idService: IIdServer, ferloadConf: FerloadConf, runType: RunType): ValidationResult[Bundle] = {
+
+    val inputBucket = conf.aws.bucketName
+    val outputBucket = conf.aws.outputBucketName
+    val outputPrefix = conf.aws.outputPrefix
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
@@ -98,7 +98,7 @@ object FhirImport extends App {
     val rawFileEntries = inputPrefixMetadataMap.keySet.flatMap(p => {
       runType match {
         case RunType.NANUK => CheckS3Data.loadRawFileEntries(inputBucket, p)
-        case RunType.NARVAL => CheckS3Data.loadRawFileEntriesNarval(inputBucket, p)
+        case RunType.NARVAL => CheckS3Data.loadRawFileEntriesNarval(conf.narval.projectsFolder, p)
       }
     }).toSeq
 
@@ -130,7 +130,7 @@ object FhirImport extends App {
         val allBundle = bundle ++ bundleList
 
         if(allBundle.size > 5000) {
-          TBundle.saveByFragments(allBundle).head //FIXME
+          TBundle.saveByFragments(allBundle).head
         } else {
           val result = TBundle(allBundle).execute()
           if (result.isInvalid) {
@@ -148,13 +148,13 @@ object FhirImport extends App {
     results
   }
 
-  private def getMatadataPerRuns(bucket: String, prefix: String, study: String, version: String, runType: RunType)
-                                (implicit nanuqClient: NanuqClient, s3Client: S3Client, sshClient: SshClient) = {
+  private def getMatadataPerRuns(projectsFolder: String, prefix: String, runType: RunType)
+                                (implicit nanuqClient: NanuqClient, sshClient: SshClient) = {
 
     runType match {
       case RunType.NARVAL =>
         val lines = sshClient.exec(
-          s"""input="projects/def-vferrett-ab/COMMON/michaud/pruned_T-DEE_epilepsy_IGN_P04.ndjson"
+          s"""input="$projectsFolder/$prefix/metadata.ndjson"
              |while IFS= read -r line; do
              |    echo $$line
              |done < $$input""".stripMargin) match {
@@ -165,12 +165,12 @@ object FhirImport extends App {
         lines.map(line => {
           val lookupRunName = Json.parse(line) \ "experiment" \ "runName"
           lookupRunName match {
-            case JsDefined(runName) => runName.as[String] -> line.validNel.andThen(Metadata.validateMetadata)
-            case JsUndefined() => "" -> s"Nanuq returned an empty body".invalidNel //fixme
+            case JsDefined(runName) => s"$prefix/${runName.as[String]}" -> line.validNel.andThen(Metadata.validateMetadata)
+            case JsUndefined() => "" -> s"Narval returned an empty body".invalidNel
           }
         }).toMap
       case RunType.NANUK => runNames.map(r => {
-        s"genorefq_wgs_data/$r" -> nanuqClient.fetch(r).andThen(Metadata.validateMetadata)
+        s"$prefix/$r" -> nanuqClient.fetch(r).andThen(Metadata.validateMetadata)
       }).toMap
     }
   }

@@ -3,7 +3,6 @@ package bio.ferlab.cqdg.etl.task.nanuq
 import bio.ferlab.cqdg.etl.isValid
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata, RawFileEntry}
 import bio.ferlab.cqdg.etl.s3.S3Utils.getContent
-import bio.ferlab.cqdg.etl.task.nanuq.CheckS3Data.attach
 import cats.data.ValidatedNel
 import com.decodified.scalassh.SshClient
 import org.apache.commons.codec.digest.DigestUtils
@@ -14,7 +13,6 @@ import software.amazon.awssdk.services.s3.model._
 
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.UUID
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
 import scala.util.Success
@@ -54,13 +52,17 @@ object CheckS3Data {
         && f.filename != "metadata.json"
         && !f.filename.toLowerCase().contains("hard-filtered.formatted.norm.vep.vcf.gz")
         && !f.filename.toLowerCase().contains("hard-filtered.vcf.gz")
-        && !f.filename.toLowerCase().endsWith("extra_results.tgz"))
+        && !f.filename.toLowerCase().endsWith("extra_results.tgz")
+        && !f.filename.toLowerCase().endsWith("seg.bw") //IGV type not supported
+        && !f.filename.toLowerCase().endsWith("hard-filtered.baf.bw") //IGV type not supported
+        && !f.filename.toLowerCase().endsWith("roh.bed") //IGV type not supported
+      )
     fileEntries
   }
 
-  def loadRawFileEntriesNarval(bucket: String, prefix: String)(implicit sshClient: SshClient): Seq[RawFileEntry] = {
+  def loadRawFileEntriesNarval(projectFolder: String, prefix: String)(implicit sshClient: SshClient): Seq[RawFileEntry] = {
     val keys = sshClient.exec(
-      s"""search_dir=projects/def-vferrett-ab/COMMON/michaud/WGS-EE/${prefix}
+      s"""search_dir=$projectFolder/$prefix
         |for entry in "$$search_dir"/*
         |do
         | echo "$$entry"
@@ -69,7 +71,7 @@ object CheckS3Data {
       case _ => Nil
     }
 
-    keys.map(k => RawFileEntry(bucket, k, 0)) //FIXME Size is 0 as we dont have access to files (links only)
+    keys.map(k => RawFileEntry(projectFolder, s"$prefix/${k.split("/").last}", 0)) //FIXME Size is 0 as we dont have access to files (links only)
   }
 
   def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], studyId: String)(implicit s3Client: S3Client): Seq[FileEntry] = {
