@@ -24,7 +24,6 @@ lazy val root = (project in file("."))
     libraryDependencies += "ca.uhn.hapi.fhir" % "hapi-fhir-server" % "5.4.2",
     libraryDependencies += "com.github.pureconfig" %% "pureconfig" % "0.17.1",
     libraryDependencies += "org.typelevel" %% "cats-core" % "2.3.1",
-    libraryDependencies += "com.decodified" %% "scala-ssh" % "0.11.1",
     libraryDependencies +=
       "org.scala-lang.modules" %% "scala-parallel-collections" % "1.0.4"
   )

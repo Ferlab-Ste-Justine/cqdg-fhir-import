@@ -2,12 +2,13 @@ package bio.ferlab.cqdg.etl.task.nanuq
 
 import bio.ferlab.cqdg.etl.isValid
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata, RawFileEntry}
+import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.s3.S3Utils.getContent
 import cats.data.ValidatedNel
-import com.decodified.scalassh.SshClient
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model._
 
@@ -60,16 +61,11 @@ object CheckS3Data {
     fileEntries
   }
 
-  def loadRawFileEntriesNarval(projectFolder: String, prefix: String)(implicit sshClient: SshClient): Seq[RawFileEntry] = {
-    val keys = sshClient.exec(
-      s"""search_dir=$projectFolder/$prefix
-        |for entry in "$$search_dir"/*
-        |do
-        | echo "$$entry"
-        |done""".stripMargin) match {
-      case Success(value) => value.stdOutAsString().split("\n").toSeq
-      case _ => Nil
-    }
+  def loadRawFileEntriesFromListFile(projectFolder: String, prefix: String)(implicit s3Client: S3Client): Seq[RawFileEntry] = {
+    val runName = prefix.split("/").last
+    val keys = (Json.parse(S3Utils.getContent("cqdg-qa-app-clinical-data-service", "michaud/trio-dee/files_list")) \ "files")
+      .as[Seq[String]]
+      .filter(s => s.contains(s"/$runName"))
 
     keys.map(k => RawFileEntry(projectFolder, s"$prefix/${k.split("/").last}", 0)) //FIXME Size is 0 as we dont have access to files (links only)
   }

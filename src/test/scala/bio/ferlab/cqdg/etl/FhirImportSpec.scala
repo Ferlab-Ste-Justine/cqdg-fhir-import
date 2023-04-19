@@ -1,16 +1,14 @@
 package bio.ferlab.cqdg.etl
 
 import bio.ferlab.cqdg.etl
-import bio.ferlab.cqdg.etl.RunType.RunType
 import bio.ferlab.cqdg.etl.clients.IIdServer
-import bio.ferlab.cqdg.etl.conf.{Conf, FerloadConf}
+import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.CAUSE_OF_DEATH
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions.{AGE_OF_DEATH, POPULATION_URL}
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.Metadata
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
-import com.decodified.scalassh.{HostConfig, PasswordLogin, SimplePasswordProducer, SshClient}
 import org.hl7.fhir.r4.model._
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 
@@ -21,12 +19,6 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
   implicit val idService: IIdServer = new IdServerMock()
   implicit val ferloadConf: FerloadConf = new FerloadConf(url = "http://flerloadurl")
-
-  implicit val sshClient: SshClient = new SshClient(
-    new HostConfig(
-      login = PasswordLogin("user", SimplePasswordProducer("password")),
-     )
-  )
 
   implicit val runType: etl.RunType.Value = RunType.NANUK
 
@@ -64,7 +56,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       val metaDataMap = Map(inputPrefix + "/files" -> metadata)
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, "reportPath", "",  metaDataMap, "", true)
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, "",  metaDataMap, "", true)
 
       result.isValid shouldBe true
 

@@ -62,7 +62,7 @@ object S3Utils {
       .bucket(bucket)
       .build()
 
-    Source.fromInputStream(s3Client.getObject(objectRequest)).getLines.toList
+    Source.fromInputStream(s3Client.getObject(objectRequest)).getLines.filterNot(_.isEmpty).toList
   }
 
   def writeContent(bucket: String, key: String, content: String)(implicit s3Client: S3Client): Unit = {
