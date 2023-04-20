@@ -130,5 +130,7 @@
       ]
     }
   ],
+  "experimental": false,
+  "caseSensitive": true,
   "count": 11
 }

@@ -1,5 +1,7 @@
 package bio.ferlab.cqdg.etl
 
+import bio.ferlab.cqdg.etl
+import bio.ferlab.cqdg.etl.RunType.RunType
 import bio.ferlab.cqdg.etl.clients.{IIdServer, IdServerClient, NanuqClient}
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
@@ -25,8 +27,20 @@ import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
 
-  val Array(prefix, bucket, version, release, study, removeMissing, runName) = args
-  val runNames = runName.split(",")
+  val prefix = args(0)
+  val prefixFiles = args(1)
+  val bucket = args(2)
+  val version = args(3)
+  val release = args(4)
+  val study = args(5)
+  val removeMissing = args(6)
+
+  var runName = ""
+  if (args.length > 7) {
+    runName = args.last
+  }
+
+  val runNames = runName.split(",").filterNot(e => e.isEmpty)
 
   withSystemExit {
     withLog {
@@ -35,16 +49,18 @@ object FhirImport extends App {
         implicit val fhirClient: IGenericClient = buildFhirClient(conf.fhir, conf.keycloak)
         implicit val idService: IdServerClient = new IdServerClient()
         implicit val ferloadConf: FerloadConf = conf.ferload
-        val nanuqClient = new NanuqClient(conf.nanuq)
-
-        val metadataInputPrefixMap = runNames.map(r => {
-          s"genorefq_wgs_data/$r" -> nanuqClient.fetch(r).andThen(Metadata.validateMetadata)
-        }).toMap
-
+        implicit val nanuqClient: NanuqClient = new NanuqClient(conf.nanuq)
+        implicit val runType: etl.RunType.Value = runNames match {
+          case Array() => RunType.NARVAL
+          case _ => RunType.NANUK
+        }
 
         val inputBucket = conf.aws.bucketName
         val outputBucket = conf.aws.outputBucketName
-        val outputPrefix = conf.aws.outputPrefix
+        val outputNarvalBucket = conf.aws.outputNarvalBucket
+        val narvalProjectRoot = conf.narval.projectsFolder
+
+        val metadataInputPrefixMap = getMatadataPerRuns(prefixFiles, outputNarvalBucket, runType)
 
         val auth: Auth = new AuthTokenInterceptor(conf.keycloak).auth
 
@@ -52,16 +68,17 @@ object FhirImport extends App {
 
         updateIG()
 
-        withReport(inputBucket, metadataInputPrefixMap.keySet) { reportPath =>
-          run(bucket, prefix, version, study, release, inputBucket, metadataInputPrefixMap, reportPath, outputBucket, removeMissing.toBoolean) //todo add output Prefix
+        withReport(bucket, s"$prefix/$version-$study/$release/${metadataInputPrefixMap.keySet.head}") { reportPath =>
+          run(bucket, prefix, version, study, release, inputBucket, outputBucket, outputNarvalBucket, narvalProjectRoot, metadataInputPrefixMap, reportPath, removeMissing.toBoolean)
         }
       }
     }
   }
 
   def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String,
-          inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, outputBucket: String, removeMissing: Boolean)
-         (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
+          outputBucket: String, outputNarvalBucket: String, narvalProjectRoot: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean)
+         (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf, runType: RunType): ValidationResult[Bundle] = {
+
     val rawResources = extractResources(bucket, prefix, version, study, release)
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
 
@@ -74,7 +91,10 @@ object FhirImport extends App {
     val bundleList = bundleCreate(resources)
 
     val rawFileEntries = inputPrefixMetadataMap.keySet.flatMap(p => {
-      CheckS3Data.loadRawFileEntries(inputBucket, p)
+      runType match {
+        case RunType.NANUK => CheckS3Data.loadRawFileEntries(inputBucket, p)
+        case RunType.NARVAL => CheckS3Data.loadRawFileEntriesFromListFile(narvalProjectRoot, outputNarvalBucket, p)
+      }
     }).toSeq
 
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
@@ -94,16 +114,18 @@ object FhirImport extends App {
 
     val results = bundleListWithFiles.andThen({ case (bundle, files) =>
       try {
+
         // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
-        writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
-//        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
+        runType match {
+          case RunType.NANUK => writeAheadLog(inputBucket, reportPath, TBundle(bundle), files)
+          case RunType.NARVAL => writeAheadLog(outputBucket, reportPath, TBundle(bundle), files)
+        }
+
+        //        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
         val allBundle = bundle ++ bundleList
 
-        val test = bundle.map(b => b.getResource).filter(r => r.getResourceType.name() == "DocumentReference")
-        println(s"doc bundle length: ${test.length}")
-
         if(allBundle.size > 5000) {
-          TBundle.saveByFragments(allBundle).head //FIXME
+          TBundle.saveByFragments(allBundle).head
         } else {
           val result = TBundle(allBundle).execute()
           if (result.isInvalid) {
@@ -119,6 +141,22 @@ object FhirImport extends App {
     })
 
     results
+  }
+
+  private def getMatadataPerRuns(prefix: String, outputNarvalBucket: String, runType: RunType)(implicit nanuqClient: NanuqClient, s3Client: S3Client) = {
+    runType match {
+      case RunType.NARVAL =>
+        S3Utils.getLinesContent(outputNarvalBucket, s"$prefix/metadata.ndjson")
+          .flatMap(line => {
+            (Json.parse(line) \ "experiment" \ "runName").asOpt[String].map(e => {
+              s"$prefix/$e" -> Metadata.validateMetadata(line)
+            })
+          }).toMap
+
+      case RunType.NANUK => runNames.map(r => {
+        s"$prefix/$r" -> nanuqClient.fetch(r).andThen(Metadata.validateMetadata)
+      }).toMap
+    }
   }
 
   private def extractResources(bucket: String, prefix: String, version: String, study: String, release: String)(implicit s3: S3Client): Map[String, Seq[RawResource]] = {

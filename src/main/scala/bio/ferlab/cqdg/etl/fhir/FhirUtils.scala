@@ -37,7 +37,7 @@ object FhirUtils {
       val DR_FORMAT = s"$baseFhirServer/CodeSystem/document-format"
       val EXPERIMENTAL_STRATEGY = s"$baseFhirServer/CodeSystem/experimental-strategy"
       val GENOME_BUILD = s"$baseFhirServer/CodeSystem/genome-build"
-      val OBJECT_STORE = "http://objecstore.cqgc.qc.ca"
+      val OBJECT_STORE = "http://objecstore.cqdg.qc.ca"
       val CAUSE_OF_DEATH = s"$baseFhirServer/CodeSystem/cause-of-death"
       val POPULATION = s"$baseFhirServer/CodeSystem/population"
       val OBSERVATION_CATEGORY = s"${baseFhirServer}/CodeSystem/observation-code"

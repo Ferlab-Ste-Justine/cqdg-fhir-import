@@ -1,5 +1,6 @@
 package bio.ferlab.cqdg.etl
 
+import bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.CAUSE_OF_DEATH
@@ -18,6 +19,8 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
   implicit val idService: IIdServer = new IdServerMock()
   implicit val ferloadConf: FerloadConf = new FerloadConf(url = "http://flerloadurl")
+
+  implicit val runType: etl.RunType.Value = RunType.NANUK
 
   val objects: Seq[String] = Seq(
     RawParticipant.FILENAME,
@@ -53,7 +56,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       val metaDataMap = Map(inputPrefix + "/files" -> metadata)
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, metaDataMap, "reportPath", outputBucket, true)
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, "", "",  metaDataMap, "", true)
 
       result.isValid shouldBe true
 

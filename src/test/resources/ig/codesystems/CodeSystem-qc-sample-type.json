@@ -4,8 +4,8 @@
   "content": "complete",
   "name": "QCSampleType",
   "id": "qc-sample-type",
-  "title": "Sample Type Code System",
-  "description": "Tissue sample types",
+  "title": "QC Sample Type",
+  "description": "Qc sample type",
   "version": "0.1.0",
   "url": "http://purl.obolibrary.org/obo/ncit.owl",
   "concept": [
@@ -70,5 +70,7 @@
       ]
     }
   ],
+  "experimental": false,
+  "caseSensitive": true,
   "count": 6
 }

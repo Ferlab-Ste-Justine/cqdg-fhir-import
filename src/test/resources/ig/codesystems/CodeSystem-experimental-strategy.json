@@ -47,5 +47,9 @@
       ]
     }
   ],
+  "title": "Experimental strategy",
+  "experimental": false,
+  "description": "Experimental strategy",
+  "caseSensitive": true,
   "count": 3
 }

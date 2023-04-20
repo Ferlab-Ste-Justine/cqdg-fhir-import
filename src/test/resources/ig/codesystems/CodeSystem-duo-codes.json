@@ -4,7 +4,7 @@
   "content": "complete",
   "name": "DUOCodes",
   "id": "duo-codes",
-  "description": "Duo Codes",
+  "description": "DUO codes",
   "version": "0.1.0",
   "url": "http://purl.obolibrary.org/obo/duo.owl",
   "concept": [
@@ -308,5 +308,8 @@
       ]
     }
   ],
+  "title": "DUO codes",
+  "experimental": false,
+  "caseSensitive": true,
   "count": 23
 }

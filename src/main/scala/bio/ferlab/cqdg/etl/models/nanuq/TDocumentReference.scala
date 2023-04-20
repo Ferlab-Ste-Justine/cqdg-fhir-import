@@ -7,7 +7,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.CQDG_DOC_REFERENCE_PROFILE
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, Extensions}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, validateOutcomes}
-import bio.ferlab.cqdg.etl.models.nanuq.TDocumentAttachment.{idFromList, valid}
+import bio.ferlab.cqdg.etl.models.nanuq.TDocumentAttachment.{idFromList, valid, validOpt}
 import bio.ferlab.cqdg.etl.task.HashIdMap
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.implicits._
@@ -93,14 +93,14 @@ case class SequencingAlignment(document: Seq[TDocumentAttachment]) extends TDocu
 }
 
 object SequencingAlignment {
-  val documentType: String = "Aligned Reads"
+  val documentType: String = "Aligned-reads"
   val label: String = "Sequencing Alignment (CRAM and CRAI)"
   implicit case object builder extends ToReference[SequencingAlignment] {
     override val label: String = SequencingAlignment.label
 
     protected override def build(documents: Seq[TDocumentAttachment]): SequencingAlignment = SequencingAlignment(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[CRAM], valid[CRAI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[CRAM], valid[CRAI])
 
   }
 }
@@ -118,7 +118,7 @@ object VariantCalling {
 
     protected override def build(documents: Seq[TDocumentAttachment]): VariantCalling = VariantCalling(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[SNV])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[SNV], validOpt[SNV_TBI])
 
 
   }
@@ -130,14 +130,14 @@ case class CopyNumberVariant(document: Seq[TDocumentAttachment]) extends TDocume
 }
 
 object CopyNumberVariant {
-  val documentType: String = "Germline CNV"
+  val documentType: String = "Germline-CNV"
   val label = "Copy Number Variant"
   implicit case object builder extends ToReference[CopyNumberVariant] {
     override val label: String = CopyNumberVariant.label
 
     protected override def build(documents: Seq[TDocumentAttachment]): CopyNumberVariant = CopyNumberVariant(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[CNV])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[CNV], validOpt[CNV_TBI])
 
   }
 }
@@ -148,14 +148,14 @@ case class StructuralVariant(document: Seq[TDocumentAttachment]) extends TDocume
 }
 
 object StructuralVariant {
-  val documentType: String = "Germline Structural Variant"
+  val documentType: String = "Germline-structural-variant"
   val label = "Structural Variant"
   implicit case object builder extends ToReference[StructuralVariant] {
     override val label: String = StructuralVariant.label
 
     protected override def build(documents: Seq[TDocumentAttachment]): StructuralVariant = StructuralVariant(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[SV])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[SV], validOpt[SV_TBI])
 
   }
 }
@@ -166,14 +166,14 @@ case class SupplementDocument(document: Seq[TDocumentAttachment]) extends TDocum
 }
 
 object SupplementDocument {
-  val documentType: String = "Sequencing Data Supplement"
+  val documentType: String = "Sequencing-data-supplement"
   val label = "Supplement"
   implicit case object builder extends ToReference[SupplementDocument] {
     override val label: String = SupplementDocument.label
 
     protected override def build(documents: Seq[TDocumentAttachment]): SupplementDocument = SupplementDocument(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]] = Seq(valid[Supplement])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[Supplement])
   }
 }
 
@@ -182,10 +182,10 @@ trait ToReference[T <: TDocumentReference] {
 
   protected def build(documents: Seq[TDocumentAttachment]): T
 
-  def attachments: Seq[(Map[String, FileEntry], Analysis) => ValidationResult[TDocumentAttachment]]
+  def attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]]
 
   def attach(files: Map[String, FileEntry], a: Analysis): Seq[ValidationResult[TDocumentAttachment]] =
-    attachments.map(v => v(files, a))
+    attachments.flatMap(v => v(files, a))
 
   def validate(files: Map[String, FileEntry], a: Analysis, studyId: String, release: String)(implicit client: IGenericClient, ferloadConf: FerloadConf): ValidationResult[T] = {
     attach(files, a).toList.sequence

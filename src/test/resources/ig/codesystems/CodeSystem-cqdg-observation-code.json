@@ -4,44 +4,44 @@
   "content": "complete",
   "name": "CQDGObservationCode",
   "id": "cqdg-observation-code",
-  "description": "CQDG Observation categories",
+  "description": "CQDG Observation codes",
   "version": "0.1.0",
-  "url": "http://hl7.org/fhir/CodeSystem/observation-code",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code",
   "concept": [
     {
-      "code": "Family Relationship",
+      "code": "Family-relationship",
       "display": "Family Relationship",
       "designation": [
         {
           "use": {
-            "code": "family-relashionship",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+            "code": "Family-relationship",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
           },
           "value": "Social history observation"
         }
       ]
     },
     {
-      "code": "Tumor Normal Designation",
+      "code": "Tumor-normal-designation",
       "display": "Tumor Normal Designation",
       "designation": [
         {
           "use": {
-            "code": "tumor-normal-designation",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+            "code": "Tumor-normal-designation",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
           },
           "value": "Histological Diagnosis"
         }
       ]
     },
     {
-      "code": "Disease Status",
+      "code": "Disease-Status",
       "display": "Disease Status",
       "designation": [
         {
           "use": {
-            "code": "disease-status",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+            "code": "Disease-Status",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
           },
           "value": "Disease Status observation"
         }
@@ -53,26 +53,29 @@
       "designation": [
         {
           "use": {
-            "code": "phenotype",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+            "code": "Phenotype",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
           },
           "value": "Phenotype observation"
         }
       ]
     },
     {
-      "code": "Cause of Death",
+      "code": "Cause-of-Death",
       "display": "Cause of Death",
       "designation": [
         {
           "use": {
-            "code": "cause-of-death",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/observation-category"
+            "code": "Cause-of-Death",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
           },
           "value": "Cause of death"
         }
       ]
     }
   ],
+  "title": "CQDG Observation codes",
+  "experimental": false,
+  "caseSensitive": true,
   "count": 5
 }

@@ -2,17 +2,18 @@ package bio.ferlab.cqdg.etl.task.nanuq
 
 import bio.ferlab.cqdg.etl.isValid
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata, RawFileEntry}
+import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.s3.S3Utils.getContent
 import cats.data.ValidatedNel
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.http.entity.ContentType.APPLICATION_OCTET_STREAM
 import org.slf4j.{Logger, LoggerFactory}
+import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model._
 
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
-import java.util.UUID
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
 
@@ -51,8 +52,21 @@ object CheckS3Data {
         && f.filename != "metadata.json"
         && !f.filename.toLowerCase().contains("hard-filtered.formatted.norm.vep.vcf.gz")
         && !f.filename.toLowerCase().contains("hard-filtered.vcf.gz")
-        && !f.filename.toLowerCase().endsWith("extra_results.tgz"))
+        && !f.filename.toLowerCase().endsWith("extra_results.tgz")
+        && !f.filename.toLowerCase().endsWith("seg.bw") //IGV type not supported
+        && !f.filename.toLowerCase().endsWith("hard-filtered.baf.bw") //IGV type not supported
+        && !f.filename.toLowerCase().endsWith("roh.bed") //IGV type not supported
+      )
     fileEntries
+  }
+
+  def loadRawFileEntriesFromListFile(projectFolder: String, outputNarvalBucket: String, prefix: String)(implicit s3Client: S3Client): Seq[RawFileEntry] = {
+    val runName = prefix.split("/").last
+    val keys = (Json.parse(S3Utils.getContent(outputNarvalBucket, s"${prefix.stripSuffix(s"/$runName")}/files.json")) \ "files")
+      .as[Seq[String]]
+      .filter(s => s.contains(s"/$runName"))
+
+    keys.map(k => RawFileEntry(projectFolder, s"$prefix/${k.split("/").last}", 0)) //FIXME Size is 0 as we dont have access to files (links only)
   }
 
   def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], studyId: String)(implicit s3Client: S3Client): Seq[FileEntry] = {
@@ -61,8 +75,11 @@ object CheckS3Data {
       val cramId: String = s"${DigestUtils.sha1Hex(List(a.files.cram, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val craiId: String = s"${DigestUtils.sha1Hex(List(a.files.crai, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val snvId: String = s"${DigestUtils.sha1Hex(List(a.files.snv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val snvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.snv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val cnvId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val cnvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val svId: String = s"${DigestUtils.sha1Hex(List(a.files.sv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val svTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.sv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val qcId: String = s"${DigestUtils.sha1Hex(List(a.files.supplement, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
 
       Seq(
@@ -72,7 +89,20 @@ object CheckS3Data {
         a.files.cnv -> (cnvId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cnv)),
         a.files.sv -> (svId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.sv)),
         a.files.supplement -> (qcId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.supplement))
-      )
+      ) ++ Seq(
+        a.files.snv_tbi match {
+          case Some(value) => Some(value -> (snvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
+          case None => None
+        },
+        a.files.cnv_tbi match {
+          case Some(value) => Some(value -> (cnvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
+          case None => None
+        },
+        a.files.sv_tbi match {
+          case Some(value) => Some(value -> (svTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
+          case None => None
+        },
+      ).flatten
     }.toMap
     files
       .flatMap { f =>

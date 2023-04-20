@@ -55,6 +55,16 @@ object S3Utils {
     }.toList
   }
 
+  def getLinesContent(bucket: String, key: String)(implicit s3Client: S3Client): List[String] = {
+    val objectRequest = GetObjectRequest
+      .builder()
+      .key(key)
+      .bucket(bucket)
+      .build()
+
+    Source.fromInputStream(s3Client.getObject(objectRequest)).getLines.filterNot(_.isEmpty).toList
+  }
+
   def writeContent(bucket: String, key: String, content: String)(implicit s3Client: S3Client): Unit = {
     val objectRequest = PutObjectRequest.builder()
       .bucket(bucket)

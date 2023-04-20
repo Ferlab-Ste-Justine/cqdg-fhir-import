@@ -63,7 +63,17 @@ object Analysis {
   implicit val reads: Reads[Analysis] = Json.reads[Analysis]
 }
 
-case class FilesAnalysis(cram: String, crai: String, snv: String, cnv: String, sv: String, supplement: String)
+case class FilesAnalysis(
+                          cram: String,
+                          crai: String,
+                          snv: String,
+                          snv_tbi: Option[String],
+                          cnv: String,
+                          cnv_tbi: Option[String],
+                          sv: String,
+                          sv_tbi: Option[String],
+                          supplement: String
+                        )
 
 object FilesAnalysis {
   implicit val reads: Reads[FilesAnalysis] = Json.reads[FilesAnalysis]

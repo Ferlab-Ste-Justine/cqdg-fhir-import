@@ -5,7 +5,7 @@
   "name": "DiseaseStatusCS",
   "id": "disease-status-cs",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status",
+  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status-cs",
   "concept": [
     {
       "code": "Affected",
@@ -13,21 +13,21 @@
       "designation": [
         {
           "use": {
-            "code": "affected",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status"
+            "code": "Affected",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status-cs"
           },
           "value": "Affected"
         }
       ]
     },
     {
-      "code": "Non affected",
+      "code": "Non-affected",
       "display": "Non affected",
       "designation": [
         {
           "use": {
-            "code": "non-affected",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status"
+            "code": "Non-affected",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status-cs"
           },
           "value": "Non affected"
         }
@@ -39,13 +39,17 @@
       "designation": [
         {
           "use": {
-            "code": "unknown",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status"
+            "code": "Unknown",
+            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status-cs"
           },
           "value": "Unknown"
         }
       ]
     }
   ],
+  "title": "Disease Status Code System",
+  "experimental": false,
+  "description": "Disease status code system",
+  "caseSensitive": true,
   "count": 3
 }
