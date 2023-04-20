@@ -16,7 +16,6 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import scala.annotation.tailrec
 import scala.jdk.CollectionConverters._
-import scala.util.Success
 
 object CheckS3Data {
 
@@ -61,9 +60,9 @@ object CheckS3Data {
     fileEntries
   }
 
-  def loadRawFileEntriesFromListFile(projectFolder: String, prefix: String)(implicit s3Client: S3Client): Seq[RawFileEntry] = {
+  def loadRawFileEntriesFromListFile(projectFolder: String, outputNarvalBucket: String, prefix: String)(implicit s3Client: S3Client): Seq[RawFileEntry] = {
     val runName = prefix.split("/").last
-    val keys = (Json.parse(S3Utils.getContent("cqdg-qa-app-clinical-data-service", "michaud/trio-dee/files_list")) \ "files")
+    val keys = (Json.parse(S3Utils.getContent(outputNarvalBucket, s"${prefix.stripSuffix(s"/$runName")}/files.json")) \ "files")
       .as[Seq[String]]
       .filter(s => s.contains(s"/$runName"))
 

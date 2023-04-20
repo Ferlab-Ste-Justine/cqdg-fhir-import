@@ -21,7 +21,7 @@ trait MinioServer {
 
 
   protected val minioEndpoint = s"http://localhost:$minioPort"
-  implicit val s3: S3Client = S3Utils.buildS3Client(AWSConf(MinioContainer.accessKey, MinioContainer.secretKey, minioEndpoint, bucketName = BUCKETNAME, pathStyleAccess = true, "", ""))
+  implicit val s3: S3Client = S3Utils.buildS3Client(AWSConf(MinioContainer.accessKey, MinioContainer.secretKey, minioEndpoint, bucketName = BUCKETNAME, pathStyleAccess = true, "", "", ""))
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
   createBuckets()

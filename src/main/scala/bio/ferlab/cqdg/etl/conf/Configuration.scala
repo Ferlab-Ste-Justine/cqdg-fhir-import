@@ -14,7 +14,8 @@ case class AWSConf(
                     bucketName: String,
                     pathStyleAccess: Boolean,
                     outputBucketName: String,
-                    outputPrefix: String
+                    outputPrefix: String,
+                    outputNarvalBucket: String
                   )
 
 case class FhirConf(url: String)

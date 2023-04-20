@@ -56,7 +56,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       val metaDataMap = Map(inputPrefix + "/files" -> metadata)
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, "",  metaDataMap, "", true)
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, "", "",  metaDataMap, "", true)
 
       result.isValid shouldBe true
 
