@@ -27,18 +27,7 @@ import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
 
-  val prefix = args(0)
-  val prefixFiles = args(1)
-  val bucket = args(2)
-  val version = args(3)
-  val release = args(4)
-  val study = args(5)
-  val removeMissing = args(6)
-
-  var runName = ""
-  if (args.length > 7) {
-    runName = args.last
-  }
+  val Array(prefix, prefixFiles, bucket, version, release, study, removeMissing, runName, _type) = args
 
   val runNames = runName.split(",").filterNot(e => e.isEmpty)
 
@@ -50,8 +39,8 @@ object FhirImport extends App {
         implicit val idService: IdServerClient = new IdServerClient()
         implicit val ferloadConf: FerloadConf = conf.ferload
         implicit val nanuqClient: NanuqClient = new NanuqClient(conf.nanuq)
-        implicit val runType: etl.RunType.Value = runNames match {
-          case Array() => RunType.NARVAL
+        implicit val runType: etl.RunType.Value = _type.toLowerCase() match {
+          case "narval" => RunType.NARVAL
           case _ => RunType.NANUK
         }
 
