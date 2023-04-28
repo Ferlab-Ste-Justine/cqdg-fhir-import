@@ -1,6 +1,7 @@
 package bio.ferlab.cqdg.etl.fhir
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.UNITS_OF_MEASURE
 import bio.ferlab.cqdg.etl.{CODE_SYS_FILES, IG_REPO_GH, IG_RESOURCES, STRUCT_DEF_FILES, VALUE_SET_FILES, isValid}
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource, TBundle}
 import ca.uhn.fhir.context.FhirContext
@@ -22,7 +23,7 @@ object FhirUtils {
 
   object Constants {
 
-    val baseFhirServer = "http://fhir.cqdg.ferlab.bio"
+    val baseFhirServer = "https://fhir.cqdg.ca"
 
     object CodingSystems {
       val SPECIMEN_TYPE = s"$baseFhirServer/CodeSystem/research-domain"
@@ -31,6 +32,7 @@ object FhirUtils {
       val DIAGNOSIS_SYSTEM = "http://purl.obolibrary.org/obo/mondo.owl"
       val DISEASES_STATUS = s"$baseFhirServer/CodeSystem/disease-status"
       val NCIT_SYSTEM = "http://purl.obolibrary.org/obo/ncit.owl"
+      val DUO_SYSTEM = "http://purl.obolibrary.org/obo/duo.owl"
       val DR_TYPE = s"$baseFhirServer/CodeSystem/data-type"
       val ANALYSIS_TYPE = s"$baseFhirServer/CodeSystem/bioinfo-analysis-code"
       val DR_CATEGORY = s"$baseFhirServer/CodeSystem/data-category"
@@ -38,25 +40,29 @@ object FhirUtils {
       val EXPERIMENTAL_STRATEGY = s"$baseFhirServer/CodeSystem/experimental-strategy"
       val GENOME_BUILD = s"$baseFhirServer/CodeSystem/genome-build"
       val OBJECT_STORE = "http://objecstore.cqdg.qc.ca"
-      val CAUSE_OF_DEATH = s"$baseFhirServer/CodeSystem/cause-of-death"
+      val UNITS_OF_MEASURE = "http://unitsofmeasure.org"
+      val CAUSE_OF_DEATH = s"$baseFhirServer/CodeSystem/cause-of-death-codes"
+      val QC_ETHNICITY = s"$baseFhirServer/CodeSystem/qc-ethnicity"
+      val FAMILY_TYPE = s"$baseFhirServer/CodeSystem/family-type"
       val POPULATION = s"$baseFhirServer/CodeSystem/population"
-      val OBSERVATION_CATEGORY = s"${baseFhirServer}/CodeSystem/observation-code"
+      val OBSERVATION_CATEGORY = s"${baseFhirServer}/CodeSystem/cqdg-observation-code"
       val TUMOR_NORMAL_DESIGNATION = s"${baseFhirServer}/CodeSystem/tumor-normal-designation"
+      val RESEARCH_DOMAIN = s"${baseFhirServer}/CodeSystem/research-domain"
+      val V3_OBSERVATION_INTERPRETATION = s"http://terminology.hl7.org/3.1.0/CodeSystem-v3-ObservationInterpretation.html"
     }
 
     object Extensions {
-      val AGE_BIOSPECIMEN_COLLECTION = s"$baseFhirServer/StructureDefinition/Specimen/ageBiospecimenCollection"
+      val AGE_BIOSPECIMEN_COLLECTION = s"$baseFhirServer/StructureDefinition/Specimen/AgeAtBioSpecimenCollection"
       val ACCESS_REQUIREMENTS_SD = s"$baseFhirServer/StructureDefinition/AccessRequirements"
       val ACCESS_LIMITATIONS_SD = s"$baseFhirServer/StructureDefinition/AccessLimitations"
-      val AGE_PARTICIPANT_AGE_RECRUITEMENT = s"$baseFhirServer/StructureDefinition/ResearchSubject/ageAtRecruitment"
-      val WORKFLOW = s"$baseFhirServer/StructureDefinition/workflow"
-      val SEQUENCING_EXPERIMENT = s"$baseFhirServer/StructureDefinition/sequencing-experiment"
-      val FULL_SIZE = s"$baseFhirServer/StructureDefinition/full-size"
+      val AGE_AT_RECRUITEMENT = s"$baseFhirServer/StructureDefinition/ResearchSubject/AgeAtRecruitment"
+      val WORKFLOW = s"$baseFhirServer/StructureDefinition/WorkflowExtension"
+      val SEQUENCING_EXPERIMENT = s"$baseFhirServer/StructureDefinition/SequencingExperimentExtension"
+      val FULL_SIZE = s"$baseFhirServer/StructureDefinition/FullSizeExtension"
       val ETHNICITY_SD = s"$baseFhirServer/StructureDefinition/QCEthnicity"
-      val AGE_OF_DEATH = s"$baseFhirServer/StructureDefinition/Patient/age-of-death"
+      val AGE_OF_DEATH = s"$baseFhirServer/StructureDefinition/AgeOfDeath"
       val POPULATION_URL = s"$baseFhirServer/StructureDefinition/ResearchStudy/population"
-      val QC_ETHNICITY_CS = s"$baseFhirServer/CodeSystem/qc-ethnicity"
-
+      val AGE_AT_PHENOTYPE = s"$baseFhirServer/StructureDefinition/Observation/AgeAtPhenotype"
     }
 
     object Profiles {
@@ -66,6 +72,14 @@ object FhirUtils {
       val CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE = s"$baseFhirServer/StructureDefinition/CQDGObservationSocialHistory"
       val CQDG_DOC_REFERENCE_PROFILE = s"$baseFhirServer/StructureDefinition/cqdg-document-reference"
       val CQDG_TASK_PROFILE = s"$baseFhirServer/StructureDefinition/cqgc-analysis-task"
+    }
+
+    object Identifier {
+      val RESEARCH_STUDY_IDENTIFIER = s"$baseFhirServer/fhir/ResearchStudy"
+      val PATIENT_IDENTIFIER = s"$baseFhirServer/fhir/Patient"
+      val SPECIMEN_IDENTIFIER = s"$baseFhirServer/fhir/Specimen"
+      val CONDITION_IDENTIFIER = s"$baseFhirServer/fhir/Condition"
+      val OBSERVATION_IDENTIFIER = s"$baseFhirServer/fhir/Observation"
     }
 
   }
@@ -106,11 +120,10 @@ object FhirUtils {
     meta
   }
 
-  def setAgeExtension(value: Long, unit: String, url: String): Extension = {
+  def setAgeExtension(value: Long, url: String): Extension = {
     val age = new Age
     val extension = new Extension
-    age.setUnit(unit)
-    age.setValue(value)
+    age.setUnit("days").setValue(value).setSystem(UNITS_OF_MEASURE).setCode("d")
     extension.setUrl(url)
 
     extension.setValue(age)

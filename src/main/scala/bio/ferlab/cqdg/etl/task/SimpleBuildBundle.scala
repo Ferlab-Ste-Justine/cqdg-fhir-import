@@ -2,6 +2,7 @@ package bio.ferlab.cqdg.etl.task
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions._
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Identifier.{CONDITION_IDENTIFIER, OBSERVATION_IDENTIFIER, PATIENT_IDENTIFIER, RESEARCH_STUDY_IDENTIFIER, SPECIMEN_IDENTIFIER}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.{CQDG_OBSERVATION_DISEASE_STATUS_PROFILE, CQDG_OBSERVATION_PHENOTYPE_PROFILE, CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE, CQDG_PATIENT_PROFILE}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, baseFhirServer}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension}
@@ -116,7 +117,7 @@ object SimpleBuildBundle {
       SimpleCode(code = "Phenotype", system = Some(OBSERVATION_CATEGORY)))
 
     phenotype.addIdentifier()
-      .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Observation")
+      .setSystem(OBSERVATION_IDENTIFIER)
       .setValue(resourceId)
 
     val codeableConcept = new CodeableConcept()
@@ -141,7 +142,7 @@ object SimpleBuildBundle {
       val observedCode = if(obs.toLowerCase == "true" || obs.toLowerCase == "pos") "POS" else "NEG"
 
       codingObserved
-        .setSystem("http://terminology.hl7.org/3.1.0/CodeSystem-v3-ObservationInterpretation.html")
+        .setSystem(V3_OBSERVATION_INTERPRETATION)
         .setCode(observedCode)
         .setDisplay(observedCode)
       observedCodeableConcept.setCoding(List(codingObserved).asJava)
@@ -150,8 +151,8 @@ object SimpleBuildBundle {
 
     // ***************** Phenotype Age at Phenotype *********************
     val ageValue = new Age()
-    ageValue.setValue(resource.age_at_phenotype).setUnit("days")
-    val ageExtension = new Extension("http://fhir.cqdg.ferlab.bio/StructureDefinition/Observation/AgeAtPhenotype", ageValue)
+    ageValue.setValue(resource.age_at_phenotype).setUnit("days").setSystem(UNITS_OF_MEASURE).setCode("d")
+    val ageExtension = new Extension(AGE_AT_PHENOTYPE, ageValue)
     phenotype.setExtension(List(ageExtension).asJava)
 
     if(parentId.isDefined) {
@@ -166,7 +167,7 @@ object SimpleBuildBundle {
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
 
     val diagnosis = new Condition()
-    diagnosis.setSimpleMeta(studyId, studyVersion, None) //FIXME
+    diagnosis.setSimpleMeta(studyId, studyVersion, None)
 
     (resource.diagnosis_mondo_code, resource.diagnosis_ICD_code) match {
       //FIXME what is the system for ICD???
@@ -179,13 +180,12 @@ object SimpleBuildBundle {
     // ************* Age at Diagnosis **********************
     if(resource.age_at_diagnosis.isDefined){
       val age = new Age()
-      age.setValue(resource.age_at_diagnosis.get)
-      age.setUnit("days")
+      age.setValue(resource.age_at_diagnosis.get).setUnit("days").setSystem(UNITS_OF_MEASURE).setCode("d")
       diagnosis.setOnset(age)
     }
 
     diagnosis.addIdentifier()
-      .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Condition")
+      .setSystem(CONDITION_IDENTIFIER)
       .setValue(resourceId)
 
     if(parentId.isDefined){
@@ -202,7 +202,7 @@ object SimpleBuildBundle {
     study.setSimpleMeta(resourceId, studyVersion, None)
 
     study.addIdentifier()
-      .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/ResearchStudy")
+      .setSystem(RESEARCH_STUDY_IDENTIFIER)
       .setValue(resourceId)
     study.setTitle(resource.name)
     study.setDescription(resource.description)
@@ -221,9 +221,8 @@ object SimpleBuildBundle {
     //************ Domain **********************
     val codes = resource.domain.map({ d =>
       val code = new Coding()
-      //FIXME should be setting code instead of display
       code.setCode(d)
-      code.setSystem("http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain")
+      code.setSystem(RESEARCH_DOMAIN)
     })
     val codeableConcept = new CodeableConcept()
     codeableConcept.setCoding(codes.asJava)
@@ -241,7 +240,7 @@ object SimpleBuildBundle {
     resource.access_limitations.map({a =>
       val codeableConceptAL = new CodeableConcept()
       val code = new Coding()
-      code.setSystem("http://purl.obolibrary.org/obo/duo.owl").setCode(a)
+      code.setSystem(DUO_SYSTEM).setCode(a)
       codeableConceptAL.setCoding(List(code).asJava)
       accessLimitationExtension.setValue(codeableConceptAL)
     })
@@ -253,7 +252,7 @@ object SimpleBuildBundle {
 
     val accessRequirementCodes = resource.access_requirements.map({a =>
       val code = new Coding()
-      code.setSystem("http://purl.obolibrary.org/obo/duo.owl").setCode(a)
+      code.setSystem(DUO_SYSTEM).setCode(a)
     })
 
     codeableConceptAR.setCoding(accessRequirementCodes.asJava)
@@ -281,12 +280,12 @@ object SimpleBuildBundle {
     patient.setSimpleMeta(studyId, studyVersion, Some(CQDG_PATIENT_PROFILE))
 
     patient.addIdentifier()
-      .setSystem("https://fhir.qa.cqdg.ferlab.bio/fhir/Patient")
+      .setSystem(PATIENT_IDENTIFIER)
       .setValue(resourceId)
 
     //****************** Age At Recruitment ***************
     val ageExtension = resource.age_at_recruitment.map(age =>
-      setAgeExtension(age.toLong, "days", AGE_PARTICIPANT_AGE_RECRUITEMENT)
+      setAgeExtension(age.toLong, AGE_AT_RECRUITEMENT)
     )
 
     //****************** Ethnicity ***************
@@ -295,7 +294,7 @@ object SimpleBuildBundle {
       val codeableConceptEthnicity = new CodeableConcept()
 
       val code = new Coding()
-      code.setSystem("http://fhir.cqdg.ferlab.bio/CodeSystem/qc-ethnicity").setCode(ethnicity)
+      code.setSystem(QC_ETHNICITY).setCode(ethnicity)
 
       codeableConceptEthnicity.setCoding(List(code).asJava)
       extension.setValue(codeableConceptEthnicity)
@@ -311,7 +310,7 @@ object SimpleBuildBundle {
     val ageOfDeathExtension =
       if(resource.age_of_death.isDefined){
         resource.age_of_death match {
-        case Some(age) => Some(setAgeExtension(age.toLong, "days", AGE_OF_DEATH))
+        case Some(age) => Some(setAgeExtension(age.toLong, AGE_OF_DEATH))
         case None => None
       }
     } else None
@@ -329,6 +328,10 @@ object SimpleBuildBundle {
   def createParticipantObservation(resourceId: String, causeOfDeath: String, studyVersion: String)(studyId: String): Resource  = {
     val participantObservation = new Observation()
     val reference = new Reference()
+
+    participantObservation.addIdentifier()
+      .setSystem(OBSERVATION_IDENTIFIER)
+      .setValue(resourceId)
 
     participantObservation.setSimpleMeta(studyId, studyVersion, None) //FIXME
 
@@ -360,7 +363,7 @@ object SimpleBuildBundle {
     specimen.setSimpleMeta(studyId, studyVersion, None)
 
     specimen.addIdentifier()
-      .setSystem(s"$baseFhirServer/fhir/Specimen")
+      .setSystem(SPECIMEN_IDENTIFIER)
       .setValue(resourceId)
 
     if(parentId.isDefined){
@@ -378,7 +381,7 @@ object SimpleBuildBundle {
     specimen.setType(typeCodeableConcept)
 
     if(resource.age_biospecimen_collection.isDefined){
-      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, "days", AGE_BIOSPECIMEN_COLLECTION)
+      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, AGE_BIOSPECIMEN_COLLECTION)
       specimen.setExtension(List(ageExtension).asJava)
     }
     specimen
@@ -389,7 +392,11 @@ object SimpleBuildBundle {
 
     val observation = new Observation()
 
-    observation.setSimpleMeta(studyId, studyVersion, None) //FIXME
+    observation.addIdentifier()
+      .setSystem(OBSERVATION_IDENTIFIER)
+      .setValue(resourceId)
+
+    observation.setSimpleMeta(studyId, studyVersion, None)
 
     observation.setId(resourceId)
 
@@ -400,7 +407,6 @@ object SimpleBuildBundle {
     subjectId.map(id => {
       val referenceSubject = new Reference().setReference(s"Patient/$id")
       observation.setSubject(referenceSubject)
-//      observation.setSpecimen(referenceSubject) //TODO why setSpecimen Fails?
     })
 
     // ************* valueCodeableConcept.coding[0] **************
@@ -442,7 +448,7 @@ object SimpleBuildBundle {
 
     specimen.setId(resourceId)
     specimen.addIdentifier()
-      .setSystem(s"$baseFhirServer/fhir/Specimen")
+      .setSystem(SPECIMEN_IDENTIFIER)
       .setValue(resourceId)
     specimen.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_sample_id)
     specimen
@@ -455,6 +461,10 @@ object SimpleBuildBundle {
     observation.setSimpleMeta(studyId, studyVersion, Some(CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE))
     // To differentiate the id of Family Relationship Observation form the Disease Status Observation
     observation.setId(s"${resourceId}FR")
+
+    observation.addIdentifier()
+      .setSystem(OBSERVATION_IDENTIFIER)
+      .setValue(s"${resourceId}FR")
 
     // ********** code.coding[0] ****************
     observation.setSimpleCodes(None, SimpleCode(code = "Family Relationship", system = Some(OBSERVATION_CATEGORY)))
@@ -504,6 +514,10 @@ object SimpleBuildBundle {
     // To differentiate the id of Family Relationship Observation form the Disease Status Observation
     observation.setId(s"${resourceId}DS")
 
+    observation.addIdentifier()
+      .setSystem(OBSERVATION_IDENTIFIER)
+      .setValue(s"${resourceId}DS")
+
     // ********** code.coding[0] ****************
     observation.setSimpleCodes(None, SimpleCode(code = "Disease Status", system = Some(OBSERVATION_CATEGORY)))
 
@@ -539,14 +553,13 @@ object SimpleBuildBundle {
     val group = new Group()
 
     group.setId(resourceId)
-    group.setSimpleMeta(studyId, studyVersion, None) ///FIXME
+    group.setSimpleMeta(studyId, studyVersion, None)
     group.setQuantity(resources.length)
     group.addIdentifier()
       .setValue(resources.head.submitter_family_id)
       .setUse(Identifier.IdentifierUse.SECONDARY)
     group.setType(Group.GroupType.PERSON)
-    //FIXME clarify if with set code or display
-    group.setSimpleCodes(None, SimpleCode(code = resources.head.family_type, system = Some("http://fhir.cqdg.ferlab.bio/CodeSystem/family-type")))
+    group.setSimpleCodes(None, SimpleCode(code = resources.head.family_type, system = Some(FAMILY_TYPE)))
 
     //member[x].entity.reference
     val members = resources.flatMap({r =>
@@ -565,6 +578,7 @@ object SimpleBuildBundle {
 
   def createOrganization(studyVersion: String, studyId: String): Resource = {
     val organization = new Organization()
+    organization.setName("CQDG")
 
     organization.setSimpleMeta(studyId, studyVersion, None)
     organization.setId("CQDG")
