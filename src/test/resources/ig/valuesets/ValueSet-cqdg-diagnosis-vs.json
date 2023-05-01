@@ -3,8 +3,10 @@
   "status": "active",
   "name": "CQDGDiagnosisVS",
   "id": "cqdg-diagnosis-vs",
+  "title": "Ferlab.bio ValueSet/diagnosis",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/cqdg-diagnosis-vs",
+  "url": "https://fhir.cqdg.ca/ValueSet/cqdg-diagnosis-vs",
+  "description": "Diagnosis ValueSet",
   "compose": {
     "include": [
       {

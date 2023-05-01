@@ -1,10 +1,12 @@
 {
   "resourceType": "StructureDefinition",
-  "id": "specific-id",
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/specific-id",
+  "id": "RunDate",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/RunDate",
   "version": "0.1.0",
-  "name": "SpecificID",
+  "name": "RunDate",
+  "title": "Ferlab.bio StructureDefinition/run-date",
   "status": "active",
+  "description": "Run Date Extension",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -22,14 +24,15 @@
     }
   ],
   "type": "Extension",
-  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "baseDefinition": "https://fhir.cqdg.ca/StructureDefinition/SequencingExperimentExtension",
   "derivation": "constraint",
   "differential": {
     "element": [
       {
-        "id": "Extension.url",
-        "path": "Extension.url",
-        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/specific-id"
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Ferlab.bio StructureDefinition/run-date",
+        "definition": "Run Date Extension"
       }
     ]
   }

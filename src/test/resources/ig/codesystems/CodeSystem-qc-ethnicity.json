@@ -4,10 +4,10 @@
   "content": "complete",
   "name": "QCEthnicity",
   "id": "qc-ethnicity",
-  "title": "Ethnicites in Quebec",
+  "title": "Ferlab.bio CodeSystem/qc-ethnicity",
   "description": "Classification of people living in Quebec in a named category of humans sharing a common history, geographic origin or nationality. The ethnic codes used to represent these concepts are based on a list provided by the genomic sequencing center",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/qc-ethnicity",
+  "url": "https://fhir.cqdg.ca/CodeSystem/qc-ethnicity",
   "concept": [
     {
       "code": "French Canadian",

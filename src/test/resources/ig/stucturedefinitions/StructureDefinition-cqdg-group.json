@@ -1,19 +1,10 @@
 {
   "resourceType": "StructureDefinition",
   "id": "cqdg-group",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Base.Individuals"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "business"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-group",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/cqdg-group",
   "version": "1.0.0",
   "name": "CQDG_Group",
+  "title": "Ferlab.bio StructureDefinition/cqdg-group",
   "status": "active",
   "description": "A CQDG group",
   "fhirVersion": "4.0.1",
@@ -41,7 +32,7 @@
         "path": "Group.code.coding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/family-type-vs"
+          "valueSet": "https://fhir.cqdg.ca/ValueSet/family-type-vs"
         }
       }
     ]

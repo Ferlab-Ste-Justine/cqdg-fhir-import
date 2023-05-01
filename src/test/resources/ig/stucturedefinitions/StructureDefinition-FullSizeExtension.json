@@ -1,10 +1,12 @@
 {
   "resourceType": "StructureDefinition",
-  "id": "AgeAt",
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/AgeAt",
+  "id": "FullSizeExtension",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/FullSizeExtension",
   "version": "0.1.0",
-  "name": "AgeAt",
+  "name": "FullSizeExtension",
+  "title": "Ferlab.bio Extension/full-size",
   "status": "active",
+  "description": "Full Size Extension",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -27,9 +29,15 @@
   "differential": {
     "element": [
       {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Ferlab.bio Extension/full-size",
+        "definition": "Full Size Extension"
+      },
+      {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/AgeAt"
+        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/FullSizeExtension"
       }
     ]
   }

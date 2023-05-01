@@ -4,8 +4,9 @@
   "content": "complete",
   "name": "DataType",
   "id": "data-type",
+  "title": "Ferlab.bio CodeSystem/data-type",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-type",
+  "url": "https://fhir.cqdg.ca/CodeSystem/data-type",
   "concept": [
     {
       "code": "Aligned-reads",
@@ -14,7 +15,7 @@
         {
           "use": {
             "code": "Aligned-reads",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem/data-type"
           },
           "value": "Aligned Reads"
         }
@@ -27,7 +28,7 @@
         {
           "use": {
             "code": "Snv",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem//data-type"
           },
           "value": "SNV"
         }
@@ -40,7 +41,7 @@
         {
           "use": {
             "code": "Germline-CNV",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem//data-type"
           },
           "value": "Germline CNV"
         }
@@ -53,7 +54,7 @@
         {
           "use": {
             "code": "Sequencing-data-supplement",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem//data-type"
           },
           "value": "Sequencing Data Supplement"
         }
@@ -66,7 +67,7 @@
         {
           "use": {
             "code": "Sequencing-data-index",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem//data-type"
           },
           "value": "Sequencing Data Index"
         }
@@ -79,7 +80,7 @@
         {
           "use": {
             "code": "Germline-structural-variant",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem//data-type"
           },
           "value": "Germline Structural Variant"
         }
@@ -92,14 +93,13 @@
         {
           "use": {
             "code": "IGV",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem//data-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem//data-type"
           },
           "value": "IGV"
         }
       ]
     }
   ],
-  "title": "Data Type",
   "experimental": false,
   "description": "Data Type",
   "caseSensitive": true,

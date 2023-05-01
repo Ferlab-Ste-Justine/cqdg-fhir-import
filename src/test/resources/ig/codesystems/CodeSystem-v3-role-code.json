@@ -4,8 +4,9 @@
   "content": "complete",
   "name": "V3RoleCode",
   "id": "v3-role-code",
+  "title": "Ferlab.bio CodeSystem/v3-roles",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code",
+  "url": "https://fhir.cqdg.ca/CodeSystem/v3-role-code",
   "concept": [
     {
       "code": "Self",
@@ -14,7 +15,7 @@
         {
           "use": {
             "code": "Self",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Self"
         }
@@ -27,7 +28,7 @@
         {
           "use": {
             "code": "Mother",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Mother"
         }
@@ -40,7 +41,7 @@
         {
           "use": {
             "code": "Father",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Father"
         }
@@ -53,7 +54,7 @@
         {
           "use": {
             "code": "Brother",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Brother"
         }
@@ -66,7 +67,7 @@
         {
           "use": {
             "code": "Sister",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Sister"
         }
@@ -79,7 +80,7 @@
         {
           "use": {
             "code": "Half-brother",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Half-brother"
         }
@@ -92,7 +93,7 @@
         {
           "use": {
             "code": "Half-sister",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Half-sister"
         }
@@ -105,7 +106,7 @@
         {
           "use": {
             "code": "Identical-twin",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Identical twin"
         }
@@ -118,7 +119,7 @@
         {
           "use": {
             "code": "Fraternal-twin-brother",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Fraternal twin brother"
         }
@@ -131,7 +132,7 @@
         {
           "use": {
             "code": "Fraternal-twin-sister",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Fraternal twin sister"
         }
@@ -143,8 +144,8 @@
       "designation": [
         {
           "use": {
-            "code": "son",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "code": "Son",
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Son"
         }
@@ -156,15 +157,14 @@
       "designation": [
         {
           "use": {
-            "code": "daughter",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/v3-role-code"
+            "code": "Daughter",
+            "system": "https://fhir.cqdg.ca/CodeSystem/v3-role-code"
           },
           "value": "Daughter"
         }
       ]
     }
   ],
-  "title": "v3 Role Code",
   "experimental": false,
   "description": "V3 role code",
   "caseSensitive": true,

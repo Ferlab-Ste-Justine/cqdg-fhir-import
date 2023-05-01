@@ -1,20 +1,12 @@
 {
   "resourceType": "StructureDefinition",
   "id": "CQDGObservationCauseOfDeath",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Clinical.Diagnostics"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "patient"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/CQDGObservationCauseOfDeath",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/CQDGObservationCauseOfDeath",
   "version": "0.1.0",
   "name": "CQDGObservationCauseOfDeath",
+  "title": "Ferlab.bio StructureDefinition/cause-of-death",
   "status": "active",
+  "description": "An example of a cqdg Observation (cause of death)",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -51,7 +43,7 @@
   "kind": "resource",
   "abstract": false,
   "type": "Observation",
-  "baseDefinition": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-observation-group",
+  "baseDefinition": "https://fhir.cqdg.ca/StructureDefinition/cqdg-observation-group",
   "derivation": "constraint",
   "differential": {
     "element": [
@@ -71,7 +63,7 @@
         "path": "Observation.valueCodeableConcept.coding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "http://fhir.cqdg.ferlab.bio/CodeSystem/cause-of-death"
+          "valueSet": "https://fhir.cqdg.ca/CodeSystem/cause-of-death-vs"
         }
       }
     ]

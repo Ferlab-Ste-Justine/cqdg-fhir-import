@@ -3,10 +3,10 @@
   "status": "active",
   "name": "AccessLimitationsVS",
   "id": "access-limitation-vs",
-  "title": "Access limitation value set",
+  "title": "Ferlab.bio ValueSet/access-limitation",
   "description": "Restriction on access",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/access-limitation-vs",
+  "url": "https://fhir.cqdg.ca/ValueSet/access-limitation-vs",
   "compose": {
     "include": [
       {

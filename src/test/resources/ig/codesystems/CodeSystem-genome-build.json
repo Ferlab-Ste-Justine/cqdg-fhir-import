@@ -4,8 +4,9 @@
   "content": "complete",
   "name": "GenomeBuild",
   "id": "genome-build",
+  "title": "Ferlab.bio CodeSystem/genome-build",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/genome-build",
+  "url": "https://fhir.cqdg.ca/CodeSystem/genome-build",
   "concept": [
     {
       "code": "GRCh38",
@@ -14,14 +15,13 @@
         {
           "use": {
             "code": "GRCh38",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/genome-build"
+            "system": "https://fhir.cqdg.ca/CodeSystem/genome-build"
           },
           "value": "GRCh38"
         }
       ]
     }
   ],
-  "title": "Genome Build",
   "experimental": false,
   "description": "Genome build",
   "caseSensitive": true,

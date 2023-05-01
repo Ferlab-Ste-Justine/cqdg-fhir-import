@@ -4,8 +4,9 @@
   "content": "complete",
   "name": "ExperimentalStrategy",
   "id": "experimental-strategy",
+  "title": "Ferlab.bio CodeSystem/experimental-strategy",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/experimental-strategy",
+  "url": "https://fhir.cqdg.ca/CodeSystem/experimental-strategy",
   "concept": [
     {
       "code": "WXS",
@@ -14,7 +15,7 @@
         {
           "use": {
             "code": "WXS",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/experimental-strategy"
+            "system": "https://fhir.cqdg.ca/CodeSystem/experimental-strategy"
           },
           "value": "Whole Exome Sequencing"
         }
@@ -27,7 +28,7 @@
         {
           "use": {
             "code": "WGS",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/experimental-strategy"
+            "system": "https://fhir.cqdg.ca/CodeSystem/experimental-strategy"
           },
           "value": "Whole Genome Sequencing"
         }
@@ -40,14 +41,13 @@
         {
           "use": {
             "code": "TARS",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/experimental-strategy"
+            "system": "https://fhir.cqdg.ca/CodeSystem/experimental-strategy"
           },
           "value": "Targeted Sequencing"
         }
       ]
     }
   ],
-  "title": "Experimental strategy",
   "experimental": false,
   "description": "Experimental strategy",
   "caseSensitive": true,

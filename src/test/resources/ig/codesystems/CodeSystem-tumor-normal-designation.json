@@ -4,8 +4,9 @@
   "content": "complete",
   "name": "TumorNormalDesignation",
   "id": "tumor-normal-designation",
+  "title": "Ferlab.bio CodeSystem/tumor-normal-designation",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation",
+  "url": "https://fhir.cqdg.ca/CodeSystem/tumor-normal-designation",
   "concept": [
     {
       "code": "Normal",
@@ -14,7 +15,7 @@
         {
           "use": {
             "code": "Normal",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
+            "system": "https://fhir.cqdg.ca/CodeSystem/tumor-normal-designation"
           },
           "value": "Normal"
         }
@@ -27,7 +28,7 @@
         {
           "use": {
             "code": "Tumor",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
+            "system": "https://fhir.cqdg.ca/CodeSystem/tumor-normal-designation"
           },
           "value": "Tumor"
         }
@@ -40,14 +41,13 @@
         {
           "use": {
             "code": "Not-applicable",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
+            "system": "https://fhir.cqdg.ca/CodeSystem/tumor-normal-designation"
           },
           "value": "Not applicable"
         }
       ]
     }
   ],
-  "title": "Tumor normal designation",
   "experimental": false,
   "description": "Tumor normal designation",
   "caseSensitive": true,

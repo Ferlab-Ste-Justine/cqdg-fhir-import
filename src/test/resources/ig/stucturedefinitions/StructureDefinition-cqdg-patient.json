@@ -1,20 +1,12 @@
 {
   "resourceType": "StructureDefinition",
   "id": "cqdg-patient",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Base.Individuals"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "patient"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-patient",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/cqdg-patient",
   "version": "0.1.0",
   "name": "CQDGPatient",
+  "title": "Ferlab.bio StructureDefinition/cqdg-patient",
   "status": "active",
+  "description": "An example of a cqdg Patient",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -84,7 +76,7 @@
           {
             "code": "Extension",
             "profile": [
-              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AgeAt"
+              "https://fhir.cqdg.ca/StructureDefinition/AgeOfDeath"
             ]
           }
         ]
@@ -99,7 +91,7 @@
           {
             "code": "Extension",
             "profile": [
-              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AgeAt"
+              "https://fhir.cqdg.ca/StructureDefinition/AgeAtRecruitment"
             ]
           }
         ]
@@ -114,10 +106,20 @@
           {
             "code": "Extension",
             "profile": [
-              "http://fhir.cqdg.ferlab.bio/StructureDefinition/QCEthnicity"
+              "https://fhir.cqdg.ca/StructureDefinition/QCEthnicity"
             ]
           }
         ]
+      },
+      {
+        "id": "Patient.extension:ethnicity.valueCodeableConcept",
+        "path": "Patient.extension.valueCodeableConcept",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.cqdg.ca/ValueSet/qc-ethnicity-vs"
+        }
       },
       {
         "id": "Patient.identifier",
@@ -144,14 +146,7 @@
         "id": "Patient.identifier:CQDG_ID.system",
         "path": "Patient.identifier.system",
         "min": 1,
-        "patternUri": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-identifier"
-      },
-      {
-        "id": "Patient.identifier:OTHER_ID",
-        "path": "Patient.identifier",
-        "sliceName": "OTHER_ID",
-        "min": 0,
-        "max": "*"
+        "patternUri": "https://fhir.cqdg.ca/fhir/Patient"
       }
     ]
   }

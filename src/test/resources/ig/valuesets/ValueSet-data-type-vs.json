@@ -3,12 +3,14 @@
   "status": "active",
   "name": "DataTypeVS",
   "id": "data-type-vs",
+  "title": "Ferlab.bio ValueSet/data-type",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/data-type-vs",
+  "url": "https://fhir.cqdg.ca/ValueSet/data-type-vs",
+  "description": "Date Type ValueSet",
   "compose": {
     "include": [
       {
-        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/data-type"
+        "system": "https://fhir.cqdg.ca/CodeSystem/data-type"
       }
     ]
   }

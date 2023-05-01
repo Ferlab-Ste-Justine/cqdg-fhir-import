@@ -1,19 +1,10 @@
 {
   "resourceType": "StructureDefinition",
   "id": "cqdg-document-reference",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Foundation.Documents"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "not-classified"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-document-reference",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/cqdg-document-reference",
   "version": "0.1.0",
   "name": "CQDGDocumentReference",
+  "title": "Ferlab.bio StructureDefinition/cqdg-document-reference",
   "status": "active",
   "description": "A CQDG group",
   "fhirVersion": "4.0.1",

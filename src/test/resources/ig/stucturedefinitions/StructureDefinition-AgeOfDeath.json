@@ -1,12 +1,12 @@
 {
   "resourceType": "StructureDefinition",
-  "id": "QCEthnicity",
-  "url": "https://fhir.cqdg.ca/StructureDefinition/QCEthnicity",
+  "id": "AgeOfDeath",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/AgeOfDeath",
   "version": "0.1.0",
-  "name": "QCEthnicity",
-  "title": "Ferlab.bio Extension/qc-ethnicity",
+  "name": "AgeOfDeath",
+  "title": "Ferlab.bio Extension/age-of-death",
   "status": "active",
-  "description": "qc ethnicity for cqdg project",
+  "description": "Age Of Death Extension",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -31,27 +31,13 @@
       {
         "id": "Extension",
         "path": "Extension",
-        "short": "Ferlab.bio Extension/qc-ethnicity",
-        "definition": "qc ethnicity for cqdg project"
-      },
-      {
-        "id": "Extension.extension",
-        "path": "Extension.extension",
-        "max": "0"
+        "short": "Ferlab.bio Extension/age-of-death",
+        "definition": "Age Of Death Extension"
       },
       {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/QCEthnicity"
-      },
-      {
-        "id": "Extension.value[x]",
-        "path": "Extension.value[x]",
-        "type": [
-          {
-            "code": "CodeableConcept"
-          }
-        ]
+        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/AgeOfDeath"
       }
     ]
   }

@@ -1,10 +1,12 @@
 {
   "resourceType": "StructureDefinition",
   "id": "population-info",
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/population-info",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/population-info",
   "version": "0.1.0",
   "name": "PopulationInfo",
+  "title": "Ferlab.bio Extension/population-info",
   "status": "active",
+  "description": "Population Info Extension",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -27,9 +29,15 @@
   "differential": {
     "element": [
       {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Ferlab.bio Extension/population-info",
+        "definition": "Population Info Extension"
+      },
+      {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/population-info"
+        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/population-info"
       },
       {
         "id": "Extension.valueCoding",
@@ -47,7 +55,7 @@
         "path": "Extension.valueCoding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/population-vs"
+          "valueSet": "https://fhir.cqdg.ca/ValueSet/population-vs"
         }
       },
       {
@@ -55,7 +63,7 @@
         "path": "Extension.valueCoding.code",
         "binding": {
           "strength": "required",
-          "valueSet": "http://fhir.cqdg.ferlab.bio/ValueSet/population-vs"
+          "valueSet": "https://fhir.cqdg.ca/ValueSet/population-vs"
         }
       }
     ]

@@ -1,21 +1,12 @@
 {
   "resourceType": "StructureDefinition",
   "id": "cqdg-task",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Base.Workflow"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "not-classified"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-task",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/cqdg-task",
   "version": "0.1.0",
   "name": "CQDGTask",
-  "title": "profile task",
+  "title": "Ferlab.bio Profile/cqdg-task",
   "status": "active",
+  "description": "CQDG Task",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
