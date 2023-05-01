@@ -1,12 +1,12 @@
 {
   "resourceType": "StructureDefinition",
-  "id": "QCEthnicity",
-  "url": "https://fhir.cqdg.ca/StructureDefinition/QCEthnicity",
+  "id": "AgeAtRecruitment",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/AgeAtRecruitment",
   "version": "0.1.0",
-  "name": "QCEthnicity",
-  "title": "Ferlab.bio Extension/qc-ethnicity",
+  "name": "AgeAtRecruitment",
+  "title": "Ferlab.bio Extension/age-at-recruitment",
   "status": "active",
-  "description": "qc ethnicity for cqdg project",
+  "description": "Age At Recruitment Extension",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -31,27 +31,13 @@
       {
         "id": "Extension",
         "path": "Extension",
-        "short": "Ferlab.bio Extension/qc-ethnicity",
-        "definition": "qc ethnicity for cqdg project"
-      },
-      {
-        "id": "Extension.extension",
-        "path": "Extension.extension",
-        "max": "0"
+        "short": "Ferlab.bio Extension/age-at-recruitment",
+        "definition": "Age At Recruitment Extension"
       },
       {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/QCEthnicity"
-      },
-      {
-        "id": "Extension.value[x]",
-        "path": "Extension.value[x]",
-        "type": [
-          {
-            "code": "CodeableConcept"
-          }
-        ]
+        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/AgeAtRecruitment"
       }
     ]
   }

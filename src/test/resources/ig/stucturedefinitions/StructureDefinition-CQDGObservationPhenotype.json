@@ -1,20 +1,12 @@
 {
   "resourceType": "StructureDefinition",
   "id": "CQDGObservationPhenotype",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Clinical.Diagnostics"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "patient"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/CQDGObservationPhenotype",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/CQDGObservationPhenotype",
   "version": "0.1.0",
   "name": "CQDGObservationPhenotype",
+  "title": "Ferlab.bio StructureDefinition/phenotype",
   "status": "active",
+  "description": "An example of a cqdg Observation (phenotype)",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -51,54 +43,10 @@
   "kind": "resource",
   "abstract": false,
   "type": "Observation",
-  "baseDefinition": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-observation-group",
+  "baseDefinition": "https://fhir.cqdg.ca/StructureDefinition/cqdg-observation-group",
   "derivation": "constraint",
   "differential": {
     "element": [
-      {
-        "id": "Observation.extension",
-        "path": "Observation.extension",
-        "slicing": {
-          "discriminator": [
-            {
-              "type": "value",
-              "path": "url"
-            }
-          ],
-          "ordered": false,
-          "rules": "open"
-        }
-      },
-      {
-        "id": "Observation.extension:age_at_phenotype",
-        "path": "Observation.extension",
-        "sliceName": "age_at_phenotype",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "Extension",
-            "profile": [
-              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AgeAt"
-            ]
-          }
-        ]
-      },
-      {
-        "id": "Observation.extension:isObserved",
-        "path": "Observation.extension",
-        "sliceName": "isObserved",
-        "min": 0,
-        "max": "1",
-        "type": [
-          {
-            "code": "Extension",
-            "profile": [
-              "http://fhir.cqdg.ferlab.bio/StructureDefinition/BooleanValue"
-            ]
-          }
-        ]
-      },
       {
         "id": "Observation.valueCodeableConcept",
         "path": "Observation.valueCodeableConcept",

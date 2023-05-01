@@ -1,20 +1,12 @@
 {
   "resourceType": "StructureDefinition",
   "id": "cqdg-observation-group",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Clinical.Diagnostics"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "patient"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-observation-group",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/cqdg-observation-group",
   "version": "0.1.0",
   "name": "CQDGObservationGroup",
+  "title": "Ferlab.bio StructureDefinition/cqdg-observation",
   "status": "active",
+  "description": "An example of a cqdg group",
   "fhirVersion": "4.0.1",
   "mapping": [
     {

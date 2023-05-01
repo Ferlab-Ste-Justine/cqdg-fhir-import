@@ -1,20 +1,12 @@
 {
   "resourceType": "StructureDefinition",
   "id": "CQDGObservationTumorNormalDesignation",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Clinical.Diagnostics"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "patient"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/CQDGObservationTumorNormalDesignation",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/CQDGObservationTumorNormalDesignation",
   "version": "0.1.0",
   "name": "CQDGObservationTumorNormalDesignation",
+  "title": "Ferlab.bio StructureDefinition/tumor-normal-designation",
   "status": "active",
+  "description": "An example of a cqdg Observation Group",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -51,7 +43,7 @@
   "kind": "resource",
   "abstract": false,
   "type": "Observation",
-  "baseDefinition": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-observation-group",
+  "baseDefinition": "https://fhir.cqdg.ca/StructureDefinition/cqdg-observation-group",
   "derivation": "constraint",
   "differential": {
     "element": [
@@ -71,7 +63,7 @@
         "path": "Observation.valueCodeableConcept.coding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "http://fhir.cqdg.ferlab.bio/CodeSystem/tumor-normal-designation"
+          "valueSet": "https://fhir.cqdg.ca/CodeSystem/tumor-normal-designation-vs"
         }
       }
     ]

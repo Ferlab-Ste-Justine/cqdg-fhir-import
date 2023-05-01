@@ -4,9 +4,10 @@
   "content": "complete",
   "name": "DUOCodes",
   "id": "duo-codes",
+  "title": "Ferlab.bio CodeSystem/duo-codes",
   "description": "DUO codes",
   "version": "0.1.0",
-  "url": "http://purl.obolibrary.org/obo/duo.owl",
+  "url": "https://fhir.cqdg.ca/CodeSystem/duo-codes",
   "concept": [
     {
       "code": "DUO:0000012",
@@ -308,7 +309,6 @@
       ]
     }
   ],
-  "title": "DUO codes",
   "experimental": false,
   "caseSensitive": true,
   "count": 23

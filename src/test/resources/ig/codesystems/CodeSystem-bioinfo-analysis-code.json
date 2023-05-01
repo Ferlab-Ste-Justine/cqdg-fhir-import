@@ -4,8 +4,9 @@
   "content": "complete",
   "name": "BioinfoAnalysisCode",
   "id": "bioinfo-analysis-code",
+  "title": "Ferlab.bio CodeSystem/bioinformatics-analysis",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code",
+  "url": "https://fhir.cqdg.ca/CodeSystem/bioinfo-analysis-code",
   "concept": [
     {
       "code": "RABA",
@@ -14,7 +15,7 @@
         {
           "use": {
             "code": "RABA",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Reads Alignement Bioinformatic Analysis"
         }
@@ -27,7 +28,7 @@
         {
           "use": {
             "code": "SNVC",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Reads Alignement Bioinformatic Analysis"
         }
@@ -40,7 +41,7 @@
         {
           "use": {
             "code": "QCBA",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Quality Control Bioinformatic Analysis"
         }
@@ -53,7 +54,7 @@
         {
           "use": {
             "code": "GEBA",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Germline Exome Bioinformatic Analysis"
         }
@@ -66,14 +67,13 @@
         {
           "use": {
             "code": "GGBA",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/bioinfo-analysis-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/bioinfo-analysis-code"
           },
           "value": "Germline Genome Bioinformatic Analysis"
         }
       ]
     }
   ],
-  "title": "Bioinformatics analysis code",
   "experimental": false,
   "description": "Bioinformatics analysis code",
   "caseSensitive": true,

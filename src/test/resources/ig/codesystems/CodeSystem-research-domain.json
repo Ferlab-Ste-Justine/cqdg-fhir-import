@@ -4,8 +4,9 @@
   "content": "complete",
   "name": "ResearchDomain",
   "id": "research-domain",
+  "title": "Ferlab.bio CodeSystem/research-domain",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain",
+  "url": "https://fhir.cqdg.ca/CodeSystem/research-domain",
   "concept": [
     {
       "code": "Aging",
@@ -14,7 +15,7 @@
         {
           "use": {
             "code": "Aging",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Aging study"
         }
@@ -27,7 +28,7 @@
         {
           "use": {
             "code": "Birth-Defect",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Birth defect study"
         }
@@ -40,7 +41,7 @@
         {
           "use": {
             "code": "Cancer",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "cancer study"
         }
@@ -53,7 +54,7 @@
         {
           "use": {
             "code": "Circulatory-and-Respiratory-Health",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Circulatory and Respiratory Health study"
         }
@@ -67,7 +68,7 @@
         {
           "use": {
             "code": "General-Health",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "General Health study"
         }
@@ -80,7 +81,7 @@
         {
           "use": {
             "code": "Infection-and-Immunity",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Infection and Immunity study"
         }
@@ -93,7 +94,7 @@
         {
           "use": {
             "code": "Musculoskeletal-Health-and-Arthritis",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Musculoskeletal Health and Arthritis study"
         }
@@ -107,7 +108,7 @@
         {
           "use": {
             "code": "Neurodevelopmental-Conditions",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Neurodevelopmental Conditions study"
         }
@@ -121,7 +122,7 @@
         {
           "use": {
             "code": "Neurosciences-Mental-Health-and-Addiction",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Neurosciences, Mental Health and Addiction study"
         }
@@ -135,7 +136,7 @@
         {
           "use": {
             "code": "Nutrition-Metabolism-and-Diabetes",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Nutrition, Metabolism and Diabetes study"
         }
@@ -149,7 +150,7 @@
         {
           "use": {
             "code": "Population-Genomics",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Population Genomics study"
         }
@@ -163,7 +164,7 @@
         {
           "use": {
             "code": "Rare-Diseases",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Rare Diseases study"
         }
@@ -177,7 +178,7 @@
         {
           "use": {
             "code": "Not-Applicable",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Not Applicable study"
         }
@@ -191,14 +192,13 @@
         {
           "use": {
             "code": "Other",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/research-domain"
+            "system": "https://fhir.cqdg.ca/CodeSystem/research-domain"
           },
           "value": "Other study"
         }
       ]
     }
   ],
-  "title": "Research Domain",
   "experimental": false,
   "description": "Research domain",
   "caseSensitive": false,

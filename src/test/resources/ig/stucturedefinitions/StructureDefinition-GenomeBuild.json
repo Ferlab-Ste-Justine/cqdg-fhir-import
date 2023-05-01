@@ -1,11 +1,12 @@
 {
   "resourceType": "StructureDefinition",
-  "id": "BooleanValue",
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/BooleanValue",
-  "version": "1.0.0",
-  "name": "BooleanValue",
+  "id": "GenomeBuild",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/GenomeBuild",
+  "version": "0.1.0",
+  "name": "GenomeBuild",
+  "title": "Ferlab.bio StructureDefinition/genome-build",
   "status": "active",
-  "description": "Age at event",
+  "description": "Genome Build Extension",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -23,19 +24,15 @@
     }
   ],
   "type": "Extension",
-  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "baseDefinition": "https://fhir.cqdg.ca/StructureDefinition/WorkflowExtension",
   "derivation": "constraint",
   "differential": {
     "element": [
       {
         "id": "Extension",
         "path": "Extension",
-        "definition": "Age at event"
-      },
-      {
-        "id": "Extension.url",
-        "path": "Extension.url",
-        "fixedUri": "http://fhir.cqdg.ferlab.bio/StructureDefinition/BooleanValue"
+        "short": "Ferlab.bio StructureDefinition/genome-build",
+        "definition": "Genome Build Extension"
       }
     ]
   }

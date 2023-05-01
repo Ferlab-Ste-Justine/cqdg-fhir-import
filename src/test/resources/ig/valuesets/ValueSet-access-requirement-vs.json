@@ -3,10 +3,10 @@
   "status": "active",
   "name": "AccessRequirementVS",
   "id": "access-requirement-vs",
-  "title": "Access requirement value set",
+  "title": "Ferlab.bio ValueSet/access-requirement",
   "description": "Requirements before access",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/access-requirement-vs",
+  "url": "https://fhir.cqdg.ca/ValueSet/access-requirement-vs",
   "compose": {
     "include": [
       {

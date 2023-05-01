@@ -4,9 +4,10 @@
   "content": "complete",
   "name": "CQDGObservationCode",
   "id": "cqdg-observation-code",
+  "title": "Ferlab.bio CodeSystem/cqdg-observation",
   "description": "CQDG Observation codes",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code",
+  "url": "https://fhir.cqdg.ca/CodeSystem/cqdg-observation-code",
   "concept": [
     {
       "code": "Family-relationship",
@@ -15,7 +16,7 @@
         {
           "use": {
             "code": "Family-relationship",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/cqdg-observation-code"
           },
           "value": "Social history observation"
         }
@@ -28,7 +29,7 @@
         {
           "use": {
             "code": "Tumor-normal-designation",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/cqdg-observation-code"
           },
           "value": "Histological Diagnosis"
         }
@@ -41,7 +42,7 @@
         {
           "use": {
             "code": "Disease-Status",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/cqdg-observation-code"
           },
           "value": "Disease Status observation"
         }
@@ -54,7 +55,7 @@
         {
           "use": {
             "code": "Phenotype",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/cqdg-observation-code"
           },
           "value": "Phenotype observation"
         }
@@ -67,14 +68,13 @@
         {
           "use": {
             "code": "Cause-of-Death",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/cqdg-observation-code"
+            "system": "https://fhir.cqdg.ca/CodeSystem/cqdg-observation-code"
           },
           "value": "Cause of death"
         }
       ]
     }
   ],
-  "title": "CQDG Observation codes",
   "experimental": false,
   "caseSensitive": true,
   "count": 5

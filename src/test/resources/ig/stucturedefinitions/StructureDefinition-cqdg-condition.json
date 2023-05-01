@@ -1,19 +1,10 @@
 {
   "resourceType": "StructureDefinition",
   "id": "cqdg-condition",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Clinical.Summary"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "patient"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-condition",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/cqdg-condition",
   "version": "1.0.0",
   "name": "CQDG_Condition",
+  "title": "Ferlab.bio StructureDefinition/cqdg-condition",
   "status": "active",
   "description": "A condition in CQDG",
   "fhirVersion": "4.0.1",
@@ -56,6 +47,33 @@
   "derivation": "constraint",
   "differential": {
     "element": [
+      {
+        "id": "Condition.identifier",
+        "path": "Condition.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "system"
+            }
+          ],
+          "rules": "openAtEnd"
+        },
+        "min": 1
+      },
+      {
+        "id": "Condition.identifier:CQDG_ID",
+        "path": "Condition.identifier",
+        "sliceName": "CQDG_ID",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "Condition.identifier:CQDG_ID.system",
+        "path": "Condition.identifier.system",
+        "min": 1,
+        "patternUri": "https://fhir.cqdg.ca/fhir/Condition"
+      },
       {
         "id": "Condition.onsetAge",
         "path": "Condition.onsetAge",

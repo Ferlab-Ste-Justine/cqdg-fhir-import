@@ -4,8 +4,9 @@
   "content": "complete",
   "name": "FamilyType",
   "id": "family-type",
+  "title": "Ferlab.bio CodeSystem/family-type",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/CodeSystem/family-type",
+  "url": "https://fhir.cqdg.ca/CodeSystem/family-type",
   "concept": [
     {
       "code": "Case-parent-trio",
@@ -14,7 +15,7 @@
         {
           "use": {
             "code": "Case-parent-trio",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/family-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem/family-type"
           },
           "value": "Case-parent trio"
         }
@@ -27,7 +28,7 @@
         {
           "use": {
             "code": "Case-sibling",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/family-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem/family-type"
           },
           "value": "Case-sibling"
         }
@@ -40,7 +41,7 @@
         {
           "use": {
             "code": "Twins",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/family-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem/family-type"
           },
           "value": "Twins"
         }
@@ -53,7 +54,7 @@
         {
           "use": {
             "code": "Case-affected-relative",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/family-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem/family-type"
           },
           "value": "Case - affected relative"
         }
@@ -66,14 +67,13 @@
         {
           "use": {
             "code": "Other",
-            "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/family-type"
+            "system": "https://fhir.cqdg.ca/CodeSystem/family-type"
           },
           "value": "Other"
         }
       ]
     }
   ],
-  "title": "Family type",
   "experimental": false,
   "description": "Family type",
   "caseSensitive": true,

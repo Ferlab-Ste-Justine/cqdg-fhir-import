@@ -4,10 +4,10 @@
   "content": "complete",
   "name": "QCSampleType",
   "id": "qc-sample-type",
-  "title": "QC Sample Type",
+  "title": "Ferlab.bio CodeSystem/sample-type",
   "description": "Qc sample type",
   "version": "0.1.0",
-  "url": "http://purl.obolibrary.org/obo/ncit.owl",
+  "url": "https://fhir.cqdg.ca/CodeSystem/qc-sample-type",
   "concept": [
     {
       "code": "NCIT:C449",

@@ -3,13 +3,14 @@
   "status": "active",
   "name": "QCEthnicityVS",
   "id": "qc-ethnicity-vs",
-  "title": "CQDG observation value set",
+  "title": "Ferlab.bio ValueSet/qa-ethnicity",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/qc-ethnicity-vs",
+  "url": "https://fhir.cqdg.ca/ValueSet/qc-ethnicity-vs",
+  "description": "QCEthnicity ValueSet",
   "compose": {
     "include": [
       {
-        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/qc-ethnicity"
+        "system": "https://fhir.cqdg.ca/CodeSystem/qc-ethnicity"
       }
     ]
   }

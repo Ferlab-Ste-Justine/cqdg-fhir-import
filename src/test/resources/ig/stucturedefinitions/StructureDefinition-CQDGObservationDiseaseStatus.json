@@ -1,19 +1,10 @@
 {
   "resourceType": "StructureDefinition",
   "id": "CQDGObservationDiseaseStatus",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Clinical.Diagnostics"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "patient"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/CQDGObservationDiseaseStatus",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/CQDGObservationDiseaseStatus",
   "version": "0.1.0",
   "name": "CQDGObservationDiseaseStatus",
+  "title": "Ferlab.bio StructureDefinition/disease-status",
   "status": "active",
   "description": "An example of a cqdg group",
   "fhirVersion": "4.0.1",
@@ -52,7 +43,7 @@
   "kind": "resource",
   "abstract": false,
   "type": "Observation",
-  "baseDefinition": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-observation-group",
+  "baseDefinition": "https://fhir.cqdg.ca/StructureDefinition/cqdg-observation-group",
   "derivation": "constraint",
   "differential": {
     "element": [
@@ -65,14 +56,10 @@
           {
             "code": "CodeableConcept"
           }
-        ]
-      },
-      {
-        "id": "Observation.valueCodeableConcept.coding.system",
-        "path": "Observation.valueCodeableConcept.coding.system",
+        ],
         "binding": {
           "strength": "required",
-          "valueSet": "http://fhir.cqdg.ferlab.bio/CodeSystem/disease-status"
+          "valueSet": "https://fhir.cqdg.ca/ValueSet/disease-status-vs"
         }
       }
     ]

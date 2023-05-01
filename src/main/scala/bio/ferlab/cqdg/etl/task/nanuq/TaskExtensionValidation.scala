@@ -70,7 +70,7 @@ object TaskExtensionValidation {
     val exp = runDate.map { d =>
       d.map { v =>
         val newExperimentExt = buildExperimentExtension(m.experiment)
-        newExperimentExt.addExtension(new Extension("runDate", v))
+        newExperimentExt.addExtension(new Extension("RunDate", v))
         newExperimentExt
       }
     }.getOrElse(experimentExt.validNel[String])
@@ -79,7 +79,7 @@ object TaskExtensionValidation {
 
   def buildWorkflowExtension(workflow: Workflow): Extension = {
     val workflowExtension = new Extension(Extensions.WORKFLOW)
-    workflow.name.foreach { name => workflowExtension.addExtension(new Extension("workflowName", new StringType(name))) }
+    workflow.name.foreach { name => workflowExtension.addExtension(new Extension("WorkflowName", new StringType(name))) }
     workflow.genomeBuild.foreach { genomeBuild =>
       // TBD - genomic build is not conform to the IG...
       val conformGenomicBuild = genomeBuild match {
@@ -89,27 +89,27 @@ object TaskExtensionValidation {
 
       val code = new Coding()
       code.setCode(conformGenomicBuild).setSystem(CodingSystems.GENOME_BUILD)
-      workflowExtension.addExtension(new Extension("genomeBuild", code))
+      workflowExtension.addExtension(new Extension("GenomeBuild", code))
     }
-    workflow.version.foreach { version => workflowExtension.addExtension(new Extension("workflowVersion", new StringType(version))) }
+    workflow.version.foreach { version => workflowExtension.addExtension(new Extension("WorkflowVersion", new StringType(version))) }
     workflowExtension
   }
 
   def buildExperimentExtension(experiment: Experiment): Extension = {
     val expExtension = new Extension(Extensions.SEQUENCING_EXPERIMENT)
-    experiment.runName.foreach { v => expExtension.addExtension(new Extension("runName", new StringType(v))) }
+    experiment.runName.foreach { v => expExtension.addExtension(new Extension("RunName", new StringType(v))) }
 
-    experiment.runAlias.foreach { v => expExtension.addExtension(new Extension("runAlias", new StringType(v))) }
-    experiment.isPairedEnd.foreach { v => expExtension.addExtension(new Extension("isPairedEnd", new BooleanType(v))) }
-    experiment.readLength.foreach { v => expExtension.addExtension(new Extension("readLength", new StringType(v))) }
+    experiment.runAlias.foreach { v => expExtension.addExtension(new Extension("RunAlias", new StringType(v))) }
+    experiment.isPairedEnd.foreach { v => expExtension.addExtension(new Extension("IsPairedEnd", new BooleanType(v))) }
+    experiment.readLength.foreach { v => expExtension.addExtension(new Extension("ReadLength", new StringType(v))) }
     experiment.experimentalStrategy.foreach { v =>
       val code = new Coding()
       code.setCode(v).setSystem(CodingSystems.EXPERIMENTAL_STRATEGY)
-      expExtension.addExtension(new Extension("experimentalStrategy", code))
+      expExtension.addExtension(new Extension("ExperimentalStrategy", code))
     }
-    experiment.platform.foreach { v => expExtension.addExtension(new Extension("platform", new StringType(v))) }
-    experiment.captureKit.foreach { v => expExtension.addExtension(new Extension("captureKit", new StringType(v))) }
-    experiment.sequencerId.foreach { v => expExtension.addExtension(new Extension("sequencerId", new StringType(v))) }
+    experiment.platform.foreach { v => expExtension.addExtension(new Extension("Platform", new StringType(v))) }
+    experiment.captureKit.foreach { v => expExtension.addExtension(new Extension("CaptureKit", new StringType(v))) }
+    experiment.sequencerId.foreach { v => expExtension.addExtension(new Extension("SequencerId", new StringType(v))) }
     expExtension
   }
 }

@@ -1,19 +1,10 @@
 {
   "resourceType": "StructureDefinition",
   "id": "cqdg-research-study",
-  "extension": [
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-category",
-      "valueString": "Specialized.Public Health &amp; Research"
-    },
-    {
-      "url": "http://hl7.org/fhir/StructureDefinition/structuredefinition-security-category",
-      "valueCode": "business"
-    }
-  ],
-  "url": "http://fhir.cqdg.ferlab.bio/StructureDefinition/cqdg-research-study",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/cqdg-research-study",
   "version": "0.1.0",
   "name": "CQDGResearchStudy",
+  "title": "Ferlab.bio StructureDefinition/cqdg-study",
   "status": "active",
   "description": "A research study in CQDG",
   "fhirVersion": "4.0.1",
@@ -75,7 +66,7 @@
           {
             "code": "Extension",
             "profile": [
-              "http://fhir.cqdg.ferlab.bio/StructureDefinition/population-info"
+              "https://fhir.cqdg.ca/StructureDefinition/population-info"
             ]
           }
         ]
@@ -90,7 +81,7 @@
           {
             "code": "Extension",
             "profile": [
-              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessLimitations"
+              "https://fhir.cqdg.ca/StructureDefinition/AccessLimitations"
             ]
           }
         ]
@@ -105,10 +96,37 @@
           {
             "code": "Extension",
             "profile": [
-              "http://fhir.cqdg.ferlab.bio/StructureDefinition/AccessRequirements"
+              "https://fhir.cqdg.ca/StructureDefinition/AccessRequirements"
             ]
           }
         ]
+      },
+      {
+        "id": "ResearchStudy.identifier",
+        "path": "ResearchStudy.identifier",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "value",
+              "path": "system"
+            }
+          ],
+          "rules": "openAtEnd"
+        },
+        "min": 1
+      },
+      {
+        "id": "ResearchStudy.identifier:CQDG_ID",
+        "path": "ResearchStudy.identifier",
+        "sliceName": "CQDG_ID",
+        "min": 1,
+        "max": "1"
+      },
+      {
+        "id": "ResearchStudy.identifier:CQDG_ID.system",
+        "path": "ResearchStudy.identifier.system",
+        "min": 1,
+        "patternUri": "https://fhir.cqdg.ca/fhir/ResearchStudy"
       },
       {
         "id": "ResearchStudy.category",

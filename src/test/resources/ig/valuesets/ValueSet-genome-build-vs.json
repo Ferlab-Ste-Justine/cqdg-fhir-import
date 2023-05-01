@@ -3,12 +3,14 @@
   "status": "active",
   "name": "GenomeBuildVS",
   "id": "genome-build-vs",
+  "title": "Ferlab.bio ValueSet/genome-build",
   "version": "0.1.0",
-  "url": "http://fhir.cqdg.ferlab.bio/ValueSet/genome-build-vs",
+  "url": "https://fhir.cqdg.ca/ValueSet/genome-build-vs",
+  "description": "Genome Build ValueSet",
   "compose": {
     "include": [
       {
-        "system": "http://fhir.cqdg.ferlab.bio/CodeSystem/genome-build"
+        "system": "https://fhir.cqdg.ca/CodeSystem/genome-build"
       }
     ]
   }
