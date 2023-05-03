@@ -19,7 +19,7 @@ object TaskExtensionValidation {
     // Run date is validate elsewhere
 
     val experimentExtWithoutRunDate = buildExperimentExtension(m.experiment)
-    val workflowExt = buildWorkflowExtension(m.workflow)
+    val workflowExt = m.workflow.map(buildWorkflowExtension)
     val taskExtensions = validTaskExtension(experimentExtWithoutRunDate, workflowExt)
 
     val experimentExt = validateRunDate(m, experimentExtWithoutRunDate)
@@ -29,11 +29,11 @@ object TaskExtensionValidation {
     }
   }
 
-  private def validTaskExtension(experimentExtWithoutRunDate: Extension, workflowExt: Extension)(implicit client: IGenericClient) = {
+  private def validTaskExtension(experimentExtWithoutRunDate: Extension, workflowExt: Option[Extension])(implicit client: IGenericClient) = {
     // We dont need to validate each task (sequencing alignment, variant calling, and qc).
     // We just need to validate FHIR model for one of these, because workflow and sequencingExperiment should be the same for every task
     val fakeTask = AnalysisTask()
-    fakeTask.addExtension(workflowExt)
+    workflowExt.map(fakeTask.addExtension)
     fakeTask.addExtension(experimentExtWithoutRunDate)
     val outcome = FhirUtils.validateResource(fakeTask)
     val issues = outcome.getIssue.asScala.toSeq

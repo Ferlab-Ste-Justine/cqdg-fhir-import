@@ -8,7 +8,7 @@ case class RawPhenotype(
                          submitter_participant_id: String,
                          phenotype_source_text: String,
                          phenotype_HPO_code: Option[String],
-                         age_at_phenotype: Int,
+                         age_at_phenotype: Option[Int],
                          phenotype_observed: Option[String],
                        ) extends RawResource {
 
@@ -22,7 +22,7 @@ case class RawPhenotype(
   }
 
   override def getHash: String = {
-    DigestUtils.sha1Hex(List(study_id, submitter_participant_id, phenotype_source_text, phenotype_HPO_code, age_at_phenotype.toString).mkString("-"))
+    DigestUtils.sha1Hex(List(study_id, submitter_participant_id, phenotype_source_text, phenotype_HPO_code, age_at_phenotype.getOrElse("").toString).mkString("-"))
   }
 }
 
@@ -35,7 +35,7 @@ object RawPhenotype {
       line(header.indexOf("submitter_participant_id")),
       line(header.indexOf("phenotype_source_text")),
       getOptionalLineValue(line, header, "phenotype_HPO_code"),
-      line(header.indexOf("age_at_phenotype")).toInt,
+      getOptionalLineValue(line, header, "age_at_phenotype").map(_.toInt),
       getOptionalLineValue(line, header, "phenotype_observed"),
     )
   }
