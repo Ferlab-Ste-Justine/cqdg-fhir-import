@@ -45,7 +45,7 @@ object MetadataTestUtils {
   )
   val defaultMetadata: Metadata = Metadata(
     defaultExperiment,
-    defaultWorkflow,
+    Some(defaultWorkflow),
     analyses = Seq(
       defaultAnalysis
     )

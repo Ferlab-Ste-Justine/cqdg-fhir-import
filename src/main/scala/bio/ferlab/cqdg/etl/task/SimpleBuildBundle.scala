@@ -150,10 +150,12 @@ object SimpleBuildBundle {
     })
 
     // ***************** Phenotype Age at Phenotype *********************
-    val ageValue = new Age()
-    ageValue.setValue(resource.age_at_phenotype).setUnit("days").setSystem(UNITS_OF_MEASURE).setCode("d")
-    val ageExtension = new Extension(AGE_AT_PHENOTYPE, ageValue)
-    phenotype.setExtension(List(ageExtension).asJava)
+    resource.age_at_phenotype.map(age => {
+      val ageValue = new Age()
+      ageValue.setValue(age).setUnit("days").setSystem(UNITS_OF_MEASURE).setCode("d")
+      val ageExtension = new Extension(AGE_AT_PHENOTYPE, ageValue)
+      phenotype.setExtension(List(ageExtension).asJava)
+    })
 
     if(parentId.isDefined) {
       phenotype.setSubject(reference.setReference(s"Patient/${parentId.get}"))

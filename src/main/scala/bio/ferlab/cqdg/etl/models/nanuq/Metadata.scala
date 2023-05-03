@@ -7,7 +7,7 @@ import play.api.libs.json.{JsError, JsSuccess, Json, Reads}
 
 import scala.collection.Seq
 
-case class Metadata(experiment: Experiment, workflow: Workflow, analyses: Seq[Analysis])
+case class Metadata(experiment: Experiment, workflow: Option[Workflow], analyses: Seq[Analysis])
 
 object Metadata {
   implicit val reads: Reads[Metadata] = Json.reads[Metadata]

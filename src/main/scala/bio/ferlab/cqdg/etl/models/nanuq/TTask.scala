@@ -7,7 +7,7 @@ import bio.ferlab.cqdg.etl.models.nanuq.TTask._
 import org.hl7.fhir.r4.model.Task.{ParameterComponent, TaskOutputComponent}
 import org.hl7.fhir.r4.model._
 
-case class TaskExtensions(workflowExtension: Extension, experimentExtension: Extension) {
+case class TaskExtensions(workflowExtension: Option[Extension], experimentExtension: Extension) {
   def forAliquot(labAliquotId: String): TaskExtensions = {
     val expExtension = experimentExtension.copy()
     expExtension.addExtension(new Extension("LabAliquotId", new StringType(labAliquotId)))
@@ -95,7 +95,7 @@ case class TTask(taskExtensions: TaskExtensions) {
 
     val idType = new IdType(id)
     t.setId(idType)
-    t.addExtension(taskExtensions.workflowExtension)
+    taskExtensions.workflowExtension.map(t.addExtension)
     t.addExtension(taskExtensions.experimentExtension)
     t
   }
