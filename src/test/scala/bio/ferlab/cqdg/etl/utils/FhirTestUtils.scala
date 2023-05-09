@@ -125,20 +125,11 @@ object FhirTestUtils {
       "stucturedefinitions/StructureDefinition-CQDGObservationDiseaseStatus.json",
       "stucturedefinitions/StructureDefinition-CQDGObservationPhenotype.json",
       "stucturedefinitions/StructureDefinition-CQDGObservationTumorNormalDesignation.json",
-      "stucturedefinitions/StructureDefinition-ExperimentalStrategy.json",
       "stucturedefinitions/StructureDefinition-FullSizeExtension.json",
-      "stucturedefinitions/StructureDefinition-GenomeBuild.json",
-      "stucturedefinitions/StructureDefinition-IsPairedEnd.json",
-      "stucturedefinitions/StructureDefinition-LabAliquotId.json",
-      "stucturedefinitions/StructureDefinition-Platform.json",
       "stucturedefinitions/StructureDefinition-population-info.json",
       "stucturedefinitions/StructureDefinition-QCEthnicity.json",
-      "stucturedefinitions/StructureDefinition-RunDate.json",
-      "stucturedefinitions/StructureDefinition-RunName.json",
-      "stucturedefinitions/StructureDefinition-SequencingExperimentExtension.json",
-      "stucturedefinitions/StructureDefinition-WorkflowExtension.json",
-      "stucturedefinitions/StructureDefinition-WorkflowName.json",
-      "stucturedefinitions/StructureDefinition-WorkflowVersion.json",
+      "stucturedefinitions/StructureDefinition-sequencingExperimentExtension.json",
+      "stucturedefinitions/StructureDefinition-workflowExtension.json",
     ).foreach(downloadAndCreate)
   }
 

@@ -1,0 +1,268 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "sequencingExperimentExtension",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/sequencingExperimentExtension",
+  "version": "0.1.0",
+  "name": "SequencingExperimentExtension",
+  "title": "Ferlab.bio StructureDefinition/sequencing-experiment",
+  "status": "active",
+  "description": "Sequencing Experiment Extension",
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "rim",
+      "uri": "http://hl7.org/v3",
+      "name": "RIM Mapping"
+    }
+  ],
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Element"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Ferlab.bio StructureDefinition/sequencing-experiment",
+        "definition": "Sequencing Experiment Extension"
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "min": 1
+      },
+      {
+        "id": "Extension.extension:runName",
+        "path": "Extension.extension",
+        "sliceName": "runName",
+        "definition": "No description",
+        "min": 0,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:runName.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:runName.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "runName"
+      },
+      {
+        "id": "Extension.extension:runName.value[x]",
+        "path": "Extension.extension.value[x]",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:isPairedEnd",
+        "path": "Extension.extension",
+        "sliceName": "isPairedEnd",
+        "definition": "No description",
+        "min": 0,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:isPairedEnd.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:isPairedEnd.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "isPairedEnd"
+      },
+      {
+        "id": "Extension.extension:isPairedEnd.value[x]",
+        "path": "Extension.extension.value[x]",
+        "type": [
+          {
+            "code": "boolean"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:readLength",
+        "path": "Extension.extension",
+        "sliceName": "readLength",
+        "definition": "No description",
+        "min": 0,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:readLength.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:readLength.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "readLength"
+      },
+      {
+        "id": "Extension.extension:readLength.value[x]",
+        "path": "Extension.extension.value[x]",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:experimentalStrategy",
+        "path": "Extension.extension",
+        "sliceName": "experimentalStrategy",
+        "min": 0,
+        "max": "1"
+      },
+      {
+        "id": "Extension.extension:experimentalStrategy.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:experimentalStrategy.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "experimentalStrategy"
+      },
+      {
+        "id": "Extension.extension:experimentalStrategy.value[x]",
+        "path": "Extension.extension.value[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "ordered": false,
+          "rules": "open"
+        },
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:experimentalStrategy.valueCoding",
+        "path": "Extension.extension.valueCoding",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.cqdg.ca/ValueSet/experimental-strategy-vs"
+        }
+      },
+      {
+        "id": "Extension.extension:platform",
+        "path": "Extension.extension",
+        "sliceName": "platform",
+        "definition": "No description",
+        "min": 1,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:platform.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:platform.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "platform"
+      },
+      {
+        "id": "Extension.extension:platform.value[x]",
+        "path": "Extension.extension.value[x]",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:runDate",
+        "path": "Extension.extension",
+        "sliceName": "runDate",
+        "definition": "No description",
+        "min": 0,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:runDate.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:runDate.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "runDate"
+      },
+      {
+        "id": "Extension.extension:runDate.value[x]",
+        "path": "Extension.extension.value[x]",
+        "type": [
+          {
+            "code": "dateTime"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:labAliquotId",
+        "path": "Extension.extension",
+        "sliceName": "labAliquotId",
+        "definition": "No description",
+        "min": 0,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:labAliquotId.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:labAliquotId.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "labAliquotId"
+      },
+      {
+        "id": "Extension.extension:labAliquotId.value[x]",
+        "path": "Extension.extension.value[x]",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/sequencingExperimentExtension"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "max": "0"
+      }
+    ]
+  }
+}

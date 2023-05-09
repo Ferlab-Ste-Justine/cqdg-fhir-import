@@ -70,20 +70,11 @@ package object etl {
     "StructureDefinition-CQDGObservationDiseaseStatus",
     "StructureDefinition-CQDGObservationPhenotype",
     "StructureDefinition-CQDGObservationTumorNormalDesignation",
-    "StructureDefinition-ExperimentalStrategy",
     "StructureDefinition-FullSizeExtension",
-    "StructureDefinition-GenomeBuild",
-    "StructureDefinition-IsPairedEnd",
-    "StructureDefinition-LabAliquotId",
-    "StructureDefinition-Platform",
     "StructureDefinition-population-info",
     "StructureDefinition-QCEthnicity",
-    "StructureDefinition-RunDate",
-    "StructureDefinition-RunName",
-    "StructureDefinition-SequencingExperimentExtension",
-    "StructureDefinition-WorkflowExtension",
-    "StructureDefinition-WorkflowName",
-    "StructureDefinition-WorkflowVersion",
+    "StructureDefinition-sequencingExperimentExtension",
+    "StructureDefinition-workflowExtension",
   )
 
   val VALUE_SET_FILES: Seq[String] = Seq(

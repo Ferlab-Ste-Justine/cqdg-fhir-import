@@ -1,0 +1,152 @@
+{
+  "resourceType": "StructureDefinition",
+  "id": "workflowExtension",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/workflowExtension",
+  "version": "0.1.0",
+  "name": "WorkflowExtension",
+  "title": "Ferlab.bio StructureDefinition/workflow",
+  "status": "active",
+  "description": "Workflow Extension",
+  "fhirVersion": "4.0.1",
+  "mapping": [
+    {
+      "identity": "rim",
+      "uri": "http://hl7.org/v3",
+      "name": "RIM Mapping"
+    }
+  ],
+  "kind": "complex-type",
+  "abstract": false,
+  "context": [
+    {
+      "type": "element",
+      "expression": "Element"
+    }
+  ],
+  "type": "Extension",
+  "baseDefinition": "http://hl7.org/fhir/StructureDefinition/Extension",
+  "derivation": "constraint",
+  "differential": {
+    "element": [
+      {
+        "id": "Extension",
+        "path": "Extension",
+        "short": "Ferlab.bio StructureDefinition/workflow",
+        "definition": "Workflow Extension"
+      },
+      {
+        "id": "Extension.extension:workflowName",
+        "path": "Extension.extension",
+        "sliceName": "workflowName",
+        "definition": "No description",
+        "min": 0,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:workflowName.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:workflowName.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "workflowName"
+      },
+      {
+        "id": "Extension.extension:workflowName.value[x]",
+        "path": "Extension.extension.value[x]",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:workflowVersion",
+        "path": "Extension.extension",
+        "sliceName": "workflowVersion",
+        "definition": "No description",
+        "min": 0,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:workflowVersion.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:workflowVersion.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "workflowVersion"
+      },
+      {
+        "id": "Extension.extension:workflowVersion.value[x]",
+        "path": "Extension.extension.value[x]",
+        "type": [
+          {
+            "code": "string"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:genomeBuild",
+        "path": "Extension.extension",
+        "sliceName": "genomeBuild",
+        "min": 0,
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension:genomeBuild.extension",
+        "path": "Extension.extension.extension",
+        "max": "0"
+      },
+      {
+        "id": "Extension.extension:genomeBuild.url",
+        "path": "Extension.extension.url",
+        "fixedUri": "genomeBuild"
+      },
+      {
+        "id": "Extension.extension:genomeBuild.value[x]",
+        "path": "Extension.extension.value[x]",
+        "slicing": {
+          "discriminator": [
+            {
+              "type": "type",
+              "path": "$this"
+            }
+          ],
+          "ordered": false,
+          "rules": "open"
+        },
+        "type": [
+          {
+            "code": "Coding"
+          }
+        ]
+      },
+      {
+        "id": "Extension.extension:genomeBuild.valueCoding",
+        "path": "Extension.extension.valueCoding",
+        "min": 0,
+        "max": "1",
+        "binding": {
+          "strength": "required",
+          "valueSet": "https://fhir.cqdg.ca/ValueSet/genome-build-vs"
+        }
+      },
+      {
+        "id": "Extension.url",
+        "path": "Extension.url",
+        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/workflowExtension"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "max": "0"
+      }
+    ]
+  }
+}

@@ -10,7 +10,7 @@ import org.hl7.fhir.r4.model._
 case class TaskExtensions(workflowExtension: Option[Extension], experimentExtension: Extension) {
   def forAliquot(labAliquotId: String): TaskExtensions = {
     val expExtension = experimentExtension.copy()
-    expExtension.addExtension(new Extension("LabAliquotId", new StringType(labAliquotId)))
+    expExtension.addExtension(new Extension("labAliquotId", new StringType(labAliquotId)))
     this.copy(experimentExtension = expExtension)
   }
 }
