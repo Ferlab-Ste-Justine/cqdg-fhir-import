@@ -52,10 +52,10 @@ object FhirUtils {
     }
 
     object Extensions {
-      val AGE_BIOSPECIMEN_COLLECTION = s"$baseFhirServer/StructureDefinition/Specimen/AgeAtBioSpecimenCollection"
+      val AGE_BIOSPECIMEN_COLLECTION = s"$baseFhirServer/StructureDefinition/AgeAtBioSpecimenCollection"
       val ACCESS_REQUIREMENTS_SD = s"$baseFhirServer/StructureDefinition/AccessRequirements"
       val ACCESS_LIMITATIONS_SD = s"$baseFhirServer/StructureDefinition/AccessLimitations"
-      val AGE_AT_RECRUITEMENT = s"$baseFhirServer/StructureDefinition/ResearchSubject/AgeAtRecruitment"
+      val AGE_AT_RECRUITEMENT = s"$baseFhirServer/StructureDefinition/AgeAtRecruitment"
       val WORKFLOW = s"$baseFhirServer/StructureDefinition/WorkflowExtension"
       val SEQUENCING_EXPERIMENT = s"$baseFhirServer/StructureDefinition/SequencingExperimentExtension"
       val FULL_SIZE = s"$baseFhirServer/StructureDefinition/FullSizeExtension"
