@@ -1,10 +1,10 @@
 package bio.ferlab.cqdg.etl.task
 
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions._
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Identifier.{CONDITION_IDENTIFIER, OBSERVATION_IDENTIFIER, PATIENT_IDENTIFIER, RESEARCH_STUDY_IDENTIFIER, SPECIMEN_IDENTIFIER}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Identifier._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.{CQDG_OBSERVATION_DISEASE_STATUS_PROFILE, CQDG_OBSERVATION_PHENOTYPE_PROFILE, CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE, CQDG_PATIENT_PROFILE}
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.{CodingSystems, baseFhirServer}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension}
 import bio.ferlab.cqdg.etl.models.RawFamily.isProband
 import bio.ferlab.cqdg.etl.models._
@@ -153,7 +153,7 @@ object SimpleBuildBundle {
     resource.age_at_phenotype.map(age => {
       val ageValue = new Age()
       ageValue.setValue(age).setUnit("days").setSystem(UNITS_OF_MEASURE).setCode("d")
-      val ageExtension = new Extension(AGE_AT_PHENOTYPE, ageValue)
+      val ageExtension = new Extension(AGE_AT_EVENT, ageValue)
       phenotype.setExtension(List(ageExtension).asJava)
     })
 
@@ -287,7 +287,7 @@ object SimpleBuildBundle {
 
     //****************** Age At Recruitment ***************
     val ageExtension = resource.age_at_recruitment.map(age =>
-      setAgeExtension(age.toLong, AGE_AT_RECRUITEMENT)
+      setAgeExtension(age.toLong, AGE_AT_RECRUITMENT)
     )
 
     //****************** Ethnicity ***************
@@ -383,7 +383,7 @@ object SimpleBuildBundle {
     specimen.setType(typeCodeableConcept)
 
     if(resource.age_biospecimen_collection.isDefined){
-      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, AGE_BIOSPECIMEN_COLLECTION)
+      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, AGE_AT_EVENT)
       specimen.setExtension(List(ageExtension).asJava)
     }
     specimen

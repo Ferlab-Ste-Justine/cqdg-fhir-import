@@ -7,7 +7,7 @@
   "title": "Ferlab.bio CodeSystem/sample-type",
   "description": "Qc sample type",
   "version": "0.1.0",
-  "url": "https://fhir.cqdg.ca/CodeSystem/qc-sample-type",
+  "url": "http://purl.obolibrary.org/obo/ncit.owl",
   "concept": [
     {
       "code": "NCIT:C449",

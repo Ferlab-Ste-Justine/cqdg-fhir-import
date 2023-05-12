@@ -86,7 +86,7 @@
         "path": "Patient.extension",
         "sliceName": "ageAtRecruitment",
         "min": 0,
-        "max": "*",
+        "max": "1",
         "type": [
           {
             "code": "Extension",
@@ -120,33 +120,6 @@
           "strength": "required",
           "valueSet": "https://fhir.cqdg.ca/ValueSet/qc-ethnicity-vs"
         }
-      },
-      {
-        "id": "Patient.identifier",
-        "path": "Patient.identifier",
-        "slicing": {
-          "discriminator": [
-            {
-              "type": "value",
-              "path": "system"
-            }
-          ],
-          "rules": "openAtEnd"
-        },
-        "min": 1
-      },
-      {
-        "id": "Patient.identifier:CQDG_ID",
-        "path": "Patient.identifier",
-        "sliceName": "CQDG_ID",
-        "min": 1,
-        "max": "1"
-      },
-      {
-        "id": "Patient.identifier:CQDG_ID.system",
-        "path": "Patient.identifier.system",
-        "min": 1,
-        "patternUri": "https://fhir.cqdg.ca/fhir/Patient"
       }
     ]
   }

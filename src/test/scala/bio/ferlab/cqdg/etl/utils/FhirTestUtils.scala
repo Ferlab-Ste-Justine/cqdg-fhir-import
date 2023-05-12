@@ -89,7 +89,6 @@ object FhirTestUtils {
       "valuesets/ValueSet-cause-of-death-vs.json",
       "valuesets/ValueSet-cqdg-diagnosis-vs.json",
       "valuesets/ValueSet-cqdg-observation-category.json",
-      "valuesets/ValueSet-cqdg-specimen-vs.json",
       "valuesets/ValueSet-data-category-vs.json",
       "valuesets/ValueSet-data-type-vs.json",
       "valuesets/ValueSet-disease-status-vs.json",
@@ -109,7 +108,7 @@ object FhirTestUtils {
     Seq(
       "stucturedefinitions/StructureDefinition-AccessLimitations.json",
       "stucturedefinitions/StructureDefinition-AccessRequirements.json",
-      "stucturedefinitions/StructureDefinition-AgeAtBioSpecimenCollection.json",
+      "stucturedefinitions/StructureDefinition-AgeAtEvent.json",
       "stucturedefinitions/StructureDefinition-AgeAtRecruitment.json",
       "stucturedefinitions/StructureDefinition-AgeOfDeath.json",
       "stucturedefinitions/StructureDefinition-cqdg-condition.json",

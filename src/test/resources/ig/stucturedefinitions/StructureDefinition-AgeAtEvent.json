@@ -1,10 +1,10 @@
 {
   "resourceType": "StructureDefinition",
-  "id": "AgeOfDeath",
-  "url": "https://fhir.cqdg.ca/StructureDefinition/AgeOfDeath",
+  "id": "AgeAtEvent",
+  "url": "https://fhir.cqdg.ca/StructureDefinition/AgeAtEvent",
   "version": "0.1.0",
-  "name": "AgeOfDeath",
-  "title": "Ferlab.bio Extension/age-of-death",
+  "name": "AgeAtEvent",
+  "title": "Ferlab.bio Extension/age-at-event",
   "status": "draft",
   "description": "Patient's age (in days since birth) at the time of death",
   "fhirVersion": "4.0.1",
@@ -31,8 +31,8 @@
       {
         "id": "Extension",
         "path": "Extension",
-        "short": "Age of death",
-        "definition": "Age at the time of Death",
+        "short": "Age at event",
+        "definition": "Age at the time of medical consultation",
         "max": "1",
         "mustSupport": true
       },
@@ -44,7 +44,7 @@
       {
         "id": "Extension.url",
         "path": "Extension.url",
-        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/AgeOfDeath"
+        "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/AgeAtEvent"
       },
       {
         "id": "Extension.value[x]",

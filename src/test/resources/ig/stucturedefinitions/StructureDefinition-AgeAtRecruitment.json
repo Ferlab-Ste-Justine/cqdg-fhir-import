@@ -5,8 +5,8 @@
   "version": "0.1.0",
   "name": "AgeAtRecruitment",
   "title": "Ferlab.bio Extension/age-at-recruitment",
-  "status": "active",
-  "description": "Age At Recruitment Extension",
+  "status": "draft",
+  "description": "Patient's age (in days since birth) at the time of recruitment",
   "fhirVersion": "4.0.1",
   "mapping": [
     {
@@ -20,7 +20,7 @@
   "context": [
     {
       "type": "element",
-      "expression": "Element"
+      "expression": "ClinicalImpression"
     }
   ],
   "type": "Extension",
@@ -31,13 +31,29 @@
       {
         "id": "Extension",
         "path": "Extension",
-        "short": "Ferlab.bio Extension/age-at-recruitment",
-        "definition": "Age At Recruitment Extension"
+        "short": "Age at recruitment",
+        "definition": "Age at the time of medical consultation",
+        "max": "1",
+        "mustSupport": true
+      },
+      {
+        "id": "Extension.extension",
+        "path": "Extension.extension",
+        "max": "0"
       },
       {
         "id": "Extension.url",
         "path": "Extension.url",
         "fixedUri": "https://fhir.cqdg.ca/StructureDefinition/AgeAtRecruitment"
+      },
+      {
+        "id": "Extension.value[x]",
+        "path": "Extension.value[x]",
+        "type": [
+          {
+            "code": "Age"
+          }
+        ]
       }
     ]
   }

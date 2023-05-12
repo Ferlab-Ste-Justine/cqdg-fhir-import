@@ -47,16 +47,16 @@
         }
       },
       {
-        "id": "Specimen.extension:ageAtBiospecimenCollection",
+        "id": "Specimen.extension:ageAt",
         "path": "Specimen.extension",
-        "sliceName": "ageAtBiospecimenCollection",
+        "sliceName": "ageAt",
         "min": 0,
         "max": "1",
         "type": [
           {
             "code": "Extension",
             "profile": [
-              "https://fhir.cqdg.ca/StructureDefinition/AgeAtBioSpecimenCollection"
+              "https://fhir.cqdg.ca/StructureDefinition/AgeAtEvent"
             ]
           }
         ]
@@ -93,15 +93,7 @@
         "path": "Specimen.type.coding.system",
         "binding": {
           "strength": "required",
-          "valueSet": "https://fhir.cqdg.ca/ValueSet/cqdg-specimen-vs"
-        }
-      },
-      {
-        "id": "Specimen.collection.bodySite.coding.system",
-        "path": "Specimen.collection.bodySite.coding.system",
-        "binding": {
-          "strength": "required",
-          "valueSet": "https://fhir.cqdg.ca/ValueSet/cqdg-specimen-vs"
+          "valueSet": "https://fhir.cqdg.ca/ValueSet/sample-type-tissue-source-vs"
         }
       }
     ]
