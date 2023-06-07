@@ -320,7 +320,7 @@ object SimpleBuildBundle {
     //***************************************************************
     patient.setExtension((Nil ++ ageExtension ++ ethnicityExtension ++ ageOfDeathExtension).asJava)
 
-    patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.sex.toLowerCase))
+    patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.gender.toLowerCase))
     patient.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
 
     patient.setId(resourceId)
