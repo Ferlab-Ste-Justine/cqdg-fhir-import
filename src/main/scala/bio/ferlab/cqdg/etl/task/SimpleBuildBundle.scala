@@ -173,8 +173,8 @@ object SimpleBuildBundle {
 
     (resource.diagnosis_mondo_code, resource.diagnosis_ICD_code) match {
       //FIXME what is the system for ICD???
-      case (Some(m), Some(i)) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), SimpleCode(code = m, system = Some(DIAGNOSIS_SYSTEM)), SimpleCode(code = i))
-      case (None, Some(i)) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), SimpleCode(code = i))
+      case (Some(m), Some(i)) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), SimpleCode(code = m, system = Some(DIAGNOSIS_SYSTEM)), SimpleCode(code = i, system = Some(DIAGNOSIS_SYSTEM_ICD)))
+      case (None, Some(i)) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), SimpleCode(code = i, system = Some(DIAGNOSIS_SYSTEM_ICD)))
       case (Some(m), None) => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text), SimpleCode(code = m, system = Some(DIAGNOSIS_SYSTEM)))
       case _ => diagnosis.setSimpleCodes(Some(resource.diagnosis_source_text))
     }
