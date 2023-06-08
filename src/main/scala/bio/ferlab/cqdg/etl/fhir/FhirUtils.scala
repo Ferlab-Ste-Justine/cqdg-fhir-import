@@ -30,6 +30,7 @@ object FhirUtils {
       val RELATIONSHIP_TO_PROBAND = "http://terminology.hl7.org/CodeSystem/v3-RoleCode"
       val PHENOTYPE_SYSTEM = "http://purl.obolibrary.org/obo/hp.owl"
       val DIAGNOSIS_SYSTEM = "http://purl.obolibrary.org/obo/mondo.owl"
+      val DIAGNOSIS_SYSTEM_ICD = "http://terminology.hl7.org/CodeSystem/icd10-CA"
       val DISEASES_STATUS = s"$baseFhirServer/CodeSystem/disease-status"
       val NCIT_SYSTEM = "http://purl.obolibrary.org/obo/ncit.owl"
       val DUO_SYSTEM = "http://purl.obolibrary.org/obo/duo.owl"
