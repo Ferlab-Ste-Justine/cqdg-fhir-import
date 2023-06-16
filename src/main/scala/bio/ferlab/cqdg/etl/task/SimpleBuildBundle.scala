@@ -16,6 +16,7 @@ import play.api.libs.functional.syntax.toFunctionalBuilderOps
 import play.api.libs.json.{JsPath, Reads}
 
 import scala.jdk.CollectionConverters._
+import scala.util.matching.Regex
 
 
 case class HashIdMap(hash: String, internal_id: String)
@@ -30,6 +31,8 @@ object HashIdMap {
 object SimpleBuildBundle {
 
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
+  // Need to replace icd codes of the form A00.A11 to A00-A11
+  val icdRegex: Regex = "^[A-Z]{1}[0-9]{2}(\\.)[A-Z]{1}[A-Z0-9]{2}$".r
 
   def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, studyVersion: String, studyId: String): Seq[Resource] = {
     val resources = rawResources(resourceType)
@@ -171,7 +174,8 @@ object SimpleBuildBundle {
     val diagnosis = new Condition()
     diagnosis.setSimpleMeta(studyId, studyVersion, None)
 
-    (resource.diagnosis_mondo_code, resource.diagnosis_ICD_code.map(_.replace(".", "-"))) match {
+    (resource.diagnosis_mondo_code,
+      resource.diagnosis_ICD_code.map(s => if (icdRegex.matches(s)) s.replace(".", "-") else s)) match {
       case (Some(m), Some(i)) => diagnosis.setSimpleCodes(
         Some(resource.diagnosis_source_text),
         SimpleCode(code = m, system = Some(DIAGNOSIS_SYSTEM)),
