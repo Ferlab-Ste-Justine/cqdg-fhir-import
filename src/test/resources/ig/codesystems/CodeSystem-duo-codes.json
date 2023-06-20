@@ -7,17 +7,13 @@
   "title": "Ferlab.bio CodeSystem/duo-codes",
   "description": "DUO codes",
   "version": "0.1.0",
-  "url": "https://fhir.cqdg.ca/CodeSystem/duo-codes",
+  "url": "http://purl.obolibrary.org/obo/duo.owl",
   "concept": [
     {
       "code": "DUO:0000012",
       "display": "research specific restrictions",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000012",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "research specific restrictions"
         }
       ]
@@ -27,10 +23,6 @@
       "display": "no general methods research",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000015",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "no general methods research"
         }
       ]
@@ -40,10 +32,6 @@
       "display": "genetic studies only",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000016",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "genetic studies only"
         }
       ]
@@ -53,10 +41,6 @@
       "display": "not for profit, non commercial use only",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000018",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "not for profit, non commercial use only"
         }
       ]
@@ -66,10 +50,6 @@
       "display": "publication required",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000019",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "publication required"
         }
       ]
@@ -79,10 +59,6 @@
       "display": "collaboration required",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000020",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "collaboration required"
         }
       ]
@@ -92,10 +68,6 @@
       "display": "ethics approval required",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000021",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "ethics approval required"
         }
       ]
@@ -105,10 +77,6 @@
       "display": "geographical restriction",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000022",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "geographical restriction"
         }
       ]
@@ -118,10 +86,6 @@
       "display": "publication moratorium",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000024",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "publication moratorium"
         }
       ]
@@ -131,10 +95,6 @@
       "display": "time limit on use",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000025",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "time limit on use"
         }
       ]
@@ -144,10 +104,6 @@
       "display": "user specific restriction",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000026",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "user specific restriction"
         }
       ]
@@ -157,10 +113,6 @@
       "display": "project specific restriction",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000027",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "project specific restriction"
         }
       ]
@@ -170,10 +122,6 @@
       "display": "institution specific restriction",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000028",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "institution specific restriction"
         }
       ]
@@ -183,10 +131,6 @@
       "display": "return to database or resource",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000029",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "return to database or resource"
         }
       ]
@@ -196,10 +140,6 @@
       "display": "clinical care use",
       "designation": [
         {
-          "use": {
-            "code": "DUO:00000043",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "clinical care use"
         }
       ]
@@ -209,10 +149,6 @@
       "display": "population origins or ancestry research prohibited",
       "designation": [
         {
-          "use": {
-            "code": "DUO:00000044",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "population origins or ancestry research prohibited"
         }
       ]
@@ -222,10 +158,6 @@
       "display": "not for profit organisation use only",
       "designation": [
         {
-          "use": {
-            "code": "DUO:00000045",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "not for profit organisation use only"
         }
       ]
@@ -235,10 +167,6 @@
       "display": "non-commercial use only",
       "designation": [
         {
-          "use": {
-            "code": "DUO:00000046",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "non-commercial use only"
         }
       ]
@@ -248,10 +176,6 @@
       "display": "Restriction on access",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000004",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "Restriction on access"
         }
       ]
@@ -261,10 +185,6 @@
       "display": "health or medical or biomedical research",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000006",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "health or medical or biomedical research"
         }
       ]
@@ -274,10 +194,6 @@
       "display": "disease specific research",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000007",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "disease specific research"
         }
       ]
@@ -287,10 +203,6 @@
       "display": "population origins or ancestry research",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000011",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "population origins or ancestry research"
         }
       ]
@@ -300,10 +212,6 @@
       "display": "general research use",
       "designation": [
         {
-          "use": {
-            "code": "DUO:0000042",
-            "system": "http://purl.obolibrary.org/obo/duo.owl"
-          },
           "value": "general research use"
         }
       ]

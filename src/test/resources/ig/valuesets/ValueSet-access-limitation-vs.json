@@ -10,29 +10,7 @@
   "compose": {
     "include": [
       {
-        "system": "http://purl.obolibrary.org/obo/duo.owl",
-        "concept": [
-          {
-            "code": "DUO:0000004",
-            "display": "No restriction"
-          },
-          {
-            "code": "DUO:0000006",
-            "display": "health or medical or biomedical research"
-          },
-          {
-            "code": "DUO:0000007",
-            "display": "disease specific research"
-          },
-          {
-            "code": "DUO:0000011",
-            "display": "population origins or ancestry research"
-          },
-          {
-            "code": "DUO:0000042",
-            "display": "general research use"
-          }
-        ]
+        "system": "http://purl.obolibrary.org/obo/duo.owl"
       }
     ]
   }
