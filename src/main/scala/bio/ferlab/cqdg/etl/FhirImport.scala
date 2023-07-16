@@ -23,6 +23,7 @@ import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
 
+import scala.collection.mutable
 import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
@@ -69,7 +70,14 @@ object FhirImport extends App {
          (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf, runType: RunType): ValidationResult[Bundle] = {
 
     val rawResources = extractResources(bucket, prefix, version, study, release)
-    val allRawResources: Map[String, Map[String, RawResource]] = addIds(rawResources)
+    val rawDataset = extractResource(bucket, prefix, version, study, release, RawDataset.FILENAME).asInstanceOf[List[RawDataset]]
+
+    val enrichRawResources = rawResources.map {
+      case (k: String, l: Seq[RawResource]) if k == RawStudy.FILENAME => k -> l.map(r => r.asInstanceOf[RawStudy].addDataSets(rawDataset))
+      case d => d
+    }
+
+    val allRawResources: Map[String, Map[String, RawResource]] = addIds(enrichRawResources)
 
     val studyId = allRawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
 
@@ -132,15 +140,17 @@ object FhirImport extends App {
     results
   }
 
-  private def getMatadataPerRuns(prefix: String, outputNarvalBucket: String, runType: RunType)(implicit nanuqClient: NanuqClient, s3Client: S3Client) = {
+  private def getMatadataPerRuns(study: String, outputNarvalBucket: String, runType: RunType)(implicit nanuqClient: NanuqClient, s3Client: S3Client) = {
     runType match {
       case RunType.NARVAL =>
-        S3Utils.getLinesContent(outputNarvalBucket, s"$prefix/metadata.ndjson")
-          .flatMap(line => {
-            (Json.parse(line) \ "experiment" \ "runName").asOpt[String].map(e => {
-              s"$prefix/$e" -> Metadata.validateMetadata(line)
+          S3Utils.getDatasets(outputNarvalBucket, study).flatMap(ds => {
+          S3Utils.getLinesContent(outputNarvalBucket, s"$study/$ds/metadata.ndjson")
+            .flatMap(line => {
+              (Json.parse(line) \ "experiment" \ "runName").asOpt[String].map(e => {
+                s"$study/$ds/$e" -> Metadata.validateMetadata(line)
+              })
             })
-          }).toMap
+        }).toMap
 
       case RunType.NANUK => runNames.map(r => {
         s"$prefix/$r" -> nanuqClient.fetch(r).andThen(Metadata.validateMetadata)
@@ -162,6 +172,19 @@ object FhirImport extends App {
     }).toMap
   }
 
+  private def extractResource(bucket: String, prefix: String, version: String, study: String, release: String, fileName: String)(implicit s3: S3Client): Seq[RawResource] = {
+    val req = ListObjectsV2Request.builder().bucket(bucket).prefix(s"$prefix/$version-$study/$release").build()
+    val bucketKeys = s3.listObjectsV2(req).contents().asScala.map(_.key())
+
+    if (bucketKeys.exists(key => key.endsWith(s"$fileName.tsv"))) {
+      val rawResource = getRawResource(getContentTSV(bucket, s"$prefix/$version-$study/$release/$fileName.tsv"), "dataset")
+      rawResource
+    } else {
+      Seq.empty[RawResource]
+    }
+
+  }
+
   def getRawResource(content: List[Array[String]], _type: String): List[RawResource] = {
     val header = content.head
     val rows = content.tail
@@ -174,6 +197,7 @@ object FhirImport extends App {
         case "biospecimen" => RawBiospecimen(l, header)
         case "sample_registration" => RawSampleRegistration(l, header)
         case "family_relationship" => RawFamily(l, header)
+        case "dataset" => RawDataset(l, header)
       }
     }
   }

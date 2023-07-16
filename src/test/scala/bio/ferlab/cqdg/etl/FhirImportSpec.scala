@@ -29,7 +29,8 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
     RawPhenotype.FILENAME,
     RawBiospecimen.FILENAME,
     RawSampleRegistration.FILENAME,
-    RawFamily.FILENAME
+    RawFamily.FILENAME,
+    RawDataset.FILENAME
   )
   val study = "STU0000001"
   val release = "RE_0001"

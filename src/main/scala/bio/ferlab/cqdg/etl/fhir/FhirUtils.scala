@@ -63,6 +63,7 @@ object FhirUtils {
       val ETHNICITY_SD = s"$baseFhirServer/StructureDefinition/QCEthnicity"
       val AGE_OF_DEATH = s"$baseFhirServer/StructureDefinition/AgeOfDeath"
       val POPULATION_URL = s"$baseFhirServer/StructureDefinition/ResearchStudy/population"
+      val DATASET = s"$baseFhirServer/StructureDefinition/dataset"
     }
 
     object Profiles {

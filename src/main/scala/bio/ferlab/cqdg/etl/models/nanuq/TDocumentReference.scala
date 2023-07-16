@@ -20,12 +20,12 @@ import scala.jdk.CollectionConverters._
 trait TDocumentReference extends DocumentReferenceType {
   def document: Seq[TDocumentAttachment]
 
-  def validateBaseResource(studyId: String, release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf): OperationOutcome = {
-    val baseResource = buildBase(studyId, release)
+  def validateBaseResource(studyId: String, release: String, dataset: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf): OperationOutcome = {
+    val baseResource = buildBase(studyId, release, dataset: String)
     FhirUtils.validateResource(baseResource)
   }
 
-  def buildResource(subject: Reference, related: Seq[Reference], studyId: String, release: String, filesHashId: List[HashIdMap])
+  def buildResource(subject: Reference, related: Seq[Reference], studyId: String, release: String, filesHashId: List[HashIdMap], dataset: String)
                    (implicit ferloadConf: FerloadConf): Resource = {
 
     val fileId = filesHashId.find(h => h.hash == this.id) match {
@@ -33,7 +33,7 @@ trait TDocumentReference extends DocumentReferenceType {
       case None => throw new RuntimeException(s"Failed to retrieve id for ${this.id}")
     }
 
-    val dr = buildBase(studyId, release)
+    val dr = buildBase(studyId, release, dataset: String)
 
     val drc = new DocumentReferenceContextComponent()
     drc.setRelated(related.asJava)
@@ -45,7 +45,7 @@ trait TDocumentReference extends DocumentReferenceType {
 
   }
 
-  private def buildBase(studyId: String, release: String)(implicit ferloadConf: FerloadConf) = {
+  private def buildBase(studyId: String, release: String, dataset: String)(implicit ferloadConf: FerloadConf) = {
     val dr = new DocumentReference()
     dr.setSimpleMeta(studyId, release, Some(CQDG_DOC_REFERENCE_PROFILE))
     dr.getMasterIdentifier.setSystem(CodingSystems.OBJECT_STORE).setValue(id)
@@ -76,9 +76,9 @@ trait TDocumentReference extends DocumentReferenceType {
 }
 
 object TDocumentReference {
-  def validate[T <: TDocumentReference](files: Map[String, FileEntry], a: Analysis, studyId: String, release: String)
+  def validate[T <: TDocumentReference](files: Map[String, FileEntry], a: Analysis, studyId: String, release: String, dataset: String)
                                        (implicit v: ToReference[T], fhirClient: IGenericClient, ferloadConf: FerloadConf): ValidationResult[T] =
-    v.validate(files, a, studyId, release)
+    v.validate(files, a, studyId, release, dataset: String)
 }
 
 trait DocumentReferenceType {
@@ -187,11 +187,11 @@ trait ToReference[T <: TDocumentReference] {
   def attach(files: Map[String, FileEntry], a: Analysis): Seq[ValidationResult[TDocumentAttachment]] =
     attachments.flatMap(v => v(files, a))
 
-  def validate(files: Map[String, FileEntry], a: Analysis, studyId: String, release: String)(implicit client: IGenericClient, ferloadConf: FerloadConf): ValidationResult[T] = {
+  def validate(files: Map[String, FileEntry], a: Analysis, studyId: String, release: String, dataset: String)(implicit client: IGenericClient, ferloadConf: FerloadConf): ValidationResult[T] = {
     attach(files, a).toList.sequence
       .andThen { attachments =>
         val dr: T = build(attachments)
-        val outcome = dr.validateBaseResource(studyId, release)
+        val outcome = dr.validateBaseResource(studyId, release, dataset)
         validateOutcomes(outcome, dr) { o =>
           val diag = o.getDiagnostics
           val loc = o.getLocation.asScala.headOption.map(_.getValueNotNull).getOrElse("")

@@ -210,6 +210,15 @@ object SimpleBuildBundle {
 
     study.setSimpleMeta(resourceId, studyVersion, None)
 
+    val datasetExtensions = resource.datasets.map(ds => {
+      val datasetNameExtension = new Extension("name").setValue(new StringType(ds.name))
+      val datasetDescriptionExtension = ds.description.map(desc => new Extension("description").setValue(new StringType(desc)))
+      new Extension(DATASET)
+        .addExtension(datasetNameExtension)
+        .addExtension(datasetDescriptionExtension.get)
+        .asInstanceOf[Extension]
+    })
+
     study.addIdentifier()
       .setSystem(RESEARCH_STUDY_IDENTIFIER)
       .setValue(resourceId)
@@ -275,7 +284,7 @@ object SimpleBuildBundle {
       new Extension(POPULATION_URL).setValue(populationCode)
     })
 
-    study.setExtension((List(accessLimitationExtension, accessRequirementsExtension) ++ populationExtension).asJava)
+    study.setExtension((List(accessLimitationExtension, accessRequirementsExtension) ++ datasetExtensions ++ populationExtension).asJava)
     //******************************************
 
     study.setStatus(ResearchStudy.ResearchStudyStatus.COMPLETED)

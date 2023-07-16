@@ -12,7 +12,8 @@ case class RawStudy(
                     domain: List[String] = Nil,
                     population: Option[String],
                     access_limitations: Option[String],
-                    access_requirements: List[String] = Nil
+                    access_requirements: List[String] = Nil,
+                    datasets: List[Dataset] = Nil
                   ) extends RawResource {
 
 
@@ -29,7 +30,16 @@ case class RawStudy(
   override def getHash: String = {
     DigestUtils.sha1Hex(study_id)
   }
+
+  def addDataSets(datasets: List[RawDataset]): RawStudy = {
+    this.copy(datasets = datasets.filter(d => d.study_id == study_id).map(e => Dataset(e.name, e.description)))
+  }
 }
+
+case class Dataset(
+                     name: String,
+                     description: Option[String],
+                   )
 
 object RawStudy {
   val FILENAME = "study"
@@ -49,4 +59,5 @@ object RawStudy {
       access_requirements = line(header.indexOf("access_requirements")).split(";").map(_.trim).toList,
     )
   }
+
 }
