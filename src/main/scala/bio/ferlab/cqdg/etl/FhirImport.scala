@@ -70,7 +70,7 @@ object FhirImport extends App {
          (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf, runType: RunType): ValidationResult[Bundle] = {
 
     val rawResources = extractResources(bucket, prefix, version, study, release)
-    val rawDataset = extractResource(bucket, prefix, version, study, release, RawDataset.FILENAME).asInstanceOf[List[RawDataset]]
+    val rawDataset = extractResource(bucket, prefix, version, study, release, RawDataset.FILENAME, "dataset").asInstanceOf[List[RawDataset]]
 
     val enrichRawResources = rawResources.map {
       case (k: String, l: Seq[RawResource]) if k == RawStudy.FILENAME => k -> l.map(r => r.asInstanceOf[RawStudy].addDataSets(rawDataset))
@@ -104,7 +104,9 @@ object FhirImport extends App {
     val bundleListWithFiles = mapDataFilesSeq.andThen(m => {
       val allFiles = m.values.toSeq.flatten
 
-      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing), CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
+      val dataset = m.headOption.flatMap({ case (m: Metadata, files: Seq[FileEntry]) => files.headOption.flatMap(r => r.dataSet) })
+
+      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing, dataset), CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
         .mapN((bundle, files) => (bundle, files))
     })
 
@@ -172,17 +174,16 @@ object FhirImport extends App {
     }).toMap
   }
 
-  private def extractResource(bucket: String, prefix: String, version: String, study: String, release: String, fileName: String)(implicit s3: S3Client): Seq[RawResource] = {
+  private def extractResource(bucket: String, prefix: String, version: String, study: String, release: String, fileName: String, _type: String)
+                             (implicit s3: S3Client): Seq[RawResource] = {
     val req = ListObjectsV2Request.builder().bucket(bucket).prefix(s"$prefix/$version-$study/$release").build()
     val bucketKeys = s3.listObjectsV2(req).contents().asScala.map(_.key())
 
     if (bucketKeys.exists(key => key.endsWith(s"$fileName.tsv"))) {
-      val rawResource = getRawResource(getContentTSV(bucket, s"$prefix/$version-$study/$release/$fileName.tsv"), "dataset")
-      rawResource
+      getRawResource(getContentTSV(bucket, s"$prefix/$version-$study/$release/$fileName.tsv"), _type)
     } else {
       Seq.empty[RawResource]
     }
-
   }
 
   def getRawResource(content: List[Array[String]], _type: String): List[RawResource] = {

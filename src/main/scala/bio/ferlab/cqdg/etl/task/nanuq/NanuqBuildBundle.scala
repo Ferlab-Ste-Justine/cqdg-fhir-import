@@ -25,7 +25,7 @@ object NanuqBuildBundle {
 
 
   def validate(metadataList: Seq[Metadata], files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]],
-               release: String, removeMissing: Boolean, dataset: String)
+               release: String, removeMissing: Boolean, dataset: Option[String])
               (implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
     LOGGER.info("################# Validate Resources ##################")
 
@@ -105,7 +105,7 @@ object NanuqBuildBundle {
                 Some((
                   participantIdType.valid[String].toValidatedNel,
                   sampleIdType.valid[String].toValidatedNel,
-                  validateFiles(mapFiles, a, studyId, release, dataset),
+                  validateFiles(mapFiles, a, studyId, release),
                   taskExtensions.map(c => c.forAliquot(a.labAliquotId)),
                   id.valid[String].toValidatedNel,
                   studyId.valid[String].toValidatedNel,
@@ -128,7 +128,7 @@ object NanuqBuildBundle {
   }
 
   def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions,
-                      taskId: String, studyId: String, version: String, filesHashId: List[HashIdMap], dataset: String)
+                      taskId: String, studyId: String, version: String, filesHashId: List[HashIdMap], dataset: Option[String])
                      (implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
     val task = TTask(taskExtensions)
     val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, version, filesHashId, dataset)

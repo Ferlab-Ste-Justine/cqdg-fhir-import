@@ -351,7 +351,7 @@ object SimpleBuildBundle {
       .setSystem(OBSERVATION_IDENTIFIER)
       .setValue(resourceId)
 
-    participantObservation.setSimpleMeta(studyId, studyVersion, None) //FIXME
+    participantObservation.setSimpleMeta(studyId, studyVersion, None)
 
     participantObservation.setId(resourceId)
 
