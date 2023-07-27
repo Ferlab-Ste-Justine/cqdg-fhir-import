@@ -1,0 +1,19 @@
+{
+    "files": [
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03344.cnv.vcf.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03344.sv.vcf.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03344.cram",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/mpsMetrics_S03344.tar.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03344.hard-filtered.gvcf.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03344.cram.crai",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03344.cnv.vcf.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03456.cnv.vcf.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03456.cram",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/mpsMetrics_S03456.tar.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03456.hard-filtered.gvcf.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03456.cram.crai",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03456.sv.vcf.gz",
+        "/narval/__RUN__/__STUDY__/dataset_default/1623/S03456.cnv.vcf.gz"
+    ],
+    "timestamp": "2023-07-14 14:37:58.020991"
+}

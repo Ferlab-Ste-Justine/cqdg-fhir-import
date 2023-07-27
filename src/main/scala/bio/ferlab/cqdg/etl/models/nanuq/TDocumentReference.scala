@@ -78,7 +78,7 @@ trait TDocumentReference extends DocumentReferenceType {
       d.md5.map(md5sum => a.setHash(md5sum.getBytes()))
       a.setTitle(d.title)
 
-      val fullSize = new Extension(Extensions.FULL_SIZE, new DecimalType(d.size))
+      val fullSize = new Extension(Extensions.FULL_SIZE_SD, new DecimalType(d.size))
       a.addExtension(fullSize)
 
       val drcc = new DocumentReferenceContentComponent(a)

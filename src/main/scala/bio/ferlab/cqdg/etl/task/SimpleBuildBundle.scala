@@ -156,7 +156,7 @@ object SimpleBuildBundle {
     resource.age_at_phenotype.map(age => {
       val ageValue = new Age()
       ageValue.setValue(age).setUnit("days").setSystem(UNITS_OF_MEASURE).setCode("d")
-      val ageExtension = new Extension(AGE_AT_EVENT, ageValue)
+      val ageExtension = new Extension(AGE_AT_EVENT_SD, ageValue)
       phenotype.setExtension(List(ageExtension).asJava)
     })
 
@@ -213,7 +213,7 @@ object SimpleBuildBundle {
     val datasetExtensions = resource.datasets.map(ds => {
       val datasetNameExtension = new Extension("name").setValue(new StringType(ds.name))
       val datasetDescriptionExtension = ds.description.map(desc => new Extension("description").setValue(new StringType(desc)))
-      new Extension(DATASET)
+      new Extension(DATASET_SD)
         .addExtension(datasetNameExtension)
         .addExtension(datasetDescriptionExtension.get)
         .asInstanceOf[Extension]
@@ -281,7 +281,7 @@ object SimpleBuildBundle {
     val populationExtension = resource.population.map(p => {
       val populationCode = new Coding()
       populationCode.setCode(p).setSystem(POPULATION).setDisplay(p)
-      new Extension(POPULATION_URL).setValue(populationCode)
+      new Extension(POPULATION_URL_SD).setValue(populationCode)
     })
 
     study.setExtension((List(accessLimitationExtension, accessRequirementsExtension) ++ datasetExtensions ++ populationExtension).asJava)
@@ -303,7 +303,7 @@ object SimpleBuildBundle {
 
     //****************** Age At Recruitment ***************
     val ageExtension = resource.age_at_recruitment.map(age =>
-      setAgeExtension(age.toLong, AGE_AT_RECRUITMENT)
+      setAgeExtension(age.toLong, AGE_AT_RECRUITMENT_SD)
     )
 
     //****************** Ethnicity ***************
@@ -328,7 +328,7 @@ object SimpleBuildBundle {
     val ageOfDeathExtension =
       if(resource.age_of_death.isDefined){
         resource.age_of_death match {
-        case Some(age) => Some(setAgeExtension(age.toLong, AGE_OF_DEATH))
+        case Some(age) => Some(setAgeExtension(age.toLong, AGE_OF_DEATH_SD))
         case None => None
       }
     } else None
@@ -399,7 +399,7 @@ object SimpleBuildBundle {
     specimen.setType(typeCodeableConcept)
 
     if(resource.age_biospecimen_collection.isDefined){
-      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, AGE_AT_EVENT)
+      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, AGE_AT_EVENT_SD)
       specimen.setExtension(List(ageExtension).asJava)
     }
     specimen

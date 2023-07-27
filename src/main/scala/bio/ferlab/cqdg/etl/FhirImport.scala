@@ -104,9 +104,7 @@ object FhirImport extends App {
     val bundleListWithFiles = mapDataFilesSeq.andThen(m => {
       val allFiles = m.values.toSeq.flatten
 
-      val dataset = m.headOption.flatMap({ case (m: Metadata, files: Seq[FileEntry]) => files.headOption.flatMap(r => r.dataSet) })
-
-      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing, dataset), CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
+      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing), CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
         .mapN((bundle, files) => (bundle, files))
     })
 
