@@ -17,6 +17,7 @@ trait MinioServer {
   private val (minioPort, _) = MinioContainer.startIfNotRunning()
 
   val BUCKETNAME = "cqdg-qa-app-clinical-data-service"
+  val BUCKET_FHIR_IMPORT = "cqdg-ops-app-fhir-import-file-data"
   val outputBucket = "cqdg-qa-app-file-download"
 
 
@@ -27,8 +28,8 @@ trait MinioServer {
   createBuckets()
 
   private def createBuckets(): Unit = {
-    val alreadyExistingBuckets = s3.listBuckets().buckets().asScala.collect { case b if b.name() == BUCKETNAME || b.name() == outputBucket => b.name() }
-    val bucketsToCreate = Seq(BUCKETNAME, outputBucket).diff(alreadyExistingBuckets)
+    val alreadyExistingBuckets = s3.listBuckets().buckets().asScala.collect { case b if b.name() == BUCKETNAME || b.name() == outputBucket || b.name() == BUCKET_FHIR_IMPORT => b.name() }
+    val bucketsToCreate = Seq(BUCKETNAME, outputBucket, BUCKET_FHIR_IMPORT).diff(alreadyExistingBuckets)
     bucketsToCreate.foreach { b =>
       val buketRequest = CreateBucketRequest.builder().bucket(b).build()
       s3.createBucket(buketRequest)

@@ -78,7 +78,7 @@ object TaskExtensionValidation {
   }
 
   def buildWorkflowExtension(workflow: Workflow): Extension = {
-    val workflowExtension = new Extension(Extensions.WORKFLOW)
+    val workflowExtension = new Extension(Extensions.WORKFLOW_SD)
     workflow.name.foreach { name => workflowExtension.addExtension(new Extension("workflowName", new StringType(name))) }
     workflow.genomeBuild.foreach { genomeBuild =>
       // TBD - genomic build is not conform to the IG...
@@ -96,7 +96,7 @@ object TaskExtensionValidation {
   }
 
   def buildExperimentExtension(experiment: Experiment): Extension = {
-    val expExtension = new Extension(Extensions.SEQUENCING_EXPERIMENT)
+    val expExtension = new Extension(Extensions.SEQUENCING_EXPERIMENT_SD)
     experiment.runName.foreach { v => expExtension.addExtension(new Extension("runName", new StringType(v))) }
 
     experiment.runAlias.foreach { v => expExtension.addExtension(new Extension("runAlias", new StringType(v))) }

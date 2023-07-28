@@ -1,15 +1,17 @@
 package bio.ferlab.cqdg.etl.s3
 
 import bio.ferlab.cqdg.etl.conf.AWSConf
+import org.checkerframework.checker.units.qual.Prefix
 import software.amazon.awssdk.auth.credentials.{AwsBasicCredentials, StaticCredentialsProvider}
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.http.apache.ApacheHttpClient
 import software.amazon.awssdk.regions.Region
-import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectRequest, NoSuchKeyException, PutObjectRequest}
+import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectRequest, ListObjectsV2Request, NoSuchKeyException, PutObjectRequest}
 import software.amazon.awssdk.services.s3.{S3Client, S3Configuration}
 
 import java.net.URI
 import scala.io.Source
+import scala.jdk.CollectionConverters.CollectionHasAsScala
 
 object S3Utils {
 
@@ -53,6 +55,16 @@ object S3Utils {
     Source.fromInputStream(s3Client.getObject(objectRequest)).getLines.map { line =>
       line.split("\t").map(s =>  s.replace("\"\"", "").trim)
     }.toList
+  }
+
+  def getDatasets(bucket: String, prefix: String)(implicit s3Client: S3Client): List[String] = {
+    val req = ListObjectsV2Request.builder().bucket(bucket).prefix(prefix).build()
+    val regex = "^.*\\/(.*)\\/metadata\\.ndjson$".r
+
+    s3Client.listObjectsV2(req).contents().asScala.flatMap (e => e.key() match {
+      case regex(dataset) => Some(dataset)
+      case _ => None
+    }).toList
   }
 
   def getLinesContent(bucket: String, key: String)(implicit s3Client: S3Client): List[String] = {

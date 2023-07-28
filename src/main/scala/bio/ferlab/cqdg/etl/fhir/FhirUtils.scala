@@ -50,19 +50,21 @@ object FhirUtils {
       val TUMOR_NORMAL_DESIGNATION = s"${baseFhirServer}/CodeSystem/tumor-normal-designation"
       val RESEARCH_DOMAIN = s"${baseFhirServer}/CodeSystem/research-domain"
       val V3_OBSERVATION_INTERPRETATION = s"http://terminology.hl7.org/3.1.0/CodeSystem-v3-ObservationInterpretation.html"
+      val DATASET_CS = s"${baseFhirServer}/CodeSystem/cqdg-dataset-cs"
     }
 
     object Extensions {
-      val AGE_AT_EVENT = s"$baseFhirServer/StructureDefinition/AgeAtEvent"
+      val AGE_AT_EVENT_SD = s"$baseFhirServer/StructureDefinition/AgeAtEvent"
       val ACCESS_REQUIREMENTS_SD = s"$baseFhirServer/StructureDefinition/AccessRequirements"
       val ACCESS_LIMITATIONS_SD = s"$baseFhirServer/StructureDefinition/AccessLimitations"
-      val AGE_AT_RECRUITMENT = s"$baseFhirServer/StructureDefinition/AgeAtRecruitment"
-      val WORKFLOW = s"$baseFhirServer/StructureDefinition/WorkflowExtension"
-      val SEQUENCING_EXPERIMENT = s"$baseFhirServer/StructureDefinition/SequencingExperimentExtension"
-      val FULL_SIZE = s"$baseFhirServer/StructureDefinition/FullSizeExtension"
+      val AGE_AT_RECRUITMENT_SD = s"$baseFhirServer/StructureDefinition/AgeAtRecruitment"
+      val WORKFLOW_SD = s"$baseFhirServer/StructureDefinition/WorkflowExtension"
+      val SEQUENCING_EXPERIMENT_SD = s"$baseFhirServer/StructureDefinition/SequencingExperimentExtension"
+      val FULL_SIZE_SD = s"$baseFhirServer/StructureDefinition/FullSizeExtension"
       val ETHNICITY_SD = s"$baseFhirServer/StructureDefinition/QCEthnicity"
-      val AGE_OF_DEATH = s"$baseFhirServer/StructureDefinition/AgeOfDeath"
-      val POPULATION_URL = s"$baseFhirServer/StructureDefinition/ResearchStudy/population"
+      val AGE_OF_DEATH_SD = s"$baseFhirServer/StructureDefinition/AgeOfDeath"
+      val POPULATION_URL_SD = s"$baseFhirServer/StructureDefinition/ResearchStudy/population"
+      val DATASET_SD = s"$baseFhirServer/StructureDefinition/dataset"
     }
 
     object Profiles {

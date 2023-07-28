@@ -24,7 +24,9 @@ object NanuqBuildBundle {
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
 
-  def validate(metadataList: Seq[Metadata], files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]], release: String, removeMissing: Boolean)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
+  def validate(metadataList: Seq[Metadata], files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]],
+               release: String, removeMissing: Boolean)
+              (implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
     LOGGER.info("################# Validate Resources ##################")
 
     val mapFiles = files.map(f => (f.filename, f)).toMap
@@ -85,6 +87,8 @@ object NanuqBuildBundle {
         //Todo what happens if sample is in 2 different batches AND if same samples are in the same batch? question for JP
         //part one: we create 2 Tasks / part 2: TBD
 
+        val datasetName = mapFiles.values.find(f => f.filename == a.files.cram).flatMap{ _.dataSet }
+
         val id = mapAliquotId(a.labAliquotId)
         val relatedSample = allRawResources("sample_registration").find {
           case (_, rawResource: RawSampleRegistration) => rawResource.submitter_sample_id === a.ldmSampleId  //its ok to ignore if not found
@@ -108,7 +112,8 @@ object NanuqBuildBundle {
                   id.valid[String].toValidatedNel,
                   studyId.valid[String].toValidatedNel,
                   release.valid[String].toValidatedNel,
-                  fileIdMap.valid[String].toValidatedNel
+                  fileIdMap.valid[String].toValidatedNel,
+                  datasetName.valid[String].toValidatedNel
                   ).mapN(createResources))
               case None => None
             }
@@ -125,9 +130,10 @@ object NanuqBuildBundle {
   }
 
   def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions,
-                      taskId: String, studyId: String, version: String, filesHashId: List[HashIdMap])(implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
+                      taskId: String, studyId: String, version: String, filesHashId: List[HashIdMap], dataset: Option[String])
+                     (implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
     val task = TTask(taskExtensions)
-    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, version, filesHashId)
+    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, version, filesHashId, dataset)
 
     val taskResources: Resource = task.buildResource(patient.toReference(), sample.toReference(), documentReferencesResources, taskId)(studyId, version)
 

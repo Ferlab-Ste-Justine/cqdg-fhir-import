@@ -10,6 +10,15 @@ case class FileEntry(
                       contentDisposition: String
                     ) {
   lazy val filename: String = FileEntry.getFileName(key)
+
+  //  assuming folder name is always  .../dataset_[name]/...
+  private val DatasetRegex = ".*dataset_(.*?)\\/.*$".r
+
+  lazy val dataSet: Option[String] = this.key match {
+    case DatasetRegex(name) => Some(name)
+    case _ => None
+  }
+
 }
 
 object FileEntry {

@@ -3,16 +3,17 @@ package bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.CAUSE_OF_DEATH
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions.{AGE_OF_DEATH, POPULATION_URL}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{CAUSE_OF_DEATH, DATASET_CS}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions.{AGE_OF_DEATH_SD, DATASET_SD, POPULATION_URL_SD}
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.Metadata
+import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.utils.WholeStackSuite
 import bio.ferlab.cqdg.etl.utils.clients.IdServerMock
 import org.hl7.fhir.r4.model._
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
+import play.api.libs.json.Json
 
-import scala.io.Source
 import scala.jdk.CollectionConverters._
 
 class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with BeforeAndAfterEach {
@@ -20,7 +21,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
   implicit val idService: IIdServer = new IdServerMock()
   implicit val ferloadConf: FerloadConf = new FerloadConf(url = "http://flerloadurl")
 
-  implicit val runType: etl.RunType.Value = RunType.NANUK
+  implicit val runType: etl.RunType.Value = RunType.NARVAL
 
   val objects: Seq[String] = Seq(
     RawParticipant.FILENAME,
@@ -29,17 +30,12 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
     RawPhenotype.FILENAME,
     RawBiospecimen.FILENAME,
     RawSampleRegistration.FILENAME,
-    RawFamily.FILENAME
+    RawFamily.FILENAME,
+    RawDataset.FILENAME
   )
   val study = "STU0000001"
   val release = "RE_0001"
   val version = "1"
-  val templateMetadata: String = Source.fromResource("good/metadata.json").mkString
-  val metadata: ValidationResult[Metadata] = Metadata.validateMetadata(
-    templateMetadata
-      .replace("_LDM_SAMPLE_ID_", "sample07779")
-  )
-
 
   private def addObjectToBucket(prefix: String, paths: Seq[String]): Unit = {
     paths.foreach(p => {
@@ -52,11 +48,21 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       addObjectToBucket(inputPrefix, objects)
 
       //add all experiment files to input bucket
-      transferFromResources(inputPrefix + "/files", "good")
+      transferFromResources(s"$inputPrefix/$study/dataset_ds_name 2", "narval/dataset2", BUCKET_FHIR_IMPORT)
+      transferFromResources(s"$inputPrefix/$study/dataset_ds_name 1", "narval/dataset1", BUCKET_FHIR_IMPORT)
 
-      val metaDataMap = Map(inputPrefix + "/files" -> metadata)
+      val metaDataMap =
+          S3Utils.getDatasets(BUCKET_FHIR_IMPORT, s"$inputPrefix/$study").flatMap(ds => {
+            S3Utils.getLinesContent(BUCKET_FHIR_IMPORT, s"$inputPrefix/$study/$ds/metadata.ndjson")
+              .flatMap(line => {
+                (Json.parse(line) \ "experiment" \ "runName").asOpt[String].map(e => {
+                  s"$inputPrefix/$study/$ds/$e" -> Metadata.validateMetadata(line)
+                })
+              })
+          }).toMap
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, "", "",  metaDataMap, "", true)
+
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, BUCKET_FHIR_IMPORT, "narval",  metaDataMap, "", true)
 
       result.isValid shouldBe true
 
@@ -75,15 +81,15 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       // ################## Patient #######################
       //Should have 3 PATIENTS
-      patients.getTotal shouldBe 3
+      patients.getTotal shouldBe 4
       //have deceased participants and right age of death
       val deceasedParticipants = read(patients, classOf[Patient]).filter(p => p.getDeceased.asInstanceOf[BooleanType].getValue)
-      deceasedParticipants.size shouldBe 1
-      deceasedParticipants.head.getExtension.asScala.count(e => e.getUrl == AGE_OF_DEATH) shouldBe 1
+      deceasedParticipants.size shouldBe 2
+      deceasedParticipants.head.getExtension.asScala.count(e => e.getUrl == AGE_OF_DEATH_SD) shouldBe 1
 
       //Should have 1 PATIENT OBSERVATION - cause of death
       val searchPatientObservations = observations.getEntry.asScala.filter(r => r.getResource.asInstanceOf[Observation].getCode.getCoding.asScala.exists(c => c.getSystem == CAUSE_OF_DEATH))
-      searchPatientObservations.size shouldBe 1
+      searchPatientObservations.size shouldBe 2
       val participantObservation3 = searchPatientObservations.head.getResource.asInstanceOf[Observation]
       participantObservation3.getSubject.getReference shouldBe "Patient/PRT0000003"
       participantObservation3.getCode.getCoding.asScala.head.getCode shouldBe "Pie eating"
@@ -92,7 +98,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       searchStudy.getTotal shouldBe 1
       val researchStudy = read(searchStudy, classOf[ResearchStudy]).head
       // Population
-      researchStudy.getExtension.asScala.count(e => e.getUrl == POPULATION_URL) shouldBe 1
+      researchStudy.getExtension.asScala.count(e => e.getUrl == POPULATION_URL_SD) shouldBe 1
 
       // ################## PHENOTYPE #######################
       val phenotypes = read(observations, classOf[Observation]).filter(p => p.getCode.getCoding.asScala.exists(c => c.getCode == "Phenotype"))
@@ -135,7 +141,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
 
       val searchSampleRegistration = searchFhir("Specimen").getEntry.asScala.filter(_.getResource.getIdBase.contains("SAM"))
-      searchSampleRegistration.length shouldBe 3
+      searchSampleRegistration.length shouldBe 4
 
       //Condition should be linked to Patient if required
       searchDiagnosis.getEntry.asScala.foreach { d =>
@@ -168,7 +174,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       //*************** Task *******************
       val searchTasks = searchFhir("Task")
-      searchTasks.getEntry.size() shouldEqual 1
+      searchTasks.getEntry.size() shouldEqual 4
 
       val taskParticipant1 = read(searchTasks, classOf[Task]).find(t => t.getFor.getReference === "Patient/PRT0000001")
       taskParticipant1 should be (Symbol("defined"))
@@ -190,6 +196,24 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
 
       patientDocuments.size shouldEqual 5
 
+      //*************** Dataset *******************
+      val patientDocumentsDs1 =
+        searchDocumentReference
+          .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
+          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset: ds_name 1"))
+
+      patientDocumentsDs1.size shouldEqual 10
+
+      val patientDocumentsDs2 =
+        searchDocumentReference
+          .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
+          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset: ds_name 2"))
+
+      patientDocumentsDs2.size shouldEqual 10
+
+      val studyDsExt = researchStudy.getExtension.asScala.toSeq.filter(ex => ex.getUrl == DATASET_SD).flatMap(ex => ex.getExtension.asScala.toSeq.map(ex => ex.getValue.toString))
+
+      studyDsExt shouldBe Seq("ds_name 1", "description 1", "ds_name 2", "description 2")
     }
   }
 }

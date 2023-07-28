@@ -6,12 +6,12 @@ import org.hl7.fhir.r4.model.{Reference, Resource}
 
 case class TDocumentReferences(sequencingAlignment: SequencingAlignment, variantCalling: VariantCalling, copyNumberVariant: CopyNumberVariant, structuralVariant: StructuralVariant, supplement: SupplementDocument) {
 
-  def buildResources(subject: Reference, sample: Reference, studyId: String, release: String, filesHashId: List[HashIdMap])(implicit ferloadConf: FerloadConf): DocumentReferencesResources = {
-    val sequencingAlignmentR = sequencingAlignment.buildResource(subject, Seq(sample), studyId, release, filesHashId)
-    val variantCallingR = variantCalling.buildResource(subject, Seq(sample), studyId, release, filesHashId)
-    val copyNumberVariantR = copyNumberVariant.buildResource(subject, Seq(sample), studyId, release, filesHashId)
-    val structuralVariantR = structuralVariant.buildResource(subject, Seq(sample), studyId, release, filesHashId)
-    val supplementR = supplement.buildResource(subject, Seq(sample), studyId, release, filesHashId)
+  def buildResources(subject: Reference, sample: Reference, studyId: String, release: String, filesHashId: List[HashIdMap], dataset: Option[String])(implicit ferloadConf: FerloadConf): DocumentReferencesResources = {
+    val sequencingAlignmentR = sequencingAlignment.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset)
+    val variantCallingR = variantCalling.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset)
+    val copyNumberVariantR = copyNumberVariant.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset)
+    val structuralVariantR = structuralVariant.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset)
+    val supplementR = supplement.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset)
     DocumentReferencesResources(sequencingAlignmentR, variantCallingR, copyNumberVariantR, structuralVariantR, supplementR)
   }
 
