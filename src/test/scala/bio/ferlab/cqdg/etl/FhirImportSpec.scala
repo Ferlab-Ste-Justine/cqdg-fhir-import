@@ -200,14 +200,14 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val patientDocumentsDs1 =
         searchDocumentReference
           .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
-          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset: ds_name 1"))
+          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset:ds_name 1"))
 
       patientDocumentsDs1.size shouldEqual 10
 
       val patientDocumentsDs2 =
         searchDocumentReference
           .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
-          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset: ds_name 2"))
+          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset:ds_name 2"))
 
       patientDocumentsDs2.size shouldEqual 10
 

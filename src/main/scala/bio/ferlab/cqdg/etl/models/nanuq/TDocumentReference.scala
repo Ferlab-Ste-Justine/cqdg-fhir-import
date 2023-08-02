@@ -56,7 +56,7 @@ trait TDocumentReference extends DocumentReferenceType {
 
     dataset match {
       case Some(ds) if ds != "default" =>
-        val dataSetCode = new Coding().setSystem(DATASET_CS).setCode(s"dataset: $ds")
+        val dataSetCode = new Coding().setSystem(DATASET_CS).setCode(s"dataset:$ds")
         meta.addTag(dataSetCode)
       case _ =>
     }
