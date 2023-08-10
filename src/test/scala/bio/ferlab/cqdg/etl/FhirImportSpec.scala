@@ -21,8 +21,6 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
   implicit val idService: IIdServer = new IdServerMock()
   implicit val ferloadConf: FerloadConf = new FerloadConf(url = "http://flerloadurl")
 
-  implicit val runType: etl.RunType.Value = RunType.NARVAL
-
   val objects: Seq[String] = Seq(
     RawParticipant.FILENAME,
     RawStudy.FILENAME,
