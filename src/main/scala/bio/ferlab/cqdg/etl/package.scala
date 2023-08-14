@@ -183,9 +183,4 @@ package object etl {
       } else None
     } else None
   }
-
-  object RunType extends Enumeration {
-    type RunType = Value
-    val NANUK, NARVAL = Value
-  }
 }
