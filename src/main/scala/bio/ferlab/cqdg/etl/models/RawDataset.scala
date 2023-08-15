@@ -27,8 +27,8 @@ object RawDataset {
   def apply(line: Array[String], header: Array[String]): RawDataset = {
     RawDataset(
       line(header.indexOf("study_id")),
-      line(header.indexOf("name")),
-      getOptionalLineValue(line, header, "description")
+      line(header.indexOf("dataset_name")),
+      getOptionalLineValue(line, header, "dataset_description")
     )
   }
 }
