@@ -5,7 +5,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Identifier._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.{CQDG_OBSERVATION_DISEASE_STATUS_PROFILE, CQDG_OBSERVATION_PHENOTYPE_PROFILE, CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE, CQDG_PATIENT_PROFILE}
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, generateMeta, getContactPointSystem, setAgeExtension}
 import bio.ferlab.cqdg.etl.models.RawFamily.isProband
 import bio.ferlab.cqdg.etl.models._
 import org.hl7.fhir.r4.model.Identifier.IdentifierUse
@@ -34,7 +34,7 @@ object SimpleBuildBundle {
   // Need to replace icd codes of the form A00.A11 to A00-A11
   val icdRegex: Regex = "^[A-Z]{1}[0-9]{2}(\\.)[A-Z]{1}[A-Z0-9]{2}$".r
 
-  def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, studyVersion: String, studyId: String): Seq[Resource] = {
+  def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, studyVersion: String, studyId: String, isRestricted: Boolean): Seq[Resource] = {
     val resources = rawResources(resourceType)
 
     // Group fhir resource for family
@@ -58,7 +58,7 @@ object SimpleBuildBundle {
             case Some(cause) => Seq(createParticipantObservation(resourceId, cause, studyVersion)(studyId), participant)
             case None => Seq(participant)
           }
-        case RawStudy.FILENAME => Seq(createStudy(resourceId, resource.asInstanceOf[RawStudy], studyVersion))
+        case RawStudy.FILENAME => Seq(createStudy(resourceId, resource.asInstanceOf[RawStudy], studyVersion, isRestricted))
         case RawDiagnosis.FILENAME => Seq(createDiagnosis(resourceId, resource.asInstanceOf[RawDiagnosis], studyVersion)(rawResources("participant"), studyId))
         case RawPhenotype.FILENAME => Seq(createPhenotype(resourceId, resource.asInstanceOf[RawPhenotype], studyVersion)(rawResources("participant"), studyId))
         case RawBiospecimen.FILENAME =>
@@ -205,10 +205,20 @@ object SimpleBuildBundle {
     diagnosis
   }
 
-  def createStudy(resourceId: String, resource: RawStudy, studyVersion: String): Resource  = {
+  def createStudy(resourceId: String, resource: RawStudy, studyVersion: String, isRestricted: Boolean): Resource  = {
     val study = new ResearchStudy
 
     study.setSimpleMeta(resourceId, studyVersion, None)
+    val codes = Seq(s"study:$resourceId", s"study_version:$studyVersion")
+
+    val meta = if (isRestricted) {
+      val securityCoding = new Coding().setSystem(CONFIDENTIALITY_CS).setCode("R")
+      generateMeta(codes, None).addSecurity(securityCoding)
+    } else {
+      generateMeta(codes, None)
+    }
+
+    study.setMeta(meta)
 
     val datasetExtensions = resource.datasets.map(ds => {
       val datasetNameExtension = new Extension("name").setValue(new StringType(ds.name))

@@ -50,6 +50,7 @@ object FhirUtils {
       val TUMOR_NORMAL_DESIGNATION = s"${baseFhirServer}/CodeSystem/tumor-normal-designation"
       val RESEARCH_DOMAIN = s"${baseFhirServer}/CodeSystem/research-domain"
       val V3_OBSERVATION_INTERPRETATION = s"http://terminology.hl7.org/3.1.0/CodeSystem-v3-ObservationInterpretation.html"
+      val CONFIDENTIALITY_CS = s"http://terminology.hl7.org/CodeSystem/v3-Confidentiality"
       val DATASET_CS = s"${baseFhirServer}/CodeSystem/cqdg-dataset-cs"
     }
 
