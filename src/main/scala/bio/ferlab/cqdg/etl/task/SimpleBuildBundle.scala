@@ -52,7 +52,7 @@ object SimpleBuildBundle {
       resourceType match {
         case RawParticipant.FILENAME =>
           val rawParticipant = resource.asInstanceOf[RawParticipant]
-          val participant = createParticipant(resourceId, rawParticipant, studyVersion)(studyId)
+          val participant = createParticipant(resourceId, rawParticipant, studyVersion, isRestricted)(studyId)
 
           rawParticipant.cause_of_death match {
             case Some(cause) => Seq(createParticipantObservation(resourceId, cause, studyVersion)(studyId), participant)
@@ -65,7 +65,7 @@ object SimpleBuildBundle {
           val tumorLocationResources = resource.asInstanceOf[RawBiospecimen].tumor_normal_designation.map(_ => {
             createTumorNormalDesignation(resourceId, resource.asInstanceOf[RawBiospecimen], studyVersion)(rawResources("participant"), rawResources("study").keySet.head)
           })
-          Seq(createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen], studyVersion)(
+          Seq(createBiospecimen(resourceId, resource.asInstanceOf[RawBiospecimen], studyVersion, isRestricted)(
             rawResources("participant"), rawResources("study").keySet.head)) ++ tumorLocationResources
         case RawSampleRegistration.FILENAME =>
           Seq(createSampleRegistration(resourceId, resource.asInstanceOf[RawSampleRegistration], studyVersion)(
@@ -108,7 +108,7 @@ object SimpleBuildBundle {
     }
   }
 
-  def createPhenotype(resourceId: String, resource: RawPhenotype, studyVersion: String)(parentList: Map[String, RawResource], studyId: String): Resource  = {
+  private def createPhenotype(resourceId: String, resource: RawPhenotype, studyVersion: String)(parentList: Map[String, RawResource], studyId: String): Resource  = {
     val reference = new Reference()
     val phenotype = new Observation()
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
@@ -167,7 +167,7 @@ object SimpleBuildBundle {
     phenotype
   }
 
-  def createDiagnosis(resourceId: String, resource: RawDiagnosis, studyVersion: String)(parentList: Map[String, RawResource], studyId: String): Resource  = {
+  private def createDiagnosis(resourceId: String, resource: RawDiagnosis, studyVersion: String)(parentList: Map[String, RawResource], studyId: String): Resource  = {
     val reference = new Reference()
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
 
@@ -205,20 +205,10 @@ object SimpleBuildBundle {
     diagnosis
   }
 
-  def createStudy(resourceId: String, resource: RawStudy, studyVersion: String, isRestricted: Boolean): Resource  = {
+  private def createStudy(resourceId: String, resource: RawStudy, studyVersion: String, isRestricted: Boolean): Resource  = {
     val study = new ResearchStudy
 
-    study.setSimpleMeta(resourceId, studyVersion, None)
-    val codes = Seq(s"study:$resourceId", s"study_version:$studyVersion")
-
-    val meta = if (isRestricted) {
-      val securityCoding = new Coding().setSystem(CONFIDENTIALITY_CS).setCode("R")
-      generateMeta(codes, None).addSecurity(securityCoding)
-    } else {
-      generateMeta(codes, None)
-    }
-
-    study.setMeta(meta)
+    study.setSimpleMeta(resourceId, studyVersion, None).setRestricted(isRestricted)
 
     val datasetExtensions = resource.datasets.map(ds => {
       val datasetNameExtension = new Extension("name").setValue(new StringType(ds.name))
@@ -302,10 +292,10 @@ object SimpleBuildBundle {
     study
   }
 
-  def createParticipant(resourceId: String, resource: RawParticipant, studyVersion: String)(studyId: String): Resource  = {
+  private def createParticipant(resourceId: String, resource: RawParticipant, studyVersion: String, isRestricted: Boolean)(studyId: String): Resource  = {
     val patient = new Patient
 
-    patient.setSimpleMeta(studyId, studyVersion, Some(CQDG_PATIENT_PROFILE))
+    patient.setSimpleMeta(studyId, studyVersion, Some(CQDG_PATIENT_PROFILE)).setRestricted(isRestricted)
 
     patient.addIdentifier()
       .setSystem(PATIENT_IDENTIFIER)
@@ -353,7 +343,7 @@ object SimpleBuildBundle {
     patient
   }
 
-  def createParticipantObservation(resourceId: String, causeOfDeath: String, studyVersion: String)(studyId: String): Resource  = {
+  private def createParticipantObservation(resourceId: String, causeOfDeath: String, studyVersion: String)(studyId: String): Resource  = {
     val participantObservation = new Observation()
     val reference = new Reference()
 
@@ -380,15 +370,15 @@ object SimpleBuildBundle {
     participantObservation
   }
 
-  def createBiospecimen(resourceId: String, resource: RawBiospecimen, studyVersion: String)
-                       (parentList: Map[String, RawResource], studyId: String): Resource = {
+  private def createBiospecimen(resourceId: String, resource: RawBiospecimen, studyVersion: String, isRestricted: Boolean)
+                               (parentList: Map[String, RawResource], studyId: String): Resource = {
 
     val specimen = new Specimen
     val reference = new Reference()
 
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
 
-    specimen.setSimpleMeta(studyId, studyVersion, None)
+    specimen.setSimpleMeta(studyId, studyVersion, None).setRestricted(isRestricted)
 
     specimen.addIdentifier()
       .setSystem(SPECIMEN_IDENTIFIER)
@@ -415,8 +405,8 @@ object SimpleBuildBundle {
     specimen
   }
 
-  def createTumorNormalDesignation(resourceId: String, resource: RawBiospecimen, studyVersion: String)
-                       (parentList: Map[String, RawResource], studyId: String): Resource = {
+  private def createTumorNormalDesignation(resourceId: String, resource: RawBiospecimen, studyVersion: String)
+                                          (parentList: Map[String, RawResource], studyId: String): Resource = {
 
     val observation = new Observation()
 
@@ -447,8 +437,8 @@ object SimpleBuildBundle {
 
 
 
-  def createSampleRegistration(resourceId: String, resource: RawSampleRegistration, studyVersion: String)
-                              (parentList: Map[String, RawResource], specimenList: Map[String, RawResource], studyId: String): Resource = {
+  private def createSampleRegistration(resourceId: String, resource: RawSampleRegistration, studyVersion: String)
+                                      (parentList: Map[String, RawResource], specimenList: Map[String, RawResource], studyId: String): Resource = {
     val specimen = new Specimen
     val reference = new Reference()
     val parentId = getResourceId(resource.submitter_participant_id, parentList, RawParticipant.FILENAME)
@@ -482,8 +472,8 @@ object SimpleBuildBundle {
     specimen
   }
 
-  def createFamilyObservation(resourceId: String, resource: RawFamily, studyVersion: String)
-                             (parentList: Map[String, RawResource], studyId: String, familyList: Seq[RawResource]): Resource = {
+  private def createFamilyObservation(resourceId: String, resource: RawFamily, studyVersion: String)
+                                     (parentList: Map[String, RawResource], studyId: String, familyList: Seq[RawResource]): Resource = {
     val observation = new Observation()
 
     observation.setSimpleMeta(studyId, studyVersion, Some(CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE))
@@ -533,8 +523,8 @@ object SimpleBuildBundle {
     observation.setValue(valueCodeableConcept)
   }
 
-  def createDiseaseStatus(resourceId: String, resource: RawFamily, studyVersion: String)
-                             (parentList: Map[String, RawResource], studyId: String): Resource = {
+  private def createDiseaseStatus(resourceId: String, resource: RawFamily, studyVersion: String)
+                                 (parentList: Map[String, RawResource], studyId: String): Resource = {
     val observation = new Observation()
 
     observation.setSimpleMeta(studyId, studyVersion, Some(CQDG_OBSERVATION_DISEASE_STATUS_PROFILE))
@@ -577,7 +567,7 @@ object SimpleBuildBundle {
 
   }
 
-  def createFamilyGroup(resourceId: String, resources: Seq[RawFamily], studyVersion: String)(parentList: Map[String, RawResource], studyId: String): Resource = {
+  private def createFamilyGroup(resourceId: String, resources: Seq[RawFamily], studyVersion: String)(parentList: Map[String, RawResource], studyId: String): Resource = {
     val group = new Group()
 
     group.setId(resourceId)

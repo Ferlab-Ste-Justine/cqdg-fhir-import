@@ -1,7 +1,7 @@
 package bio.ferlab.cqdg.etl.fhir
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.UNITS_OF_MEASURE
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{CONFIDENTIALITY_CS, UNITS_OF_MEASURE}
 import bio.ferlab.cqdg.etl.{CODE_SYS_FILES, IG_REPO_GH, IG_RESOURCES, STRUCT_DEF_FILES, VALUE_SET_FILES, isValid}
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource, TBundle}
 import ca.uhn.fhir.context.FhirContext
@@ -208,6 +208,14 @@ object FhirUtils {
     def setSimpleMeta(studyId: String, version: String, profile: Option[String], args: String*): Resource = {
       val codes = Seq(s"study:$studyId", s"study_version:$version") ++ args
       v.setMeta(generateMeta(codes, profile))
+    }
+
+    def setRestricted(isRestricted: Boolean): Resource = {
+      if (isRestricted) {
+        val securityCoding = new Coding().setSystem(CONFIDENTIALITY_CS).setCode("R")
+        v.getMeta.addSecurity(securityCoding)
+      }
+      v
     }
 
     //FIXME should be codes in lieu of display???? - TBD

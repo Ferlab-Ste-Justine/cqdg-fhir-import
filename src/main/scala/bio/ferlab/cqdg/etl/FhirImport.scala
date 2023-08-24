@@ -44,17 +44,17 @@ object FhirImport extends App {
 
         auth.withToken { (_, rpt) => rpt }
 
-        updateIG()
+//        updateIG()
 
         withReport(bucket, s"$prefix/$version-$study/$release/${metadataInputPrefixMap.keySet.head}") { reportPath =>
-          run(bucket, prefix, version, study, release, outputBucket, filesBucket, metadataInputPrefixMap, reportPath, removeMissing.toBoolean, isRestricted.toBoolean)
+          run(bucket, prefix, version, study, release, outputBucket, filesBucket, metadataInputPrefixMap, reportPath, removeMissing.toBoolean, isRestricted.toBooleanOption)
         }
       }
     }
   }
 
   def run(bucket: String, prefix: String, version: String, study: String, release: String,outputBucket: String,
-          filesBucket: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean, isRestricted: Boolean)
+          filesBucket: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean, isRestricted: Option[Boolean])
          (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
 
     val rawResources = extractResources(bucket, prefix, version, study, release)
@@ -70,7 +70,7 @@ object FhirImport extends App {
     val studyId = allRawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
 
     val resources = RESOURCES.flatMap(rt => {
-      createResources(allRawResources, rt, version, studyId, isRestricted)
+      createResources(allRawResources, rt, version, studyId, isRestricted.getOrElse(false))
     }) :+ createOrganization(version, studyId)
 
     val bundleList = bundleCreate(resources)
@@ -89,7 +89,8 @@ object FhirImport extends App {
     val bundleListWithFiles = mapDataFilesSeq.andThen(m => {
       val allFiles = m.values.toSeq.flatten
 
-      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing), CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
+      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing, isRestricted.getOrElse(false)),
+        CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
         .mapN((bundle, files) => (bundle, files))
     })
 
