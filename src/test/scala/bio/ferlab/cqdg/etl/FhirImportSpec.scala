@@ -80,6 +80,10 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       // ################## Patient #######################
       //Should have 3 PATIENTS
       patients.getTotal shouldBe 4
+      // is Restricted
+      read(patients, classOf[Patient])
+        .flatMap(p => p.getMeta.getSecurity.asScala)
+        .count(e => e.getSystem == CONFIDENTIALITY_CS) shouldBe 4
       //have deceased participants and right age of death
       val deceasedParticipants = read(patients, classOf[Patient]).filter(p => p.getDeceased.asInstanceOf[BooleanType].getValue)
       deceasedParticipants.size shouldBe 2

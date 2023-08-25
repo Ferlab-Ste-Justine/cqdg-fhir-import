@@ -22,7 +22,7 @@ trait TDocumentReference extends DocumentReferenceType {
   def document: Seq[TDocumentAttachment]
 
   def validateBaseResource(studyId: String, release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf): OperationOutcome = {
-    val baseResource = buildBase(studyId, release, None, false)
+    val baseResource = buildBase(studyId, release, dataset = None, isRestricted = false)
     FhirUtils.validateResource(baseResource)
   }
 

@@ -44,7 +44,7 @@ object FhirImport extends App {
 
         auth.withToken { (_, rpt) => rpt }
 
-//        updateIG()
+        updateIG()
 
         withReport(bucket, s"$prefix/$version-$study/$release/${metadataInputPrefixMap.keySet.head}") { reportPath =>
           run(bucket, prefix, version, study, release, outputBucket, filesBucket, metadataInputPrefixMap, reportPath, removeMissing.toBoolean, isRestricted.toBooleanOption)
