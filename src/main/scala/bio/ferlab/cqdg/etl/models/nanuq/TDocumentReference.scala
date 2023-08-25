@@ -22,11 +22,12 @@ trait TDocumentReference extends DocumentReferenceType {
   def document: Seq[TDocumentAttachment]
 
   def validateBaseResource(studyId: String, release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf): OperationOutcome = {
-    val baseResource = buildBase(studyId, release, None)
+    val baseResource = buildBase(studyId, release, dataset = None, isRestricted = false)
     FhirUtils.validateResource(baseResource)
   }
 
-  def buildResource(subject: Reference, related: Seq[Reference], studyId: String, release: String, filesHashId: List[HashIdMap], dataset: Option[String])
+  def buildResource(subject: Reference, related: Seq[Reference], studyId: String, release: String,
+                    filesHashId: List[HashIdMap], dataset: Option[String], isRestricted: Boolean)
                    (implicit ferloadConf: FerloadConf): Resource = {
 
     val fileId = filesHashId.find(h => h.hash == this.id) match {
@@ -34,7 +35,7 @@ trait TDocumentReference extends DocumentReferenceType {
       case None => throw new RuntimeException(s"Failed to retrieve id for ${this.id}")
     }
 
-    val dr = buildBase(studyId, release, dataset: Option[String])
+    val dr = buildBase(studyId, release, dataset: Option[String], isRestricted)
 
     val drc = new DocumentReferenceContextComponent()
     drc.setRelated(related.asJava)
@@ -46,11 +47,11 @@ trait TDocumentReference extends DocumentReferenceType {
 
   }
 
-  private def buildBase(studyId: String, release: String, dataset: Option[String])(implicit ferloadConf: FerloadConf) = {
+  private def buildBase(studyId: String, release: String, dataset: Option[String], isRestricted: Boolean)
+                       (implicit ferloadConf: FerloadConf) = {
     val dr = new DocumentReference()
 
     val codes = Seq(s"study:$studyId", s"study_version:$release")
-
 
     val meta = generateMeta(codes, None)
 
@@ -61,7 +62,7 @@ trait TDocumentReference extends DocumentReferenceType {
       case _ =>
     }
 
-    dr.setMeta(meta)
+    dr.setMeta(meta).setRestricted(isRestricted)
 
     dr.getMasterIdentifier.setSystem(CodingSystems.OBJECT_STORE).setValue(id)
     dr.setStatus(DocumentReferenceStatus.CURRENT)

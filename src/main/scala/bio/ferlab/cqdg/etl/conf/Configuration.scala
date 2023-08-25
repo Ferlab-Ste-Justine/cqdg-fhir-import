@@ -15,7 +15,7 @@ case class AWSConf(
                     pathStyleAccess: Boolean,
                     outputBucketName: String,
                     outputPrefix: String,
-                    outputNarvalBucket: String
+                    filesBucket: String
                   )
 
 case class FhirConf(url: String)
@@ -24,13 +24,9 @@ case class KeycloakConf(realm: String, url: String, clientKey: String, clientSec
 
 case class IdServerConf(endpoint: String, username: String, password: String)
 
-case class NanuqConf(endpoint: String, username: String, password: String)
-
 case class FerloadConf(url: String)
 
-case class NarvalConf(projectsFolder: String)
-
-case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf, nanuq: NanuqConf, ferload: FerloadConf, narval: NarvalConf)
+case class Conf(aws: AWSConf, fhir: FhirConf, keycloak: KeycloakConf, idServer: IdServerConf, ferload: FerloadConf)
 
 object Conf {
 

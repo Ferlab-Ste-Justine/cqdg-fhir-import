@@ -25,7 +25,7 @@ import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
 
-  val Array(prefix, prefixFiles, bucket, version, release, study, removeMissing, runName) = args
+  val Array(prefix, bucket, version, release, study, removeMissing, isRestricted) = args
 
   withSystemExit {
     withLog {
@@ -35,12 +35,10 @@ object FhirImport extends App {
         implicit val idService: IdServerClient = new IdServerClient()
         implicit val ferloadConf: FerloadConf = conf.ferload
 
-        val inputBucket = conf.aws.bucketName
         val outputBucket = conf.aws.outputBucketName
-        val outputNarvalBucket = conf.aws.outputNarvalBucket
-        val narvalProjectRoot = conf.narval.projectsFolder
+        val filesBucket = conf.aws.filesBucket
 
-        val metadataInputPrefixMap = getMatadataPerRuns(prefixFiles, outputNarvalBucket)
+        val metadataInputPrefixMap = getMatadataPerRuns(study.toUpperCase(), filesBucket)
 
         val auth: Auth = new AuthTokenInterceptor(conf.keycloak).auth
 
@@ -49,14 +47,14 @@ object FhirImport extends App {
         updateIG()
 
         withReport(bucket, s"$prefix/$version-$study/$release/${metadataInputPrefixMap.keySet.head}") { reportPath =>
-          run(bucket, prefix, version, study, release, inputBucket, outputBucket, outputNarvalBucket, narvalProjectRoot, metadataInputPrefixMap, reportPath, removeMissing.toBoolean)
+          run(bucket, prefix, version, study, release, outputBucket, filesBucket, metadataInputPrefixMap, reportPath, removeMissing.toBoolean, isRestricted.toBooleanOption)
         }
       }
     }
   }
 
-  def run(bucket: String, prefix: String, version: String, study: String, release: String, inputBucket: String,
-          outputBucket: String, outputNarvalBucket: String, narvalProjectRoot: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean)
+  def run(bucket: String, prefix: String, version: String, study: String, release: String,outputBucket: String,
+          filesBucket: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean, isRestricted: Option[Boolean])
          (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
 
     val rawResources = extractResources(bucket, prefix, version, study, release)
@@ -72,13 +70,13 @@ object FhirImport extends App {
     val studyId = allRawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
 
     val resources = RESOURCES.flatMap(rt => {
-      createResources(allRawResources, rt, version, studyId)
+      createResources(allRawResources, rt, version, studyId, isRestricted.getOrElse(false))
     }) :+ createOrganization(version, studyId)
 
     val bundleList = bundleCreate(resources)
 
     val rawFileEntries = inputPrefixMetadataMap.keySet.flatMap(p =>
-      CheckS3Data.loadRawFileEntriesFromListFile(narvalProjectRoot, outputNarvalBucket, p)
+      CheckS3Data.loadRawFileEntriesFromListFile(filesBucket, p)
     ).toSeq
 
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
@@ -91,7 +89,8 @@ object FhirImport extends App {
     val bundleListWithFiles = mapDataFilesSeq.andThen(m => {
       val allFiles = m.values.toSeq.flatten
 
-      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing), CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
+      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing, isRestricted.getOrElse(false)),
+        CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
         .mapN((bundle, files) => (bundle, files))
     })
 

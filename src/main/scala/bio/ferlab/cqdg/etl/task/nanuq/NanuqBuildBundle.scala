@@ -25,7 +25,7 @@ object NanuqBuildBundle {
 
 
   def validate(metadataList: Seq[Metadata], files: Seq[FileEntry], allRawResources: Map[String, Map[String, RawResource]],
-               release: String, removeMissing: Boolean)
+               release: String, removeMissing: Boolean, isRestricted: Boolean)
               (implicit fhirClient: IGenericClient, ferloadConf: FerloadConf, idService: IIdServer): ValidationResult[List[BundleEntryComponent]] = {
     LOGGER.info("################# Validate Resources ##################")
 
@@ -113,7 +113,8 @@ object NanuqBuildBundle {
                   studyId.valid[String].toValidatedNel,
                   release.valid[String].toValidatedNel,
                   fileIdMap.valid[String].toValidatedNel,
-                  datasetName.valid[String].toValidatedNel
+                  datasetName.valid[String].toValidatedNel,
+                  isRestricted.valid[String].toValidatedNel
                   ).mapN(createResources))
               case None => None
             }
@@ -130,10 +131,12 @@ object NanuqBuildBundle {
   }
 
   def createResources(patient: IdType, sample: IdType, files: TDocumentReferences, taskExtensions: TaskExtensions,
-                      taskId: String, studyId: String, version: String, filesHashId: List[HashIdMap], dataset: Option[String])
+                      taskId: String, studyId: String, version: String, filesHashId: List[HashIdMap],
+                      dataset: Option[String], isRestricted: Boolean)
                      (implicit ferloadConf: FerloadConf): List[BundleEntryComponent] = {
     val task = TTask(taskExtensions)
-    val documentReferencesResources: DocumentReferencesResources = files.buildResources(patient.toReference(), sample.toReference(), studyId, version, filesHashId, dataset)
+    val documentReferencesResources: DocumentReferencesResources =
+      files.buildResources(patient.toReference(), sample.toReference(), studyId, version, filesHashId, dataset, isRestricted)
 
     val taskResources: Resource = task.buildResource(patient.toReference(), sample.toReference(), documentReferencesResources, taskId)(studyId, version)
 

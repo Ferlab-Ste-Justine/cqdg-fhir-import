@@ -3,7 +3,7 @@ package bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{CAUSE_OF_DEATH, DATASET_CS}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{CAUSE_OF_DEATH, CONFIDENTIALITY_CS, DATASET_CS}
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions.{AGE_OF_DEATH_SD, DATASET_SD, POPULATION_URL_SD}
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.Metadata
@@ -60,7 +60,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
           }).toMap
 
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, BUCKETNAME, outputBucket, BUCKET_FHIR_IMPORT, "narval",  metaDataMap, "", true)
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, outputBucket, BUCKET_FHIR_IMPORT,  metaDataMap, "", removeMissing = true, Some(true))
 
       result.isValid shouldBe true
 
@@ -80,6 +80,10 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       // ################## Patient #######################
       //Should have 3 PATIENTS
       patients.getTotal shouldBe 4
+      // is Restricted
+      read(patients, classOf[Patient])
+        .flatMap(p => p.getMeta.getSecurity.asScala)
+        .count(e => e.getSystem == CONFIDENTIALITY_CS) shouldBe 4
       //have deceased participants and right age of death
       val deceasedParticipants = read(patients, classOf[Patient]).filter(p => p.getDeceased.asInstanceOf[BooleanType].getValue)
       deceasedParticipants.size shouldBe 2
@@ -97,6 +101,8 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val researchStudy = read(searchStudy, classOf[ResearchStudy]).head
       // Population
       researchStudy.getExtension.asScala.count(e => e.getUrl == POPULATION_URL_SD) shouldBe 1
+      // is Restricted
+      researchStudy.getMeta.getSecurity.asScala.count(e => e.getSystem == CONFIDENTIALITY_CS) shouldBe 1
 
       // ################## PHENOTYPE #######################
       val phenotypes = read(observations, classOf[Observation]).filter(p => p.getCode.getCoding.asScala.exists(c => c.getCode == "Phenotype"))
