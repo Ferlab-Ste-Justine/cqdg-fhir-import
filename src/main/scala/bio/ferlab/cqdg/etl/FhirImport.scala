@@ -34,7 +34,6 @@ object FhirImport extends App {
         implicit val fhirClient: IGenericClient = buildFhirClient(conf.fhir, conf.keycloak)
         implicit val idService: IdServerClient = new IdServerClient()
         implicit val ferloadConf: FerloadConf = conf.ferload
-        Thread.sleep(3600000)
 
         val outputBucket = conf.aws.outputBucketName
         val filesBucket = conf.aws.filesBucket
