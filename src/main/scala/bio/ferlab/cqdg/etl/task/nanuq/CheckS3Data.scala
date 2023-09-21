@@ -86,22 +86,13 @@ object CheckS3Data {
         a.files.cram -> (cramId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cram)),
         a.files.crai -> (craiId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.crai)),
         a.files.snv -> (snvId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.snv)),
-        a.files.cnv -> (cnvId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cnv)),
-        a.files.sv -> (svId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.sv)),
-        a.files.supplement -> (qcId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.supplement))
+        a.files.snv_tbi -> (snvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.snv_tbi)),
       ) ++ Seq(
-        a.files.snv_tbi match {
-          case Some(value) => Some(value -> (snvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
-          case None => None
-        },
-        a.files.cnv_tbi match {
-          case Some(value) => Some(value -> (cnvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
-          case None => None
-        },
-        a.files.sv_tbi match {
-          case Some(value) => Some(value -> (svTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
-          case None => None
-        },
+        a.files.cnv.map(f => f -> (cnvId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
+        a.files.cnv_tbi.map(f => f -> (cnvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
+        a.files.sv.map(f => f -> (svId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
+        a.files.sv_tbi.map(f => f -> (svTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
+        a.files.supplement.map(f => f -> (qcId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
       ).flatten
     }.toMap
     files

@@ -63,16 +63,16 @@ object NanuqBuildBundle {
             it will not generate an error */
         allAnalysis.toList.filter { a =>
           val analysisFile = Seq(
-            a.files.snv,
-            a.files.sv,
             a.files.crai,
             a.files.cram,
-            a.files.cnv,
-            a.files.supplement
+            a.files.snv,
+            a.files.snv_tbi,
           ) ++ Seq(
-            a.files.snv_tbi,
+            a.files.cnv,
             a.files.cnv_tbi,
-            a.files.snv_tbi,
+            a.files.sv,
+            a.files.sv_tbi,
+            a.files.supplement
           ).flatten
           mapFiles.keySet.exists(analysisFile.contains) || !listLabAliquotDouble.toList.contains(a.labAliquotId)
         }

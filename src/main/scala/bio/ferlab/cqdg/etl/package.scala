@@ -178,7 +178,7 @@ package object etl {
 
   def getOptionalLineValue(line: Array[String], header: Array[String], column: String): Option[String] = {
     if (line.length - 1 >= header.indexOf(column)) {
-      if (line(header.indexOf(column)).nonEmpty) {
+      if (header.indexOf(column)>= 0 && line(header.indexOf(column)).nonEmpty) {
         Some(line(header.indexOf(column)))
       } else None
     } else None
