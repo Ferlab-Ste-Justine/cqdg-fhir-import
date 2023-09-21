@@ -22,6 +22,7 @@
       "labAliquotId":"MPS12346928-C04",
       "files": {
         "sv":"file5.sv.vcf.gz",
+        "snv_tbi":"file6.vcf.gz",
         "cram":"file1.cram",
         "supplement":"file6.zip",
         "crai":"file2.cram.crai",

@@ -76,11 +76,11 @@ object CheckS3Data {
       val craiId: String = s"${DigestUtils.sha1Hex(List(a.files.crai, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val snvId: String = s"${DigestUtils.sha1Hex(List(a.files.snv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val snvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.snv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val cnvId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val cnvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val svId: String = s"${DigestUtils.sha1Hex(List(a.files.sv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val svTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.sv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val qcId: String = s"${DigestUtils.sha1Hex(List(a.files.supplement, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val cnvId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val cnvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv_tbi.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val svId: String = s"${DigestUtils.sha1Hex(List(a.files.sv.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val svTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.sv_tbi.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val qcId: String = s"${DigestUtils.sha1Hex(List(a.files.supplement.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
 
       Seq(
         a.files.cram -> (cramId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cram)),

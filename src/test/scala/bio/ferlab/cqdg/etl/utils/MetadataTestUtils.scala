@@ -9,12 +9,12 @@ object MetadataTestUtils {
     cram = "file1.cram",
     crai = "file2.cram.crai",
     snv = "file2.gvcf.gz",
-    snv_tbi = None,
-    cnv = "file3.cnv.vcf.gz",
+    snv_tbi = "file6.vcf.gz.tbi",
+    cnv = Some("file3.cnv.vcf.gz"),
     cnv_tbi = None,
-    sv = "file4.gvcf.gz",
+    sv = Some("file4.gvcf.gz"),
     sv_tbi = None,
-    supplement = "file5.tgz",
+    supplement = Some("file5.tgz"),
   )
   val defaultAnalysis: Analysis = Analysis(
     ldmSampleId = "submitted_sample_id",
