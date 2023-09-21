@@ -67,12 +67,12 @@ case class FilesAnalysis(
                           cram: String,
                           crai: String,
                           snv: String,
-                          snv_tbi: Option[String],
-                          cnv: String,
+                          snv_tbi: String,
+                          cnv: Option[String],
                           cnv_tbi: Option[String],
-                          sv: String,
+                          sv: Option[String],
                           sv_tbi: Option[String],
-                          supplement: String
+                          supplement: Option[String]
                         )
 
 object FilesAnalysis {

@@ -25,7 +25,7 @@ import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
 
-  val Array(prefix, bucket, version, release, study, removeMissing, isRestricted) = args
+  val Array(prefix, bucket, version, release, study, project, removeMissing, isRestricted) = args
 
   withSystemExit {
     withLog {
@@ -38,7 +38,7 @@ object FhirImport extends App {
         val outputBucket = conf.aws.outputBucketName
         val filesBucket = conf.aws.filesBucket
 
-        val metadataInputPrefixMap = getMatadataPerRuns(study.toUpperCase(), filesBucket)
+        val metadataInputPrefixMap = getMatadataPerRuns(s"$project/${study.toUpperCase()}", filesBucket)
 
         val auth: Auth = new AuthTokenInterceptor(conf.keycloak).auth
 

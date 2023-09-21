@@ -134,7 +134,7 @@ object VariantCalling {
 
     protected override def build(documents: Seq[TDocumentAttachment]): VariantCalling = VariantCalling(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[SNV], validOpt[SNV_TBI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[SNV], valid[SNV_TBI])
 
 
   }
@@ -153,7 +153,7 @@ object CopyNumberVariant {
 
     protected override def build(documents: Seq[TDocumentAttachment]): CopyNumberVariant = CopyNumberVariant(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[CNV], validOpt[CNV_TBI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(validOpt[CNV], validOpt[CNV_TBI])
 
   }
 }
@@ -171,7 +171,7 @@ object StructuralVariant {
 
     protected override def build(documents: Seq[TDocumentAttachment]): StructuralVariant = StructuralVariant(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[SV], validOpt[SV_TBI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(validOpt[SV], validOpt[SV_TBI])
 
   }
 }
@@ -189,7 +189,7 @@ object SupplementDocument {
 
     protected override def build(documents: Seq[TDocumentAttachment]): SupplementDocument = SupplementDocument(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[Supplement])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(validOpt[Supplement])
   }
 }
 

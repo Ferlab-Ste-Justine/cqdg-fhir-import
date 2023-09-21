@@ -76,32 +76,23 @@ object CheckS3Data {
       val craiId: String = s"${DigestUtils.sha1Hex(List(a.files.crai, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val snvId: String = s"${DigestUtils.sha1Hex(List(a.files.snv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
       val snvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.snv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val cnvId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val cnvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val svId: String = s"${DigestUtils.sha1Hex(List(a.files.sv, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val svTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.sv_tbi, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
-      val qcId: String = s"${DigestUtils.sha1Hex(List(a.files.supplement, m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val cnvId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val cnvTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.cnv_tbi.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val svId: String = s"${DigestUtils.sha1Hex(List(a.files.sv.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val svTbiId: String = s"${DigestUtils.sha1Hex(List(a.files.sv_tbi.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
+      val qcId: String = s"${DigestUtils.sha1Hex(List(a.files.supplement.getOrElse(""), m.experiment.runName.getOrElse(""),studyId).mkString("-"))}"
 
       Seq(
         a.files.cram -> (cramId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cram)),
         a.files.crai -> (craiId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.crai)),
         a.files.snv -> (snvId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.snv)),
-        a.files.cnv -> (cnvId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.cnv)),
-        a.files.sv -> (svId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.sv)),
-        a.files.supplement -> (qcId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.supplement))
+        a.files.snv_tbi -> (snvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(a.files.snv_tbi)),
       ) ++ Seq(
-        a.files.snv_tbi match {
-          case Some(value) => Some(value -> (snvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
-          case None => None
-        },
-        a.files.cnv_tbi match {
-          case Some(value) => Some(value -> (cnvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
-          case None => None
-        },
-        a.files.sv_tbi match {
-          case Some(value) => Some(value -> (svTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(value)))
-          case None => None
-        },
+        a.files.cnv.map(f => f -> (cnvId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
+        a.files.cnv_tbi.map(f => f -> (cnvTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
+        a.files.sv.map(f => f -> (svId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
+        a.files.sv_tbi.map(f => f -> (svTbiId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
+        a.files.supplement.map(f => f -> (qcId, APPLICATION_OCTET_STREAM.getMimeType, attach(f))),
       ).flatten
     }.toMap
     files

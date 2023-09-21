@@ -56,40 +56,40 @@ case class TTask(taskExtensions: TaskExtensions) {
       variantCalling
     }
 
-    val cnvOutput = {
+    val cnvOutput = drr.copyNumberVariant.map { r =>
       val code = new CodeableConcept()
       code.addCoding()
         .setSystem(CodingSystems.DR_TYPE)
         .setCode(CopyNumberVariant.documentType)
       val cnv = new TaskOutputComponent()
         .setType(code)
-        .setValue(drr.copyNumberVariant.toReference)
+        .setValue(r.toReference)
       cnv
     }
 
-    val svOutput = {
+    val svOutput = drr.structuralVariant.map { r =>
       val code = new CodeableConcept()
       code.addCoding()
         .setSystem(CodingSystems.DR_TYPE)
         .setCode(StructuralVariant.documentType)
       val sv = new TaskOutputComponent()
         .setType(code)
-        .setValue(drr.structuralVariant.toReference)
+        .setValue(r.toReference)
       sv
     }
 
-    val supplementOutput = {
+    val supplementOutput = drr.supplement.map { r =>
       val code = new CodeableConcept()
       code.addCoding()
         .setSystem(CodingSystems.DR_TYPE)
         .setCode(SupplementDocument.documentType)
       val sup = new TaskOutputComponent()
         .setType(code)
-        .setValue(drr.supplement.toReference)
+        .setValue(r.toReference)
       sup
     }
 
-    Seq(sequencingExperimentOutput, variantCallOutput, cnvOutput, svOutput, supplementOutput).foreach { r =>
+    (Seq(sequencingExperimentOutput, variantCallOutput) ++ Seq(cnvOutput, svOutput, supplementOutput).flatten).foreach { r =>
       t.addOutput(r)
     }
 

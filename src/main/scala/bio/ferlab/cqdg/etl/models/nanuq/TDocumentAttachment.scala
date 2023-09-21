@@ -99,10 +99,10 @@ case class CNV(objectStoreId: String, title: String, md5: Option[String], size: 
 }
 
 object CNV {
-  implicit case object builder extends ToAttachment[CNV] {
+  implicit case object builder extends ToOptAttachment[CNV] {
     override def label: String = "vcf"
 
-    override def analysisFileName: Analysis => String = a => a.files.cnv
+    override def analysisFileName: Analysis => Option[String] = a => a.files.cnv
 
     override def buildFile: FileEntry => CNV = f => CNV(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
@@ -113,10 +113,10 @@ case class SV(objectStoreId: String, title: String, md5: Option[String], size: L
 }
 
 object SV {
-  implicit case object builder extends ToAttachment[SV] {
+  implicit case object builder extends ToOptAttachment[SV] {
     override def label: String = "vcf"
 
-    override def analysisFileName: Analysis => String = a => a.files.sv
+    override def analysisFileName: Analysis => Option[String] = a => a.files.sv
 
     override def buildFile: FileEntry => SV = f => SV(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
@@ -155,10 +155,10 @@ case class SNV_TBI(objectStoreId: String, title: String, md5: Option[String], si
 }
 
 object SNV_TBI {
-  implicit case object builder extends ToOptAttachment[SNV_TBI] {
+  implicit case object builder extends ToAttachment[SNV_TBI] {
     override def label: String = "snv tbi"
 
-    override def analysisFileName: Analysis => Option[String] = a => a.files.snv_tbi
+    override def analysisFileName: Analysis => String = a => a.files.snv_tbi
 
     override def buildFile: FileEntry => SNV_TBI = f => SNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
@@ -169,10 +169,10 @@ case class Supplement(objectStoreId: String, title: String, md5: Option[String],
 }
 
 object Supplement {
-  implicit case object builder extends ToAttachment[Supplement] {
+  implicit case object builder extends ToOptAttachment[Supplement] {
     override def label: String = "supplement"
 
-    override def analysisFileName: Analysis => String = a => a.files.supplement
+    override def analysisFileName: Analysis => Option[String] = a => a.files.supplement
 
     override def buildFile: FileEntry => Supplement = f => Supplement(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }
