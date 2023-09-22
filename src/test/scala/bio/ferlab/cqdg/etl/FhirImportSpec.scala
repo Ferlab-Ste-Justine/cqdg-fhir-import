@@ -198,7 +198,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
           .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
           .filter(e => e.getSubject.getReference === "Patient/PRT0000001")
 
-      patientDocuments.size shouldEqual 5
+      patientDocuments.size shouldEqual 7
 
       //*************** Dataset *******************
       val patientDocumentsDs1 =
@@ -206,14 +206,14 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
           .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
           .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset:ds_name 1"))
 
-      patientDocumentsDs1.size shouldEqual 10
+      patientDocumentsDs1.size shouldEqual 14
 
       val patientDocumentsDs2 =
         searchDocumentReference
           .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
           .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset:ds_name 2"))
 
-      patientDocumentsDs2.size shouldEqual 10
+      patientDocumentsDs2.size shouldEqual 14
 
       val studyDsExt = researchStudy.getExtension.asScala.toSeq.filter(ex => ex.getUrl == DATASET_SD).flatMap(ex => ex.getExtension.asScala.toSeq.map(ex => ex.getValue.toString))
 
