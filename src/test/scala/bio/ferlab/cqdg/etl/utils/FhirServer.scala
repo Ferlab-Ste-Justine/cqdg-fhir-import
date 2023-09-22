@@ -53,6 +53,7 @@ trait FhirServerSuite extends FhirServer with TestSuite with BeforeAndAfterAll w
     fhirClient.search().forResource(resourceType)
       .returnBundle(classOf[Bundle])
       .summaryMode(SummaryEnum.TRUE)
+      .count(40)
       .execute()
   }
 
