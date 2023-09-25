@@ -9,7 +9,7 @@ object MetadataTestUtils {
     cram = "file1.cram",
     crai = "file2.cram.crai",
     snv = "file2.gvcf.gz",
-    snv_tbi = "file6.vcf.gz.tbi",
+    snv_tbi = Some("file6.vcf.gz.tbi"),
     cnv = Some("file3.cnv.vcf.gz"),
     cnv_tbi = None,
     sv = Some("file4.gvcf.gz"),
