@@ -8,7 +8,7 @@ case class TDocumentReferences(
                                 sequencingAlignment: SequencingAlignment,
                                 sequencingAlignmentRef: SequencingAlignmentRef,
                                 variantCalling: VariantCalling,
-                                variantCallingRef: VariantCallingRef,
+                                variantCallingRef: Option[VariantCallingRef],
                                 copyNumberVariant: Option[CopyNumberVariant],
                                 copyNumberVariantRef: Option[CopyNumberVariantRef],
                                 structuralVariant: Option[StructuralVariant],
@@ -22,9 +22,8 @@ case class TDocumentReferences(
       sequencingAlignmentRef
         .buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset, isRestricted, Some(sequencingAlignmentR.getId))
     val variantCallingR = variantCalling.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset, isRestricted)
-    val variantCallingRefR =
-      variantCallingRef
-        .buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset, isRestricted, Some(variantCallingR.getId))
+    val variantCallingRefR = variantCallingRef
+      .map(r => r.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset, isRestricted, Some(variantCallingR.getId)))
     val copyNumberVariantR = copyNumberVariant.map(r => r.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset, isRestricted))
     val copyNumberVariantRefIR = copyNumberVariantRef
       .map(r => r.buildResource(subject, Seq(sample), studyId, release, filesHashId, dataset, isRestricted, copyNumberVariantR.map(_.getId)))
@@ -52,12 +51,12 @@ case class DocumentReferencesResources(
                                         sequencingAlignment: Resource,
                                         sequencingAlignmentCraiR: Resource,
                                         variantCalling: Resource,
-                                        variantCallingTBIR: Resource,
+                                        variantCallingTBIR: Option[Resource],
                                         copyNumberVariant: Option[Resource],
                                         copyNumberVariantTbiIR: Option[Resource],
                                         structuralVariant: Option[Resource],
                                         structuralVariantTBIR: Option[Resource],
                                         supplement: Option[Resource]) {
-  def resources() = Seq(sequencingAlignment, sequencingAlignmentCraiR, variantCalling, variantCallingTBIR) ++
-    Seq(copyNumberVariant, copyNumberVariantTbiIR, structuralVariant, structuralVariantTBIR, supplement).flatten
+  def resources() = Seq(sequencingAlignment, sequencingAlignmentCraiR, variantCalling) ++
+    Seq(variantCallingTBIR, copyNumberVariant, copyNumberVariantTbiIR, structuralVariant, structuralVariantTBIR, supplement).flatten
 }
