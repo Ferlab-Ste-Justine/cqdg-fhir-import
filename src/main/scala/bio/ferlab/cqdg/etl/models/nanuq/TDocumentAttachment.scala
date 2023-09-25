@@ -155,10 +155,10 @@ case class SNV_TBI(objectStoreId: String, title: String, md5: Option[String], si
 }
 
 object SNV_TBI {
-  implicit case object builder extends ToAttachment[SNV_TBI] {
+  implicit case object builder extends ToOptAttachment[SNV_TBI] {
     override def label: String = "snv tbi"
 
-    override def analysisFileName: Analysis => String = a => a.files.snv_tbi
+    override def analysisFileName: Analysis => Option[String] = a => a.files.snv_tbi
 
     override def buildFile: FileEntry => SNV_TBI = f => SNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
   }

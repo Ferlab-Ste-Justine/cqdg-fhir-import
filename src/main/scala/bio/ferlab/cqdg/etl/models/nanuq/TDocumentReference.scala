@@ -180,7 +180,7 @@ object VariantCallingRef {
 
     protected override def build(documents: Seq[TDocumentAttachment]): VariantCallingRef = VariantCallingRef(documents)
 
-    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(valid[SNV_TBI])
+    override val attachments: Seq[(Map[String, FileEntry], Analysis) => Option[ValidationResult[TDocumentAttachment]]] = Seq(validOpt[SNV_TBI])
 
   }
 }
