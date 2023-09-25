@@ -176,7 +176,7 @@ object VariantCallingRef {
   val documentType: String = "SNV"
   val label = "Variant Calling"
   implicit case object builder extends ToReference[VariantCallingRef] {
-    override val label: String = VariantCalling.label
+    override val label: String = VariantCallingRef.label
 
     protected override def build(documents: Seq[TDocumentAttachment]): VariantCallingRef = VariantCallingRef(documents)
 

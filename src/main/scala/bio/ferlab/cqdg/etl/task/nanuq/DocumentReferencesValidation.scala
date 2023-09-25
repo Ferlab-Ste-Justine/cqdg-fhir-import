@@ -14,7 +14,7 @@ object DocumentReferencesValidation {
       validate[SequencingAlignment](files, a, studyId, release),
       validate[SequencingAlignmentRef](files, a, studyId, release),
       validate[VariantCalling](files, a, studyId, release),
-      validate[VariantCallingRef](files, a, studyId, release),
+      a.files.snv_tbi.map(_ => validate[VariantCallingRef](files, a, studyId, release)).traverse(identity),
       a.files.cnv.map(_ => validate[CopyNumberVariant](files, a, studyId, release)).traverse(identity),
       a.files.cnv_tbi.map(_ => validate[CopyNumberVariantRef](files, a, studyId, release)).traverse(identity),
       a.files.sv.map(_ => validate[StructuralVariant](files, a, studyId, release)).traverse(identity),
