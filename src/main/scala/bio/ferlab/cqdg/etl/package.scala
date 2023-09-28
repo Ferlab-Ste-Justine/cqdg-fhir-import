@@ -102,8 +102,6 @@ package object etl {
   )
 
 
-  val ID_SERVICE_BATCH_SIZE = 1000
-
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
   type ValidationResult[A] = ValidatedNel[String, A]
 

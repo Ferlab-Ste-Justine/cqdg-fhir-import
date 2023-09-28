@@ -1,9 +1,10 @@
 package bio.ferlab.cqdg.etl.task.nanuq
 
-import bio.ferlab.cqdg.etl.{ID_SERVICE_BATCH_SIZE, ValidationResult}
+import bio.ferlab.cqdg.etl.ValidationResult
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{IdTypeExtension, bundleCreate}
+import bio.ferlab.cqdg.etl.idservice.IdUtils.ID_SERVICE_BATCH_SIZE
 import bio.ferlab.cqdg.etl.models.nanuq._
 import bio.ferlab.cqdg.etl.models.{RawParticipant, RawResource, RawSampleRegistration}
 import bio.ferlab.cqdg.etl.task.HashIdMap
