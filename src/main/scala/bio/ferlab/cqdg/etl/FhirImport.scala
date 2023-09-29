@@ -5,12 +5,12 @@ import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.AuthTokenInterceptor
 import bio.ferlab.cqdg.etl.fhir.FhirClient.buildFhirClient
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.{bundleCreate, updateIG}
+import bio.ferlab.cqdg.etl.idservice.IdUtils.{getIdServiceIds, mapIdToList}
 import bio.ferlab.cqdg.etl.keycloak.Auth
 import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
 import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContentTSV}
-import bio.ferlab.cqdg.etl.task.HashIdMap
 import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources}
 import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
 import ca.uhn.fhir.rest.client.api.IGenericClient
@@ -194,17 +194,8 @@ object FhirImport extends App {
     val resourceWithHashIds = Map(rawResource map { a => a.getHash -> a }: _*)
     val resourceHashes = resourceWithHashIds.keySet map (a => a -> resourceType)
 
-    val resp = (0 until resourceHashes.size by ID_SERVICE_BATCH_SIZE).flatMap { x =>
-      val slicedResourceHashes = resourceHashes.slice(x, x + ID_SERVICE_BATCH_SIZE)
-      val payload = Json.stringify(Json.toJson(slicedResourceHashes.toMap))
-      Json.parse(idService.getCQDGIds(payload)).as[List[HashIdMap]]
-    }.toList
+    val resp = getIdServiceIds(resourceHashes)
 
-    resourceWithHashIds.map(r => {
-      val (hash, resource) = r
-      val id = resp.find(e => e.hash == hash).get.internal_id
-      id -> resource
-    })
+    mapIdToList(resourceWithHashIds, resp).asInstanceOf[Map[String, RawResource]]
   }
-
 }

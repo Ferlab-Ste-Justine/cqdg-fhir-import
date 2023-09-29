@@ -1,13 +1,16 @@
 package bio.ferlab.cqdg.etl.task
 
+import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Identifier._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.{CQDG_OBSERVATION_DISEASE_STATUS_PROFILE, CQDG_OBSERVATION_PHENOTYPE_PROFILE, CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE, CQDG_PATIENT_PROFILE}
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, generateMeta, getContactPointSystem, setAgeExtension}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension}
+import bio.ferlab.cqdg.etl.idservice.IdUtils.{getIdServiceIds, mapIdToList}
 import bio.ferlab.cqdg.etl.models.RawFamily.isProband
 import bio.ferlab.cqdg.etl.models._
+import org.apache.commons.codec.digest.DigestUtils
 import org.hl7.fhir.r4.model.Identifier.IdentifierUse
 import org.hl7.fhir.r4.model._
 import org.hl7.fhir.r4.model.codesystems.ObservationCategory
@@ -34,15 +37,24 @@ object SimpleBuildBundle {
   // Need to replace icd codes of the form A00.A11 to A00-A11
   val icdRegex: Regex = "^[A-Z]{1}[0-9]{2}(\\.)[A-Z]{1}[A-Z0-9]{2}$".r
 
-  def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, studyVersion: String, studyId: String, isRestricted: Boolean): Seq[Resource] = {
+  def createResources(rawResources: Map[String, Map[String, RawResource]], resourceType: String, studyVersion: String,
+                      studyId: String, isRestricted: Boolean)(implicit idService: IIdServer): Seq[Resource] = {
     val resources = rawResources(resourceType)
 
     // Group fhir resource for family
     val familyGroupResource = if(resourceType == RawFamily.FILENAME) {
       val groupedByFamily = resources.asInstanceOf[Map[String, RawFamily]].groupBy{ case (_: String, r: RawFamily) => r.submitter_family_id}
-      groupedByFamily.map({r =>
+
+      val groupedByFamilyHashed = groupedByFamily
+        .map{ case (groupId: String, mapFamily: Map[String, RawFamily]) => DigestUtils.sha1Hex(groupId) -> mapFamily }
+
+      val cqdgFamilyIds = getIdServiceIds(groupedByFamilyHashed.map(e => (e._1, "family_id")).toSet)
+
+      val groupedByFamilyWithCqdgIds = mapIdToList(groupedByFamilyHashed, cqdgFamilyIds).asInstanceOf[Map[String, Map[String, RawFamily]]]
+
+      groupedByFamilyWithCqdgIds.map({r =>
         val (familyId, familyMembers) = r
-        createFamilyGroup(s"${familyId}$studyId", familyMembers.values.toSeq, studyVersion)(rawResources("participant"), studyId)
+        createFamilyGroup(familyId, familyMembers.values.toSeq, studyVersion)(rawResources("participant"), studyId)
       }).toSeq
     } else Nil
 
