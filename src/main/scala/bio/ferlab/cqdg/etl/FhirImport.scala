@@ -76,7 +76,7 @@ object FhirImport extends App {
     val bundleList = bundleCreate(resources)
 
     val rawFileEntries = inputPrefixMetadataMap.keySet.flatMap(p =>
-      CheckS3Data.loadRawFileEntriesFromListFile(filesBucket, p)
+      CheckS3Data.loadRawFileEntries(filesBucket, p)
     ).toSeq
 
     val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
