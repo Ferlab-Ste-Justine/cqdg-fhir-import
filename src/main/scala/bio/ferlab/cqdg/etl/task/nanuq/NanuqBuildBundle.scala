@@ -109,7 +109,7 @@ object NanuqBuildBundle {
                   participantIdType.valid[String].toValidatedNel,
                   sampleIdType.valid[String].toValidatedNel,
                   validateFiles(mapFiles, a, studyId, release),
-                  taskExtensions.map(c => c.forAliquot(a.labAliquotId)),
+                  taskExtensions.map(c => c.addAnalysis(a)),
                   id.valid[String].toValidatedNel,
                   studyId.valid[String].toValidatedNel,
                   release.valid[String].toValidatedNel,
