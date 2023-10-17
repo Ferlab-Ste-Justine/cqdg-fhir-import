@@ -8,6 +8,8 @@ import cats.data.Validated.{Invalid, Valid}
 import org.apache.commons.codec.digest.DigestUtils
 import org.scalatest.{FlatSpec, Matchers}
 
+import java.io.File
+
 class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
   private def fileEntry(key: String, id: String, filename: String, md5: Option[String] = None) = FileEntry(BUCKETNAME, key, md5, 1, id, "application/octet-stream", s"""attachment; filename="$filename"""")
 
@@ -77,7 +79,14 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
 
     "revert" should "move back files from one bucket to the other" in {
       withS3Objects { (inputPrefix, outputPrefix) =>
-        transferFromResources(outputPrefix, "revert", outputBucket)
+        val test =
+          ls(new File(getClass.getResource("/revert").toURI))
+
+        val map = test.map(f => {
+          f -> s"$outputPrefix"
+        }).toMap
+
+        transferFromResources(map, outputBucket)
         val files = Seq(
           fileEntry(s"$inputPrefix/file1.cram", s"$outputPrefix/file1", "file1.cram"),
           fileEntry(s"$inputPrefix/file2.cram.crai", s"$outputPrefix/file2", "file2.cram.crai"),

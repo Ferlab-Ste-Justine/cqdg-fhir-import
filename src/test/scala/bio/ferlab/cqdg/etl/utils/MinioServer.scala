@@ -81,11 +81,10 @@ trait MinioServer {
     s3.putObject(put, RequestBody.fromFile(f))
   }
 
-  def transferFromResources(prefix: String, resource: String, bucket: String = BUCKETNAME): Unit = {
-    val files = ls(new File(getClass.getResource(s"/$resource").toURI))
-    files.foreach { f =>
-      val put = PutObjectRequest.builder().bucket(bucket).key(s"$prefix/${f.getName}").build()
-      s3.putObject(put, RequestBody.fromFile(f))
+  def transferFromResources(filesWithPath: Map[File, String], bucket: String = BUCKETNAME): Unit = {
+    filesWithPath.foreach { case (file, path) =>
+      val put = PutObjectRequest.builder().bucket(bucket).key(s"$path/${file.getName}").build()
+      s3.putObject(put, RequestBody.fromFile(file))
     }
   }
 
