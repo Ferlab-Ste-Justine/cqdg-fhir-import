@@ -60,15 +60,6 @@ object CheckS3Data {
     fileEntries
   }
 
-  def loadRawFileEntriesFromListFile(fileBucket: String, prefix: String)(implicit s3Client: S3Client): Seq[RawFileEntry] = {
-    val runName = prefix.split("/").last
-    val keys = (Json.parse(S3Utils.getContent(fileBucket, s"${prefix.stripSuffix(s"/$runName")}/files.json")) \ "files")
-      .as[Seq[String]]
-      .filter(s => s.contains(s"/$runName"))
-
-    keys.map(k => RawFileEntry(fileBucket, s"$prefix/${k.split("/").last}", 0)) //FIXME Size is 0 as we dont have access to files (links only)
-  }
-
   def loadFileEntries(m: Metadata, fileEntries: Seq[RawFileEntry], studyId: String)(implicit s3Client: S3Client): Seq[FileEntry] = {
     val (checksums, files) = fileEntries.partition(_.isMd5)
     val mapOfIds = m.analyses.flatMap { a =>

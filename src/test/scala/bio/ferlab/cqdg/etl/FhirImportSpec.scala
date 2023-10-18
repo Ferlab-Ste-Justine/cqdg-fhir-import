@@ -14,6 +14,7 @@ import org.hl7.fhir.r4.model._
 import org.scalatest.{BeforeAndAfterEach, FlatSpec, Matchers}
 import play.api.libs.json.Json
 
+import java.io.File
 import scala.jdk.CollectionConverters._
 
 class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with BeforeAndAfterEach {
@@ -45,9 +46,21 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
     withS3Objects { (inputPrefix, _) =>
       addObjectToBucket(inputPrefix, objects)
 
+      val pattern = """^.*narval/(.*)/.*$""".r
+
+      val files =
+        ls(new File(getClass.getResource("/narval/dataset_ds_name 1/1623").toURI)) ++
+          ls(new File(getClass.getResource("/narval/dataset_ds_name 2/1612").toURI)) ++
+          ls(new File(getClass.getResource("/narval/dataset_ds_name 1").toURI)) ++
+          ls(new File(getClass.getResource("/narval/dataset_ds_name 2").toURI))
+
+      val map = files.map(f => {
+        val pattern(pathToRun) = f.getPath
+        f -> s"$inputPrefix/$study/$pathToRun"
+      }).toMap
+
       //add all experiment files to input bucket
-      transferFromResources(s"$inputPrefix/$study/dataset_ds_name 2", "narval/dataset2", BUCKET_FHIR_IMPORT)
-      transferFromResources(s"$inputPrefix/$study/dataset_ds_name 1", "narval/dataset1", BUCKET_FHIR_IMPORT)
+      transferFromResources(map, BUCKET_FHIR_IMPORT)
 
       val metaDataMap =
           S3Utils.getDatasets(BUCKET_FHIR_IMPORT, s"$inputPrefix/$study").flatMap(ds => {
