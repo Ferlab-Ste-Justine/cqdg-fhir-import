@@ -187,6 +187,8 @@ object FhirUtils {
     })
 
     val bundle = bundleCreate(resources)
+    println("SIZE OF BUNDLE")
+    println(bundle.size)
     TBundle(bundle.toList).execute()
   }
 
