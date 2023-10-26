@@ -33,6 +33,7 @@ case class TBundle(resources: List[BundleEntryComponent]) {
       resp.validNel[String]
     } catch {
       case e: BaseServerResponseException =>
+        LOGGER.error(s"Fhir return an exception : " + e.getMessage)
         val issues = e.getOperationOutcome.asInstanceOf[OperationOutcome].getIssue.asScala.toList
           .collect { case i if i.getSeverity == IssueSeverity.ERROR || i.getSeverity == IssueSeverity.FATAL =>
             s"${i.getSeverity} : ${i.getDiagnostics}, location : ${i.getLocation.asScala.mkString(",")}"
@@ -72,13 +73,13 @@ object TBundle {
   val SAVE_BUNDLE_SIZE = 1000
 
   def saveByFragments(bundleList: List[BundleEntryComponent])(implicit client: IGenericClient): Seq[ValidationResult[Bundle]] = {
-      FHIR_INPUT_ORDER.flatMap( resourceType => {
-        val listBundleByType = bundleList.filter(_.getResource.getResourceType.name() == resourceType)
-        (0 to listBundleByType.size by SAVE_BUNDLE_SIZE).map( bundle => {
-          val splitBundle = listBundleByType.slice(bundle, bundle + SAVE_BUNDLE_SIZE)
-          LOGGER.info(s"#$resourceType # ${splitBundle.size} | $bundle of ${listBundleByType.size}")
-          TBundle(splitBundle).execute()
-        })
+    FHIR_INPUT_ORDER.flatMap(resourceType => {
+      val listBundleByType = bundleList.filter(_.getResource.getResourceType.name() == resourceType)
+      (0 to listBundleByType.size by SAVE_BUNDLE_SIZE).map(bundle => {
+        val splitBundle = listBundleByType.slice(bundle, bundle + SAVE_BUNDLE_SIZE)
+        LOGGER.info(s"#$resourceType # ${splitBundle.size} | $bundle of ${listBundleByType.size}")
+        TBundle(splitBundle).execute()
       })
+    })
   }
 }
