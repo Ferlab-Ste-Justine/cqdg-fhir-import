@@ -33,6 +33,7 @@ package object etl {
   val CODE_SYS_FILES: Seq[String] = Seq(
     "CodeSystem-bioinfo-analysis-code",
     "CodeSystem-cause-of-death-codes",
+    "CodeSystem-cqdg-dataset-cs",
     "CodeSystem-cqdg-observation-code",
     "CodeSystem-cqdg-study-cs",
     "CodeSystem-data-category",
@@ -48,7 +49,7 @@ package object etl {
     "CodeSystem-qc-sample-type",
     "CodeSystem-research-domain",
     "CodeSystem-tumor-normal-designation",
-    "CodeSystem-v3-role-code",
+    "CodeSystem-v3-role-code"
   )
 
   val STRUCT_DEF_FILES: Seq[String] = Seq(
@@ -57,6 +58,12 @@ package object etl {
       "StructureDefinition-AgeAtEvent",
       "StructureDefinition-AgeAtRecruitment",
       "StructureDefinition-AgeOfDeath",
+      "StructureDefinition-CQDGObservationCauseOfDeath",
+      "StructureDefinition-CQDGObservationDiseaseStatus",
+      "StructureDefinition-CQDGObservationPhenotype",
+      "StructureDefinition-CQDGObservationTumorNormalDesignation",
+      "StructureDefinition-FullSizeExtension",
+      "StructureDefinition-QCEthnicity",
       "StructureDefinition-cqdg-condition",
       "StructureDefinition-cqdg-document-reference",
       "StructureDefinition-cqdg-group",
@@ -66,15 +73,10 @@ package object etl {
       "StructureDefinition-cqdg-research-study",
       "StructureDefinition-cqdg-specimen",
       "StructureDefinition-cqdg-task",
-      "StructureDefinition-CQDGObservationCauseOfDeath",
-      "StructureDefinition-CQDGObservationDiseaseStatus",
-      "StructureDefinition-CQDGObservationPhenotype",
-      "StructureDefinition-CQDGObservationTumorNormalDesignation",
-      "StructureDefinition-FullSizeExtension",
+      "StructureDefinition-datasetExtension",
       "StructureDefinition-population-info",
-      "StructureDefinition-QCEthnicity",
       "StructureDefinition-sequencingExperimentExtension",
-      "StructureDefinition-workflowExtension",
+      "StructureDefinition-workflowExtension"
   )
 
   val VALUE_SET_FILES: Seq[String] = Seq(
@@ -98,7 +100,7 @@ package object etl {
       "ValueSet-research-domain-vs",
       "ValueSet-sample-type-tissue-source-vs",
       "ValueSet-study-vs",
-      "ValueSet-tumor-normal-designation-vs",
+      "ValueSet-tumor-normal-designation-vs"
   )
 
 
