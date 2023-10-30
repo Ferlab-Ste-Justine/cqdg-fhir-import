@@ -54,8 +54,8 @@ object FhirImport extends App {
     }
   }
 
-  def run(bucket: String, prefix: String, version: String, study: String, release: String,outputBucket: String,
-          filesBucket: String, inputPrefixMetadataMap:  Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean, isRestricted: Option[Boolean])
+  def run(bucket: String, prefix: String, version: String, study: String, release: String, outputBucket: String,
+          filesBucket: String, inputPrefixMetadataMap: Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean, isRestricted: Option[Boolean])
          (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
 
     val rawResources = extractResources(bucket, prefix, version, study, release)
@@ -80,7 +80,7 @@ object FhirImport extends App {
       CheckS3Data.loadRawFileEntries(filesBucket, p)
     ).toSeq
 
-    val mapDataFilesSeq = inputPrefixMetadataMap.map { case(_, metadata) =>
+    val mapDataFilesSeq = inputPrefixMetadataMap.map { case (_, metadata) =>
       metadata.map { m: Metadata =>
         val seq = CheckS3Data.loadFileEntries(m, rawFileEntries, study)
         Map(m -> seq)
@@ -96,30 +96,22 @@ object FhirImport extends App {
     })
 
 
-    val results = bundleListWithFiles.andThen({ case (bundle, files) =>
-      try {
+    val results = bundleListWithFiles.andThen { case (bundle, files) =>
 
-        // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
-        writeAheadLog(outputBucket, reportPath, TBundle(bundle), files)
 
-        //        CheckS3Data.copyFiles(files, outputBucket) //FIXME see why it fails
-        val allBundle = bundle ++ bundleList
+      // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
+      writeAheadLog(outputBucket, reportPath, TBundle(bundle), files)
+      
+      val allBundle = bundle ++ bundleList
 
-        if(allBundle.size > 5000) {
-          TBundle.saveByFragments(allBundle).head
-        } else {
-          val result = TBundle(allBundle).execute()
-          if (result.isInvalid) {
-            CheckS3Data.revert(files, outputBucket)
-          }
-          result
-        }
-      } catch {
-        case e: Exception =>
-          CheckS3Data.revert(files, outputBucket)
-          throw e
+      if (allBundle.size > 5000) {
+        TBundle.saveByFragments(allBundle).head
+      } else {
+        TBundle(allBundle).execute()
+
       }
-    })
+
+    }
 
     results
   }
@@ -140,7 +132,7 @@ object FhirImport extends App {
     val bucketKeys = s3.listObjectsV2(req).contents().asScala.map(_.key())
 
     RESOURCES.map(r => {
-      if(bucketKeys.exists(key => key.endsWith(s"$r.tsv"))){
+      if (bucketKeys.exists(key => key.endsWith(s"$r.tsv"))) {
         val rawResource = getRawResource(getContentTSV(bucket, s"$prefix/$version-$study/$release/$r.tsv"), r)
         r -> rawResource
       } else {
