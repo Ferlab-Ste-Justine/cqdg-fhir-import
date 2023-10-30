@@ -8,6 +8,9 @@ import software.amazon.awssdk.http.apache.ApacheHttpClient
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.model.{GetObjectRequest, HeadObjectRequest, ListObjectsV2Request, NoSuchKeyException, PutObjectRequest}
 import software.amazon.awssdk.services.s3.{S3Client, S3Configuration}
+import scala.annotation.tailrec
+import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model._
 
 import java.net.URI
 import scala.io.Source
@@ -57,11 +60,28 @@ object S3Utils {
     }.toList
   }
 
+   private def ls(bucket: String, prefix: String, maxKeys: Int = 4500)(implicit s3Client: S3Client): Seq[Any] = {
+    val lsRequest = ListObjectsV2Request.builder().bucket(bucket).maxKeys(maxKeys).prefix(prefix).build()
+    nextBatch(s3Client, s3Client.listObjectsV2(lsRequest), maxKeys)
+  }
+
+  @tailrec
+  private def nextBatch(s3Client: S3Client, listing: ListObjectsV2Response, maxKeys: Int, objects: List[String] = Nil): List[String] = {
+    val pageKeys = listing.contents().asScala.map(o => o.key()).toList
+
+    if (listing.isTruncated) {
+      val nextRequest = ListObjectsV2Request.builder().bucket(listing.name).prefix(listing.prefix()).continuationToken(listing.nextContinuationToken()).build()
+      nextBatch(s3Client, s3Client.listObjectsV2(nextRequest), maxKeys, pageKeys ::: objects)
+    } else
+      pageKeys ::: objects
+  }
+
   def getDatasets(bucket: String, prefix: String)(implicit s3Client: S3Client): List[String] = {
+    val test = ls(bucket, prefix)
     val req = ListObjectsV2Request.builder().bucket(bucket).prefix(prefix).build()
     val regex = "^.*\\/(.*)\\/metadata\\.ndjson$".r
 
-    val test = s3Client.listObjectsV2(req).contents().asScala
+//    val test = s3Client.listObjectsV2(req).contents().asScala
     println("IN GET DATASET")
     println(test.size)
     s3Client.listObjectsV2(req).contents().asScala.map(e => e.key()).foreach(println)
