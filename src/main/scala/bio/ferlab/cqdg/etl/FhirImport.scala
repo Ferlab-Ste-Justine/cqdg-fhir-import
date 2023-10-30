@@ -128,7 +128,9 @@ object FhirImport extends App {
   }
 
   private def getMatadataPerRuns(study: String, outputNarvalBucket: String)(implicit s3Client: S3Client) = {
-    val ttt = S3Utils.getDatasets(outputNarvalBucket, study).foreach(println)
+    println("DATASETS:")
+    println(outputNarvalBucket)
+    println(S3Utils.getDatasets(outputNarvalBucket, study).size)
     S3Utils.getDatasets(outputNarvalBucket, study).flatMap(ds => {
       S3Utils.getLinesContent(outputNarvalBucket, s"$study/$ds/metadata.ndjson")
         .flatMap(line => {
