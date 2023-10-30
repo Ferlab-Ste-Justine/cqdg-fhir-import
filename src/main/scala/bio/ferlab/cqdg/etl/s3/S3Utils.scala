@@ -64,7 +64,7 @@ object S3Utils {
     val test = s3Client.listObjectsV2(req).contents().asScala
     println("IN GET DATASET")
     println(test.size)
-    s3Client.listObjectsV2(req).contents().asScala.flatMap(e => e.key()).foreach(println)
+    s3Client.listObjectsV2(req).contents().asScala.map(e => e.key()).foreach(println)
 
     s3Client.listObjectsV2(req).contents().asScala.flatMap (e => e.key() match {
       case regex(dataset) => Some(dataset)
