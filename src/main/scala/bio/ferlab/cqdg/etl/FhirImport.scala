@@ -39,7 +39,6 @@ object FhirImport extends App {
         val filesBucket = conf.aws.filesBucket
 
         val metadataInputPrefixMap = getMatadataPerRuns(s"$project/$study", filesBucket)
-        metadataInputPrefixMap.keySet.foreach(println)
 
         val auth: Auth = new AuthTokenInterceptor(conf.keycloak).auth
 
