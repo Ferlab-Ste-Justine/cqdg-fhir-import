@@ -61,6 +61,11 @@ object S3Utils {
     val req = ListObjectsV2Request.builder().bucket(bucket).prefix(prefix).build()
     val regex = "^.*\\/(.*)\\/metadata\\.ndjson$".r
 
+    val test = s3Client.listObjectsV2(req).contents().asScala
+    println("IN GET DATASET")
+    println(test.size)
+    s3Client.listObjectsV2(req).contents().asScala.flatMap(e => e.key()).foreach(println)
+
     s3Client.listObjectsV2(req).contents().asScala.flatMap (e => e.key() match {
       case regex(dataset) => Some(dataset)
       case _ => None

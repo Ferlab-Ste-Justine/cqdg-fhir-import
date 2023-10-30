@@ -38,9 +38,6 @@ object FhirImport extends App {
         val outputBucket = conf.aws.outputBucketName
         val filesBucket = conf.aws.filesBucket
 
-        println(project)
-        println(study)
-        println(filesBucket)
         val metadataInputPrefixMap = getMatadataPerRuns(s"$project/$study", filesBucket)
         println(metadataInputPrefixMap.keySet.size)
 
@@ -128,9 +125,6 @@ object FhirImport extends App {
   }
 
   private def getMatadataPerRuns(study: String, outputNarvalBucket: String)(implicit s3Client: S3Client) = {
-    println("DATASETS:")
-    println(outputNarvalBucket)
-    println(S3Utils.getDatasets(outputNarvalBucket, study).size)
     S3Utils.getDatasets(outputNarvalBucket, study).flatMap(ds => {
       S3Utils.getLinesContent(outputNarvalBucket, s"$study/$ds/metadata.ndjson")
         .flatMap(line => {
