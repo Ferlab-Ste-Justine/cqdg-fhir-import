@@ -60,7 +60,7 @@ object S3Utils {
     }.toList
   }
 
-   private def ls(bucket: String, prefix: String, maxKeys: Int = 4500)(implicit s3Client: S3Client): Seq[Any] = {
+   private def ls(bucket: String, prefix: String, maxKeys: Int = 10000)(implicit s3Client: S3Client): Seq[String] = {
     val lsRequest = ListObjectsV2Request.builder().bucket(bucket).maxKeys(maxKeys).prefix(prefix).build()
     nextBatch(s3Client, s3Client.listObjectsV2(lsRequest), maxKeys)
   }
@@ -77,16 +77,9 @@ object S3Utils {
   }
 
   def getDatasets(bucket: String, prefix: String)(implicit s3Client: S3Client): List[String] = {
-    val test = ls(bucket, prefix)
-    val req = ListObjectsV2Request.builder().bucket(bucket).prefix(prefix).build()
     val regex = "^.*\\/(.*)\\/metadata\\.ndjson$".r
 
-//    val test = s3Client.listObjectsV2(req).contents().asScala
-    println("IN GET DATASET")
-    println(test.size)
-    s3Client.listObjectsV2(req).contents().asScala.map(e => e.key()).foreach(println)
-
-    s3Client.listObjectsV2(req).contents().asScala.flatMap (e => e.key() match {
+    ls(bucket, prefix).flatMap (e => e match {
       case regex(dataset) => Some(dataset)
       case _ => None
     }).toList
