@@ -30,7 +30,7 @@ case class RawFamily(
 }
 
 object RawFamily {
-  val FILENAME = "family_relationship"
+  val FILENAME = "family"
 
   def apply(line: Array[String], header: Array[String]): RawFamily = {
     RawFamily(
