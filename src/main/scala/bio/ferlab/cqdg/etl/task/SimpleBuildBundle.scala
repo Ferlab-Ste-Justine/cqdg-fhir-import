@@ -89,7 +89,7 @@ object SimpleBuildBundle {
           Seq(createFamilyObservation(resourceId, resource.asInstanceOf[RawFamily], studyVersion)(
             rawResources("participant"),
             studyId,
-            rawResources("family_relationship").values.toSeq
+            rawResources("family").values.toSeq
           )) ++ diseaseStatusResources
       }
     }).toSeq ++ familyGroupResource

@@ -163,7 +163,7 @@ object FhirImport extends App {
         case "phenotype" => RawPhenotype(l, header)
         case "biospecimen" => RawBiospecimen(l, header)
         case "sample_registration" => RawSampleRegistration(l, header)
-        case "family_relationship" => RawFamily(l, header)
+        case "family" => RawFamily(l, header)
         case "dataset" => RawDataset(l, header)
       }
     }
