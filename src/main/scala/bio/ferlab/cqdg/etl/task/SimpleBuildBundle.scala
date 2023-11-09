@@ -251,7 +251,7 @@ object SimpleBuildBundle {
     //************ Domain **********************
     val codes = resource.domain.map({ d =>
       val code = new Coding()
-      code.setCode(d)
+      code.setCode(d.trim.toLowerCase.replaceAll("\\s", "-").replaceAll(",", ""))
       code.setSystem(RESEARCH_DOMAIN)
     })
     val codeableConcept = new CodeableConcept()
