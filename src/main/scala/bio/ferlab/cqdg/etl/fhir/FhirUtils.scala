@@ -1,9 +1,9 @@
 package bio.ferlab.cqdg.etl.fhir
 
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{CONFIDENTIALITY_CS, UNITS_OF_MEASURE}
-import bio.ferlab.cqdg.etl.{CODE_SYS_FILES, IG_REPO_GH, IG_RESOURCES, STRUCT_DEF_FILES, VALUE_SET_FILES, isValid}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{CONFIDENTIALITY_CS, PHENOTYPE_SYSTEM}
 import bio.ferlab.cqdg.etl.models.{RawBiospecimen, RawResource, TBundle}
+import bio.ferlab.cqdg.etl._
 import ca.uhn.fhir.context.FhirContext
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import ca.uhn.fhir.rest.server.exceptions.{PreconditionFailedException, UnprocessableEntityException}
@@ -87,6 +87,20 @@ object FhirUtils {
 
   }
 
+  def mapAgeDaysToGroup(age: Int): String = {
+    age match {
+      case i if i < 0 => "HP:0030674"
+      case 0 => "HP:0003577"
+      case i if i > 0 && i < 28 => "HP:0003623"
+      case i if i >= 28 && i < 365 => "HP:0003593"
+      case i if i >= 365 && i < 5*365 => "HP:0011463"
+      case i if i >= 5*365 && i < 16*365 => "HP:0003621"
+      case i if i >= 16*365 && i < 40*365 => "HP:0011462"
+      case i if i >= 40*365 && i < 60*365 => "HP:0003596"
+      case i if i >= 60*365 => "HP:0003584"
+    }
+  }
+
   def validateResource(r: Resource)(implicit client: IGenericClient): OperationOutcome = {
     Try(client.validate().resource(r).execute().getOperationOutcome).recover {
       case e: PreconditionFailedException => e.getOperationOutcome
@@ -121,16 +135,6 @@ object FhirUtils {
       profile.map(meta.addProfile)
     })
     meta
-  }
-
-  def setAgeExtension(value: Long, url: String): Extension = {
-    val age = new Age
-    val extension = new Extension
-    age.setUnit("days").setValue(value).setSystem(UNITS_OF_MEASURE).setCode("d")
-    extension.setUrl(url)
-
-    extension.setValue(age)
-    extension
   }
 
   def bundleDelete(resources: Seq[Resource]): Seq[BundleEntryComponent] = resources.map { fhirResource =>
@@ -188,6 +192,16 @@ object FhirUtils {
 
     val bundle = bundleCreate(resources)
     TBundle(bundle.toList).execute()
+  }
+
+  def createAgeAtEventExtension(age: Int, url: String): Extension = {
+    val extension = new Extension(url)
+    val ageCodeableConcept = new CodeableConcept()
+    val ageCode = new Coding()
+    ageCode.setSystem(PHENOTYPE_SYSTEM).setCode(mapAgeDaysToGroup(age))
+    ageCodeableConcept.setCoding(List(ageCode).asJava)
+
+    extension.setValue(ageCodeableConcept)
   }
 
   private def downloadIGFile(fileName:String): String = {

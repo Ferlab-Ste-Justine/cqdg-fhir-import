@@ -6,12 +6,12 @@ import org.apache.commons.codec.digest.DigestUtils
 case class RawParticipant(
                            study_id: String,
                            submitter_participant_id: String,
-                           age_at_recruitment: Option[String],
+                           age_at_recruitment: Option[Int],
                            gender: String,
                            ethnicity: Option[String],
                            vital_status: String,
                            cause_of_death: Option[String],
-                           age_of_death: Option[String],
+                           age_of_death: Option[Int],
                          ) extends RawResource {
 
 
@@ -38,12 +38,12 @@ object RawParticipant {
     RawParticipant(
       line(header.indexOf("study_id")),
       line(header.indexOf("submitter_participant_id")),
-      getOptionalLineValue(line, header, "age_at_recruitment"),
+      getOptionalLineValue(line, header, "age_at_recruitment").map(_.toInt),
       line(header.indexOf("gender")),
       getOptionalLineValue(line, header, "ethnicity"),
       line(header.indexOf("vital_status")),
       getOptionalLineValue(line, header, "cause_of_death"),
-      getOptionalLineValue(line, header, "age_of_death"),
+      getOptionalLineValue(line, header, "age_of_death").map(_.toInt),
     )
   }
 }
