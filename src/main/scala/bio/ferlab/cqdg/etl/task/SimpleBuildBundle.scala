@@ -6,7 +6,7 @@ import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Extensions._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Identifier._
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.Profiles.{CQDG_OBSERVATION_DISEASE_STATUS_PROFILE, CQDG_OBSERVATION_PHENOTYPE_PROFILE, CQDG_OBSERVATION_SOCIAL_HISTORY_PROFILE, CQDG_PATIENT_PROFILE}
-import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, getContactPointSystem, setAgeExtension}
+import bio.ferlab.cqdg.etl.fhir.FhirUtils.{ResourceExtension, SimpleCode, createAgeAtEventExtension, getContactPointSystem}
 import bio.ferlab.cqdg.etl.idservice.IdUtils.{getIdServiceIds, mapIdToList}
 import bio.ferlab.cqdg.etl.models.RawFamily.isProband
 import bio.ferlab.cqdg.etl.models._
@@ -166,10 +166,8 @@ object SimpleBuildBundle {
 
     // ***************** Phenotype Age at Phenotype *********************
     resource.age_at_phenotype.map(age => {
-      val ageValue = new Age()
-      ageValue.setValue(age).setUnit("days").setSystem(UNITS_OF_MEASURE).setCode("d")
-      val ageExtension = new Extension(AGE_AT_EVENT_SD, ageValue)
-      phenotype.setExtension(List(ageExtension).asJava)
+      val ageExtension = createAgeAtEventExtension(age, AGE_AT_EVENT_SD)
+      phenotype.addExtension(ageExtension)
     })
 
     if(parentId.isDefined) {
@@ -199,11 +197,10 @@ object SimpleBuildBundle {
     }
 
     // ************* Age at Diagnosis **********************
-    if(resource.age_at_diagnosis.isDefined){
-      val age = new Age()
-      age.setValue(resource.age_at_diagnosis.get).setUnit("days").setSystem(UNITS_OF_MEASURE).setCode("d")
-      diagnosis.setOnset(age)
-    }
+    resource.age_at_diagnosis.map(age => {
+      val ageExtension = createAgeAtEventExtension(age, AGE_AT_EVENT_SD)
+      diagnosis.addExtension(ageExtension)
+    })
 
     diagnosis.addIdentifier()
       .setSystem(CONDITION_IDENTIFIER)
@@ -314,12 +311,13 @@ object SimpleBuildBundle {
       .setValue(resourceId)
 
     //****************** Age At Recruitment ***************
-    val ageExtension = resource.age_at_recruitment.map(age =>
-      setAgeExtension(age.toLong, AGE_AT_RECRUITMENT_SD)
-    )
+    resource.age_at_recruitment.map(age => {
+      val ageRecruitmentExtension = createAgeAtEventExtension(age, AGE_AT_RECRUITMENT_SD)
+      patient.addExtension(ageRecruitmentExtension)
+    })
 
     //****************** Ethnicity ***************
-    val ethnicityExtension = resource.ethnicity.map{ ethnicity =>
+    resource.ethnicity.map{ ethnicity =>
       val extension = new Extension(ETHNICITY_SD)
       val codeableConceptEthnicity = new CodeableConcept()
 
@@ -328,6 +326,7 @@ object SimpleBuildBundle {
 
       codeableConceptEthnicity.setCoding(List(code).asJava)
       extension.setValue(codeableConceptEthnicity)
+      patient.addExtension(extension)
     }
 
     resource.vital_status.toLowerCase match {
@@ -337,16 +336,10 @@ object SimpleBuildBundle {
     }
 
     //****************** Age of Death Extension***************
-    val ageOfDeathExtension =
-      if(resource.age_of_death.isDefined){
-        resource.age_of_death match {
-        case Some(age) => Some(setAgeExtension(age.toLong, AGE_OF_DEATH_SD))
-        case None => None
-      }
-    } else None
-
-    //***************************************************************
-    patient.setExtension((Nil ++ ageExtension ++ ethnicityExtension ++ ageOfDeathExtension).asJava)
+    resource.age_of_death.map(age => {
+      val ageOfDeathExtension = createAgeAtEventExtension(age, AGE_OF_DEATH_SD)
+      patient.addExtension(ageOfDeathExtension)
+    })
 
     patient.setGender(Enumerations.AdministrativeGender.fromCode(resource.gender.toLowerCase))
     patient.addIdentifier().setUse(IdentifierUse.SECONDARY).setValue(resource.submitter_participant_id)
@@ -410,10 +403,12 @@ object SimpleBuildBundle {
     typeCodeableConcept.setCoding(List(typeCoding).asJava)
     specimen.setType(typeCodeableConcept)
 
-    if(resource.age_biospecimen_collection.isDefined){
-      val ageExtension = setAgeExtension(resource.age_biospecimen_collection.get, AGE_AT_EVENT_SD)
-      specimen.setExtension(List(ageExtension).asJava)
-    }
+    resource.age_biospecimen_collection.map(age => {
+      val ageExtension = createAgeAtEventExtension(age, AGE_AT_EVENT_SD)
+      specimen.addExtension(ageExtension)
+    })
+
+
     specimen
   }
 
