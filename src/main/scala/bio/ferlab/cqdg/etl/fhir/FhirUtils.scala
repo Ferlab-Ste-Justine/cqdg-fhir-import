@@ -93,11 +93,11 @@ object FhirUtils {
       case 0 => "HP:0003577"
       case i if i > 0 && i < 28 => "HP:0003623"
       case i if i >= 28 && i < 365 => "HP:0003593"
-      case i if i >= 365 && i < 5*365 => "HP:0011463"
-      case i if i >= 5*365 && i < 16*365 => "HP:0003621"
-      case i if i >= 16*365 && i < 40*365 => "HP:0011462"
-      case i if i >= 40*365 && i < 60*365 => "HP:0003596"
-      case i if i >= 60*365 => "HP:0003584"
+      case i if i >= 365 && i < yearsToDays(5) => "HP:0011463"
+      case i if i >= yearsToDays(5) && i < yearsToDays(16) => "HP:0003621"
+      case i if i >= yearsToDays(16) && i < yearsToDays(40) => "HP:0011462"
+      case i if i >= yearsToDays(40) && i < yearsToDays(60) => "HP:0003596"
+      case i if i >= yearsToDays(60) => "HP:0003584"
     }
   }
 

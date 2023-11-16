@@ -109,6 +109,8 @@ package object etl {
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
   type ValidationResult[A] = ValidatedNel[String, A]
 
+  val yearsToDays = (years: Int) => (years * 365.25).toInt
+
   def withConf[T](b: Conf => ValidationResult[T]): ValidationResult[T] = {
     Conf.readConf().andThen(b)
   }
