@@ -15,7 +15,9 @@ object FhirClient {
 
     val client: IGenericClient = fhirContext.newRestfulGenericClient(fhirServerUrl)
     val hapiFhirInterceptor: AuthTokenInterceptor = new AuthTokenInterceptor(keycloakConf)
+    val metaHapiFhirInterceptor: CustomHeaderInterceptor = new CustomHeaderInterceptor("X-Meta-Snapshot-Mode", "TAG,PROFILE,SECURITY_LABEL")
     client.registerInterceptor(hapiFhirInterceptor)
+    client.registerInterceptor(metaHapiFhirInterceptor)
     client
   }
 }
