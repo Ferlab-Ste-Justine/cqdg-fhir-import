@@ -33,12 +33,12 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
     RawDataset.FILENAME
   )
   val study = "STU0000001"
-  val release = "RE_0001"
-  val version = "1"
+  val studyClinDataVersion = "1"
+  val studyClinDataId = "2"
 
   private def addObjectToBucket(prefix: String, paths: Seq[String]): Unit = {
     paths.foreach(p => {
-      transferFromResource(s"$prefix/$version-$study/$release", s"$p.tsv")
+      transferFromResource(s"$prefix/$studyClinDataId-$study/$studyClinDataVersion", s"$p.tsv")
     })
   }
 
@@ -73,7 +73,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
           }).toMap
 
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, version, study, release, outputBucket, BUCKET_FHIR_IMPORT,  metaDataMap, "", removeMissing = true, Some(true))
+      val result = FhirImport.run(BUCKETNAME, inputPrefix, studyClinDataId, study, studyClinDataVersion, outputBucket, BUCKET_FHIR_IMPORT,  metaDataMap, "", removeMissing = true, Some(true))
 
       result.isValid shouldBe true
 
@@ -180,7 +180,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       }
 
       //Resources should have study and revision in Tag
-      val tags = Seq(s"study:STU0000001", s"study_version:$version")
+      val tags = Seq(s"study:STU0000001", s"study_version:$studyClinDataVersion")
       patients.getEntry.asScala.foreach{ p =>
         val resource = p.getResource.asInstanceOf[Patient]
         resource.getIdBase match {

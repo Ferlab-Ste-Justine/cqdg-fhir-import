@@ -16,7 +16,7 @@ import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.data.{NonEmptyList, Validated}
 import cats.implicits.catsSyntaxTuple2Semigroupal
-import org.hl7.fhir.r4.model.Bundle
+import org.hl7.fhir.r4.model.{Bundle, ResourceType}
 import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
@@ -25,7 +25,7 @@ import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
 
-  val Array(prefix, bucket, version, release, study, project, removeMissing, isRestricted) = args
+  val Array(prefix, bucket, studyClinDataId, studyClinDataVersion, study, project, removeMissing, isRestricted) = args
 
   withSystemExit {
     withLog {
@@ -46,19 +46,19 @@ object FhirImport extends App {
 
         updateIG()
 
-        withReport(bucket, s"$prefix/$version-$study/$release/${metadataInputPrefixMap.keySet.head}") { reportPath =>
-          run(bucket, prefix, version, study, release, outputBucket, filesBucket, metadataInputPrefixMap, reportPath, removeMissing.toBoolean, isRestricted.toBooleanOption)
+        withReport(bucket, s"$prefix/$studyClinDataId-$study/$studyClinDataVersion/${metadataInputPrefixMap.keySet.head}") { reportPath =>
+          run(bucket, prefix, studyClinDataId, study, studyClinDataVersion, outputBucket, filesBucket, metadataInputPrefixMap, reportPath, removeMissing.toBoolean, isRestricted.toBooleanOption)
         }
       }
     }
   }
 
-  def run(bucket: String, prefix: String, version: String, study: String, release: String, outputBucket: String,
+  def run(bucket: String, prefix: String, studyClinDataId: String, study: String, studyClinDataVersion: String, outputBucket: String,
           filesBucket: String, inputPrefixMetadataMap: Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean, isRestricted: Option[Boolean])
          (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
 
-    val rawResources = extractResources(bucket, prefix, version, study, release)
-    val rawDataset = extractResource(bucket, prefix, version, study, release, RawDataset.FILENAME, "dataset").asInstanceOf[List[RawDataset]]
+    val rawResources = extractResources(bucket, prefix, studyClinDataId, study, studyClinDataVersion)
+    val rawDataset = extractResource(bucket, prefix, studyClinDataId, study, studyClinDataVersion, RawDataset.FILENAME, "dataset").asInstanceOf[List[RawDataset]]
 
     val enrichRawResources = rawResources.map {
       case (k: String, l: Seq[RawResource]) if k == RawStudy.FILENAME => k -> l.map(r => r.asInstanceOf[RawStudy].addDataSets(rawDataset))
@@ -67,11 +67,11 @@ object FhirImport extends App {
 
     val allRawResources: Map[String, Map[String, RawResource]] = addIds(enrichRawResources)
 
-    val studyId = allRawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
+    val studyFhirId = allRawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
 
     val resources = RESOURCES.flatMap(rt => {
-      createResources(allRawResources, rt, version, studyId, isRestricted.getOrElse(false))
-    }) :+ createOrganization(version, studyId)
+      createResources(allRawResources, rt, studyClinDataVersion, studyFhirId, isRestricted.getOrElse(false))
+    }) :+ createOrganization(studyClinDataVersion, studyFhirId)
 
     val bundleList = bundleCreate(resources)
 
@@ -89,7 +89,7 @@ object FhirImport extends App {
     val bundleListWithFiles = mapDataFilesSeq.andThen(m => {
       val allFiles = m.values.toSeq.flatten
 
-      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, version, removeMissing, isRestricted.getOrElse(false)),
+      (NanuqBuildBundle.validate(m.keySet.toSeq, allFiles, allRawResources, studyClinDataVersion, removeMissing, isRestricted.getOrElse(false)),
         CheckS3Data.validateFileEntries(rawFileEntries, allFiles))
         .mapN((bundle, files) => (bundle, files))
     })
@@ -107,7 +107,6 @@ object FhirImport extends App {
         TBundle.saveByFragments(allBundle).head
       } else {
         TBundle(allBundle).execute()
-
       }
 
     }
@@ -126,13 +125,13 @@ object FhirImport extends App {
     }).toMap
   }
 
-  private def extractResources(bucket: String, prefix: String, version: String, study: String, release: String)(implicit s3: S3Client): Map[String, Seq[RawResource]] = {
-    val req = ListObjectsV2Request.builder().bucket(bucket).prefix(s"$prefix/$version-$study/$release").build()
+  private def extractResources(bucket: String, prefix: String, studyId: String, study: String, version: String)(implicit s3: S3Client): Map[String, Seq[RawResource]] = {
+    val req = ListObjectsV2Request.builder().bucket(bucket).prefix(s"$prefix/$studyId-$study/$version").build()
     val bucketKeys = s3.listObjectsV2(req).contents().asScala.map(_.key())
 
     RESOURCES.map(r => {
       if (bucketKeys.exists(key => key.endsWith(s"$r.tsv"))) {
-        val rawResource = getRawResource(getContentTSV(bucket, s"$prefix/$version-$study/$release/$r.tsv"), r)
+        val rawResource = getRawResource(getContentTSV(bucket, s"$prefix/$studyId-$study/$version/$r.tsv"), r)
         r -> rawResource
       } else {
         r -> Nil
@@ -140,13 +139,13 @@ object FhirImport extends App {
     }).toMap
   }
 
-  private def extractResource(bucket: String, prefix: String, version: String, study: String, release: String, fileName: String, _type: String)
+  private def extractResource(bucket: String, prefix: String, studyId: String, study: String, version: String, fileName: String, _type: String)
                              (implicit s3: S3Client): Seq[RawResource] = {
-    val req = ListObjectsV2Request.builder().bucket(bucket).prefix(s"$prefix/$version-$study/$release").build()
+    val req = ListObjectsV2Request.builder().bucket(bucket).prefix(s"$prefix/$studyId-$study/$version").build()
     val bucketKeys = s3.listObjectsV2(req).contents().asScala.map(_.key())
 
     if (bucketKeys.exists(key => key.endsWith(s"$fileName.tsv"))) {
-      getRawResource(getContentTSV(bucket, s"$prefix/$version-$study/$release/$fileName.tsv"), _type)
+      getRawResource(getContentTSV(bucket, s"$prefix/$studyId-$study/$version/$fileName.tsv"), _type)
     } else {
       Seq.empty[RawResource]
     }
