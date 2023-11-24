@@ -11,9 +11,9 @@ import org.scalatest.{FlatSpec, Matchers}
 import java.io.File
 
 class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
-  private def fileEntry(key: String, id: String, filename: String, md5: Option[String] = None) = FileEntry(BUCKETNAME, key, md5, 1, id, "application/octet-stream", s"""attachment; filename="$filename"""")
+  private def fileEntry(key: String, id: String, filename: String, md5: Option[String] = None) = FileEntry(CLINICAL_BUCKETNAME, key, md5, 1, id, "application/octet-stream", s"""attachment; filename="$filename"""")
 
-  private def rawFileEntry(key: String) = RawFileEntry(BUCKETNAME, key, 1)
+  private def rawFileEntry(key: String) = RawFileEntry(CLINICAL_BUCKETNAME, key, 1)
 
   private val files = Seq(
     fileEntry(s"file1.cram", "abc", "file1.cram"),
@@ -36,16 +36,16 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
     withS3Objects { (prefix, _) =>
       transferFromResourceDirectory(prefix, "good")
 
-      val fileEntries = CheckS3Data.loadRawFileEntries(BUCKETNAME, prefix)
+      val fileEntries = CheckS3Data.loadRawFileEntries(CLINICAL_BUCKETNAME, prefix)
 
       val expected = List(
-        RawFileEntry(BUCKETNAME, s"$prefix/file1.cram", 10),
-        RawFileEntry(BUCKETNAME, s"$prefix/file2.cram.crai", 10),
-        RawFileEntry(BUCKETNAME, s"$prefix/file3.cnv.vcf.gz", 9),
-        RawFileEntry(BUCKETNAME, s"$prefix/file4.gvcf.gz", 9),
-        RawFileEntry(BUCKETNAME, s"$prefix/file5.sv.vcf.gz", 8),
-        RawFileEntry(BUCKETNAME, s"$prefix/file6.zip", 0),
-        RawFileEntry(BUCKETNAME, s"$prefix/file6.vcf.gz.tbi", 10)
+        RawFileEntry(CLINICAL_BUCKETNAME, s"$prefix/file1.cram", 10),
+        RawFileEntry(CLINICAL_BUCKETNAME, s"$prefix/file2.cram.crai", 10),
+        RawFileEntry(CLINICAL_BUCKETNAME, s"$prefix/file3.cnv.vcf.gz", 9),
+        RawFileEntry(CLINICAL_BUCKETNAME, s"$prefix/file4.gvcf.gz", 9),
+        RawFileEntry(CLINICAL_BUCKETNAME, s"$prefix/file5.sv.vcf.gz", 8),
+        RawFileEntry(CLINICAL_BUCKETNAME, s"$prefix/file6.zip", 0),
+        RawFileEntry(CLINICAL_BUCKETNAME, s"$prefix/file6.vcf.gz.tbi", 10)
       )
       fileEntries should contain theSameElementsAs expected
     }
@@ -55,47 +55,12 @@ class CheckS3DataSpec extends FlatSpec with MinioServerSuite with Matchers {
   "ls" should "return  of giles even if s3 listing is truncated" in {
     withS3Objects { (prefix, _) =>
       copyNFile(prefix, "good/file1.cram", 30)
-      val fileEntries = CheckS3Data.ls(BUCKETNAME, prefix, 10)
+      val fileEntries = CheckS3Data.ls(CLINICAL_BUCKETNAME, prefix, 10)
 
       fileEntries.size shouldBe 30
 
     }
   }
-
-  //TODO activate when fixed COPY FILES
-
-//    "copyFiles" should "move files from one bucket to the other" in {
-//      withS3Objects { (inputPrefix, outputPrefix) =>
-//        transferFromResourceDirectory(inputPrefix, "good")
-//        val files = Seq(
-//          fileEntry(s"$inputPrefix/file1.cram", s"$outputPrefix/abc", "file1.cram"),
-//          fileEntry(s"$inputPrefix/file2.cram.crai", s"$outputPrefix/def", "file2.cram.crai"),
-//          fileEntry(s"$inputPrefix/file2.gvcf.gz", s"$outputPrefix/ghi", "file2.gvcf.gz")
-//        )
-//        CheckS3Data.copyFiles(files, outputBucket)
-//        list(outputBucket, outputPrefix) should contain theSameElementsAs Seq(s"$outputPrefix/abc", s"$outputPrefix/def", s"$outputPrefix/ghi")
-//      }
-//    }
-
-    "revert" should "move back files from one bucket to the other" in {
-      withS3Objects { (inputPrefix, outputPrefix) =>
-        val test =
-          ls(new File(getClass.getResource("/revert").toURI))
-
-        val map = test.map(f => {
-          f -> s"$outputPrefix"
-        }).toMap
-
-        transferFromResources(map, outputBucket)
-        val files = Seq(
-          fileEntry(s"$inputPrefix/file1.cram", s"$outputPrefix/file1", "file1.cram"),
-          fileEntry(s"$inputPrefix/file2.cram.crai", s"$outputPrefix/file2", "file2.cram.crai"),
-          fileEntry(s"$inputPrefix/file2.gvcf.gz", s"$outputPrefix/file3", "file2.gvcf.gz")
-        )
-        CheckS3Data.revert(files, outputBucket)
-        list(outputBucket, outputPrefix) shouldBe empty
-      }
-    }
 
 
   "validateFiles" should "return errors if input bucket contains files that are not present into metadata" in {

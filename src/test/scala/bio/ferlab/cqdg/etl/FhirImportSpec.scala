@@ -1,6 +1,5 @@
 package bio.ferlab.cqdg.etl
 
-import bio.ferlab.cqdg.etl
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{CAUSE_OF_DEATH, CONFIDENTIALITY_CS, DATASET_CS}
@@ -60,11 +59,11 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       }).toMap
 
       //add all experiment files to input bucket
-      transferFromResources(map, BUCKET_FHIR_IMPORT)
+      transferFromResources(map, BUCKET_FILE_IMPORT)
 
       val metaDataMap =
-          S3Utils.getDatasets(BUCKET_FHIR_IMPORT, s"$inputPrefix/$study").flatMap(ds => {
-            S3Utils.getLinesContent(BUCKET_FHIR_IMPORT, s"$inputPrefix/$study/$ds/metadata.ndjson")
+          S3Utils.getDatasets(BUCKET_FILE_IMPORT, s"$inputPrefix/$study").flatMap(ds => {
+            S3Utils.getLinesContent(BUCKET_FILE_IMPORT, s"$inputPrefix/$study/$ds/metadata.ndjson")
               .flatMap(line => {
                 (Json.parse(line) \ "experiment" \ "runName").asOpt[String].map(e => {
                   s"$inputPrefix/$study/$ds/$e" -> Metadata.validateMetadata(line)
@@ -73,14 +72,9 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
           }).toMap
 
 
-      val result = FhirImport.run(BUCKETNAME, inputPrefix, studyClinDataId, study, studyClinDataVersion, outputBucket, BUCKET_FHIR_IMPORT,  metaDataMap, "", removeMissing = true, Some(true))
+      val result = FhirImport.run(CLINICAL_BUCKETNAME, inputPrefix, studyClinDataId, study, studyClinDataVersion, BUCKET_FILE_IMPORT,  metaDataMap, "", removeMissing = true, Some(true))
 
       result.isValid shouldBe true
-
-      //Validate documents that has been copied
-      //FIXME copy files not working
-//      val resultFiles = list(outputBucket, "outputPrefix")
-//      resultFiles.size shouldBe 6
 
       // Get Resources
       val patients = searchFhir("Patient")
