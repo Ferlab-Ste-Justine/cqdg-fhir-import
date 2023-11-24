@@ -16,20 +16,19 @@ import scala.util.Random
 trait MinioServer {
   private val (minioPort, _) = MinioContainer.startIfNotRunning()
 
-  val BUCKETNAME = "cqdg-qa-app-clinical-data-service"
-  val BUCKET_FHIR_IMPORT = "cqdg-ops-app-fhir-import-file-data"
-  val outputBucket = "cqdg-qa-app-file-download"
+  val CLINICAL_BUCKETNAME = "cqdg-dev-app-clinical-data-service"
+  val BUCKET_FILE_IMPORT = "cqdg-dev-file-import"
 
 
   protected val minioEndpoint = s"http://localhost:$minioPort"
-  implicit val s3: S3Client = S3Utils.buildS3Client(AWSConf(MinioContainer.accessKey, MinioContainer.secretKey, minioEndpoint, bucketName = BUCKETNAME, pathStyleAccess = true, "", "", ""))
+  implicit val s3: S3Client = S3Utils.buildS3Client(AWSConf(MinioContainer.accessKey, MinioContainer.secretKey, minioEndpoint, bucketName = CLINICAL_BUCKETNAME, pathStyleAccess = true, BUCKET_FILE_IMPORT))
   val LOGGER: Logger = LoggerFactory.getLogger(getClass)
 
   createBuckets()
 
   private def createBuckets(): Unit = {
-    val alreadyExistingBuckets = s3.listBuckets().buckets().asScala.collect { case b if b.name() == BUCKETNAME || b.name() == outputBucket || b.name() == BUCKET_FHIR_IMPORT => b.name() }
-    val bucketsToCreate = Seq(BUCKETNAME, outputBucket, BUCKET_FHIR_IMPORT).diff(alreadyExistingBuckets)
+    val alreadyExistingBuckets = s3.listBuckets().buckets().asScala.collect { case b if b.name() == CLINICAL_BUCKETNAME || b.name() == BUCKET_FILE_IMPORT => b.name() }
+    val bucketsToCreate = Seq(CLINICAL_BUCKETNAME, BUCKET_FILE_IMPORT).diff(alreadyExistingBuckets)
     bucketsToCreate.foreach { b =>
       val buketRequest = CreateBucketRequest.builder().bucket(b).build()
       s3.createBucket(buketRequest)
@@ -39,14 +38,14 @@ trait MinioServer {
 
   def withS3Objects[T](block: (String, String) => T): Unit = {
     val inputPrefix = s"run_${Random.nextInt(10000)}"
-    LOGGER.info(s"Use input prefix $inputPrefix : $minioEndpoint/minio/$BUCKETNAME/$inputPrefix")
+    LOGGER.info(s"Use input prefix $inputPrefix : $minioEndpoint/minio/$CLINICAL_BUCKETNAME/$inputPrefix")
     val outputPrefix = s"files_${Random.nextInt(10000)}"
-    LOGGER.info(s"Use output prefix $outputPrefix : : $minioEndpoint/minio/$outputBucket/$outputPrefix")
+    LOGGER.info(s"Use output prefix $outputPrefix : : $minioEndpoint/minio/$BUCKET_FILE_IMPORT/$outputPrefix")
     try {
       block(inputPrefix, outputPrefix)
     } finally {
-      deleteRecursively(BUCKETNAME, inputPrefix)
-      deleteRecursively(outputBucket, outputPrefix)
+      deleteRecursively(CLINICAL_BUCKETNAME, inputPrefix)
+      deleteRecursively(BUCKET_FILE_IMPORT, outputPrefix)
     }
   }
 
@@ -67,7 +66,7 @@ trait MinioServer {
     file.listFiles.filter(_.isFile).toList
   }
 
-  def transferFromResourceDirectory(prefix: String, directory: String, bucket: String = BUCKETNAME): Unit = {
+  def transferFromResourceDirectory(prefix: String, directory: String, bucket: String = CLINICAL_BUCKETNAME): Unit = {
     val files = ls(new File(getClass.getResource(s"/$directory").toURI))
     files.foreach { f =>
       val put = PutObjectRequest.builder().bucket(bucket).key(s"$prefix/${f.getName}").build()
@@ -75,20 +74,20 @@ trait MinioServer {
     }
   }
 
-  def transferFromResource(prefix: String, resource: String, bucket: String = BUCKETNAME): Unit = {
+  def transferFromResource(prefix: String, resource: String, bucket: String = CLINICAL_BUCKETNAME): Unit = {
     val f = new File(getClass.getResource(s"/$resource").toURI)
     val put = PutObjectRequest.builder().bucket(bucket).key(s"$prefix/${f.getName}").build()
     s3.putObject(put, RequestBody.fromFile(f))
   }
 
-  def transferFromResources(filesWithPath: Map[File, String], bucket: String = BUCKETNAME): Unit = {
+  def transferFromResources(filesWithPath: Map[File, String], bucket: String = CLINICAL_BUCKETNAME): Unit = {
     filesWithPath.foreach { case (file, path) =>
       val put = PutObjectRequest.builder().bucket(bucket).key(s"$path/${file.getName}").build()
       s3.putObject(put, RequestBody.fromFile(file))
     }
   }
 
-  def copyNFile(prefix: String, resource: String, times: Int, bucket: String = BUCKETNAME): Unit = {
+  def copyNFile(prefix: String, resource: String, times: Int, bucket: String = CLINICAL_BUCKETNAME): Unit = {
     val file = new File(getClass.getResource(s"/$resource").toURI)
     1.to(times).map { i =>
       val filename = s"${file.getName}_$i"

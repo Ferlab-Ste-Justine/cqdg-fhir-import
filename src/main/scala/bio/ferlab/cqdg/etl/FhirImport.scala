@@ -25,7 +25,7 @@ import scala.jdk.CollectionConverters._
 
 object FhirImport extends App {
 
-  val Array(prefix, bucket, studyClinDataId, studyClinDataVersion, study, project, removeMissing, isRestricted) = args
+  val Array(prefix, studyClinDataId, studyClinDataVersion, study, project, removeMissing, isRestricted) = args
 
   withSystemExit {
     withLog {
@@ -35,7 +35,7 @@ object FhirImport extends App {
         implicit val idService: IdServerClient = new IdServerClient()
         implicit val ferloadConf: FerloadConf = conf.ferload
 
-        val outputBucket = conf.aws.outputBucketName
+        val clinicalBucket = conf.aws.bucketName
         val filesBucket = conf.aws.filesBucket
 
         val metadataInputPrefixMap = getMatadataPerRuns(s"$project/$study", filesBucket)
@@ -46,19 +46,19 @@ object FhirImport extends App {
 
         updateIG()
 
-        withReport(bucket, s"$prefix/$studyClinDataId-$study/$studyClinDataVersion/${metadataInputPrefixMap.keySet.head}") { reportPath =>
-          run(bucket, prefix, studyClinDataId, study, studyClinDataVersion, outputBucket, filesBucket, metadataInputPrefixMap, reportPath, removeMissing.toBoolean, isRestricted.toBooleanOption)
+        withReport(clinicalBucket, s"$prefix/$studyClinDataId-$study/$studyClinDataVersion/${metadataInputPrefixMap.keySet.head}") { reportPath =>
+          run(clinicalBucket, prefix, studyClinDataId, study, studyClinDataVersion, filesBucket, metadataInputPrefixMap, reportPath, removeMissing.toBoolean, isRestricted.toBooleanOption)
         }
       }
     }
   }
 
-  def run(bucket: String, prefix: String, studyClinDataId: String, study: String, studyClinDataVersion: String, outputBucket: String,
+  def run(clinicalBucket: String, prefix: String, studyClinDataId: String, study: String, studyClinDataVersion: String,
           filesBucket: String, inputPrefixMetadataMap: Map[String, Validated[NonEmptyList[String], Metadata]], reportPath: String, removeMissing: Boolean, isRestricted: Option[Boolean])
          (implicit s3: S3Client, client: IGenericClient, idService: IIdServer, ferloadConf: FerloadConf): ValidationResult[Bundle] = {
 
-    val rawResources = extractResources(bucket, prefix, studyClinDataId, study, studyClinDataVersion)
-    val rawDataset = extractResource(bucket, prefix, studyClinDataId, study, studyClinDataVersion, RawDataset.FILENAME, "dataset").asInstanceOf[List[RawDataset]]
+    val rawResources = extractResources(clinicalBucket, prefix, studyClinDataId, study, studyClinDataVersion)
+    val rawDataset = extractResource(clinicalBucket, prefix, studyClinDataId, study, studyClinDataVersion, RawDataset.FILENAME, "dataset").asInstanceOf[List[RawDataset]]
 
     val enrichRawResources = rawResources.map {
       case (k: String, l: Seq[RawResource]) if k == RawStudy.FILENAME => k -> l.map(r => r.asInstanceOf[RawStudy].addDataSets(rawDataset))
@@ -99,7 +99,7 @@ object FhirImport extends App {
 
 
       // In case something bad happen in the distributed transaction, we store the modification brings to the resource (FHIR and S3 objects)
-      writeAheadLog(outputBucket, reportPath, TBundle(bundle), files)
+      writeAheadLog(clinicalBucket, reportPath, TBundle(bundle), files)
       
       val allBundle = bundle ++ bundleList
 

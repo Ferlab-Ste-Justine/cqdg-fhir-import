@@ -13,8 +13,6 @@ case class AWSConf(
                     endpoint: String,
                     bucketName: String,
                     pathStyleAccess: Boolean,
-                    outputBucketName: String,
-                    outputPrefix: String,
                     filesBucket: String
                   )
 
