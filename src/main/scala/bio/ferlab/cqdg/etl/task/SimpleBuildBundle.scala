@@ -46,7 +46,7 @@ object SimpleBuildBundle {
       val groupedByFamily = resources.asInstanceOf[Map[String, RawFamily]].groupBy{ case (_: String, r: RawFamily) => r.submitter_family_id}
 
       val groupedByFamilyHashed = groupedByFamily
-        .map{ case (groupId: String, mapFamily: Map[String, RawFamily]) => DigestUtils.sha1Hex(groupId) -> mapFamily }
+        .map{ case (groupId: String, mapFamily: Map[String, RawFamily]) => DigestUtils.sha1Hex(s"$groupId-$studyId") -> mapFamily }
 
       val cqdgFamilyIds = getIdServiceIds(groupedByFamilyHashed.map(e => (e._1, "family_id")).toSet)
 
