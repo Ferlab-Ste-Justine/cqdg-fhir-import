@@ -80,7 +80,11 @@ object CRAI {
 }
 
 case class SNV(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
-  override val format: String = "gVCF"
+  override val format: String = if (this.title.toLowerCase.contains("gvcf")) {
+    "gVCF"
+  } else {
+    "VCF"
+  }
 }
 
 object SNV {

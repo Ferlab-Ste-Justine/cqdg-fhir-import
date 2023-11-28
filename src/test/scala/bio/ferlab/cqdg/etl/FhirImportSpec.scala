@@ -225,6 +225,16 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val studyDsExt = researchStudy.getExtension.asScala.toSeq.filter(ex => ex.getUrl == DATASET_SD).flatMap(ex => ex.getExtension.asScala.toSeq.map(ex => ex.getValue.toString))
 
       studyDsExt shouldBe Seq("ds_name 1", "description 1", "ds_name 2", "description 2")
+
+      //*************** SNV | VCF or gVCF files *******************
+      searchDocumentReference
+      val documentSnvVcf = searchFhir("DocumentReference", Some("type=SNV&format=VCF")).getEntry.asScala.toList
+      val documentSnvGVcf = searchFhir("DocumentReference", Some("type=SNV&format=gVCF")).getEntry.asScala.toList
+
+      //      S03411.hard-filtered.gvcf.gz | S03344.hard-filtered.gvcf.gz | S03456.hard-filtered.gvcf.gz
+      documentSnvGVcf.size shouldEqual 3
+      //      S03357.some.vcf.gz
+      documentSnvVcf.size shouldEqual 1
     }
   }
 }
