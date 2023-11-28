@@ -6,7 +6,7 @@ import ca.uhn.fhir.parser.IParser
 import ca.uhn.fhir.rest.api.SummaryEnum
 import ca.uhn.fhir.rest.client.api.{IGenericClient, ServerValidationModeEnum}
 import org.hl7.fhir.instance.model.api.IBaseResource
-import org.hl7.fhir.r4.model.{Bundle, IdType, Resource}
+import org.hl7.fhir.r4.model.{Bundle, DocumentReference, IdType, Resource}
 import org.scalatest.{BeforeAndAfter, BeforeAndAfterAll, TestSuite}
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -49,8 +49,13 @@ trait FhirServerSuite extends FhirServer with TestSuite with BeforeAndAfterAll w
     IdType.of(r).toUnqualifiedVersionless.toString
   }
 
-  def searchFhir(resourceType: String): Bundle = {
-    fhirClient.search().forResource(resourceType)
+  def searchFhir(resourceType: String, extraConditions: Option[String] = None): Bundle = {
+    val url = extraConditions match {
+      case Some(queryParams) => s"$resourceType?$queryParams"
+      case None => s"$resourceType"
+    }
+
+    fhirClient.search().byUrl(url)
       .returnBundle(classOf[Bundle])
       .summaryMode(SummaryEnum.TRUE)
       .count(40)
