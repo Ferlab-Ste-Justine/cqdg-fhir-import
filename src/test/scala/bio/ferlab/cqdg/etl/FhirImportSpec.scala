@@ -48,10 +48,10 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val pattern = """^.*narval/(.*)/.*$""".r
 
       val files =
-        ls(new File(getClass.getResource("/narval/dataset_ds_name 1/1623").toURI)) ++
-          ls(new File(getClass.getResource("/narval/dataset_ds_name 2/1612").toURI)) ++
-          ls(new File(getClass.getResource("/narval/dataset_ds_name 1").toURI)) ++
-          ls(new File(getClass.getResource("/narval/dataset_ds_name 2").toURI))
+        ls(new File(getClass.getResource("/narval/dataset_ds_name_1/1623").toURI)) ++
+          ls(new File(getClass.getResource("/narval/dataset_ds_name_2/1612").toURI)) ++
+          ls(new File(getClass.getResource("/narval/dataset_ds_name_1").toURI)) ++
+          ls(new File(getClass.getResource("/narval/dataset_ds_name_2").toURI))
 
       val map = files.map(f => {
         val pattern(pathToRun) = f.getPath
@@ -211,20 +211,20 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       val patientDocumentsDs1 =
         searchDocumentReference
           .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
-          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset:ds_name 1"))
+          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset:ds_name_1"))
 
       patientDocumentsDs1.size shouldEqual 14
 
       val patientDocumentsDs2 =
         searchDocumentReference
           .getEntry.asScala.map(_.getResource.asInstanceOf[DocumentReference])
-          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset:ds_name 2"))
+          .filter(e => e.getMeta.getTag.asScala.exists(tag => tag.getSystem == DATASET_CS && tag.getCode == "dataset:ds_name_2"))
 
       patientDocumentsDs2.size shouldEqual 14
 
       val studyDsExt = researchStudy.getExtension.asScala.toSeq.filter(ex => ex.getUrl == DATASET_SD).flatMap(ex => ex.getExtension.asScala.toSeq.map(ex => ex.getValue.toString))
 
-      studyDsExt shouldBe Seq("ds_name 1", "description 1", "ds_name 2", "description 2")
+      studyDsExt shouldBe Seq("ds_name_1", "description 1", "ds_name_2", "description 2")
 
       //*************** SNV | VCF or gVCF files *******************
       searchDocumentReference

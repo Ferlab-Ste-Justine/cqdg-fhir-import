@@ -85,7 +85,7 @@ trait TDocumentReference extends DocumentReferenceType {
     val components = document.map { d =>
       val a = new Attachment()
       a.setContentType(d.contentType)
-      a.setUrl(s"${ferloadConf.url}/${d.objectStoreId}")
+      a.setUrl(d.s3Url)
       d.md5.map(md5sum => a.setHash(md5sum.getBytes()))
       a.setTitle(d.title)
 

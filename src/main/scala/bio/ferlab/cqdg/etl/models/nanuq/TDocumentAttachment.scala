@@ -6,6 +6,7 @@ import cats.implicits._
 trait TDocumentAttachment {
   val format: String
   val objectStoreId: String
+  val s3Url: String
   val title: String
   val md5: Option[String]
   val size: Long
@@ -51,8 +52,9 @@ trait ToOptAttachment[T <: TDocumentAttachment] {
   }
 }
 
-case class CRAM(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class CRAM(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = "CRAM"
+  override val s3Url: String = s"s3://$key"
 }
 
 case object CRAM {
@@ -61,12 +63,14 @@ case object CRAM {
 
     override def analysisFileName: Analysis => String = a => a.files.cram
 
-    override def buildFile: FileEntry => CRAM = f => CRAM(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => CRAM = f => CRAM(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
 
-case class CRAI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class CRAI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = "CRAI"
+
+  override val s3Url: String = s"s3://$key"
 }
 
 object CRAI {
@@ -75,16 +79,17 @@ object CRAI {
 
     override def analysisFileName: Analysis => String = a => a.files.crai
 
-    override def buildFile: FileEntry => CRAI = f => CRAI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => CRAI = f => CRAI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
 
-case class SNV(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class SNV(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = if (this.title.toLowerCase.contains("gvcf")) {
     "gVCF"
   } else {
     "VCF"
   }
+  override val s3Url: String = s"s3://$key"
 }
 
 object SNV {
@@ -93,13 +98,14 @@ object SNV {
 
     override def analysisFileName: Analysis => String = a => a.files.snv
 
-    override def buildFile: FileEntry => SNV = f => SNV(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => SNV = f => SNV(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
 
 
-case class CNV(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class CNV(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = "VCF"
+  override val s3Url: String = s"s3://$key"
 }
 
 object CNV {
@@ -108,12 +114,13 @@ object CNV {
 
     override def analysisFileName: Analysis => Option[String] = a => a.files.cnv
 
-    override def buildFile: FileEntry => CNV = f => CNV(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => CNV = f => CNV(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
 
-case class SV(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class SV(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = "VCF"
+  override val s3Url: String = s"s3://$key"
 }
 
 object SV {
@@ -122,12 +129,13 @@ object SV {
 
     override def analysisFileName: Analysis => Option[String] = a => a.files.sv
 
-    override def buildFile: FileEntry => SV = f => SV(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => SV = f => SV(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
 
-case class SV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class SV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = "TBI"
+  override val s3Url: String = s"s3://$key"
 }
 
 object SV_TBI {
@@ -136,12 +144,13 @@ object SV_TBI {
 
     override def analysisFileName: Analysis => Option[String] = a => a.files.sv_tbi
 
-    override def buildFile: FileEntry => SV_TBI = f => SV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => SV_TBI = f => SV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
 
-case class CNV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class CNV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = "TBI"
+  override val s3Url: String = s"s3://$key"
 }
 
 object CNV_TBI {
@@ -150,12 +159,13 @@ object CNV_TBI {
 
     override def analysisFileName: Analysis => Option[String] = a => a.files.cnv_tbi
 
-    override def buildFile: FileEntry => CNV_TBI = f => CNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => CNV_TBI = f => CNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
 
-case class SNV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class SNV_TBI(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = "TBI"
+  override val s3Url: String = s"s3://$key"
 }
 
 object SNV_TBI {
@@ -164,12 +174,13 @@ object SNV_TBI {
 
     override def analysisFileName: Analysis => Option[String] = a => a.files.snv_tbi
 
-    override def buildFile: FileEntry => SNV_TBI = f => SNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => SNV_TBI = f => SNV_TBI(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
 
-case class Supplement(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String) extends TDocumentAttachment {
+case class Supplement(objectStoreId: String, title: String, md5: Option[String], size: Long, contentType: String, key: String) extends TDocumentAttachment {
   override val format: String = "TGZ"
+  override val s3Url: String = s"s3://$key"
 }
 
 object Supplement {
@@ -178,6 +189,6 @@ object Supplement {
 
     override def analysisFileName: Analysis => Option[String] = a => a.files.supplement
 
-    override def buildFile: FileEntry => Supplement = f => Supplement(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType)
+    override def buildFile: FileEntry => Supplement = f => Supplement(objectStoreId = f.id, title = f.filename, md5 = f.md5, size = f.size, contentType = f.contentType, key = f.key)
   }
 }
