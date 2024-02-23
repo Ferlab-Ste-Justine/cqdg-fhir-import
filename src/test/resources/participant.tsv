@@ -1,4 +1,4 @@
-study_id	submitter_participant_id	age_at_recruitment	gender	ethnicity	vital_status	cause_of_death	age_of_death
+study_id	submitter_participant_id	age_at_recruitment	sex	ethnicity	vital_status	cause_of_death	age_of_death
 cag	35849409716	21975	female	French Canadian	Alive		50
 cag	35849419216	25491	male	French Canadian	Alive		50
 cag	35849430470	20410	male	Aboriginal	Deceased	Pie eating	100
