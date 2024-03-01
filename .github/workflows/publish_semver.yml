@@ -1,5 +1,5 @@
 
-name: Publish
+name: Publish Tag
 
 on:
   push:
@@ -10,7 +10,7 @@ on:
 
 jobs:
   publish:
-    name: Publish Image
+    name: Publish Image Tag
     runs-on: ubuntu-22.04
     steps:
       - name: Checkout
