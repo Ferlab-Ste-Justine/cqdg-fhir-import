@@ -3,10 +3,10 @@ name: Publish Tag
 
 on:
   push:
-    branches:
-      - master
     tags:
       - v*
+    branches-ignore:
+      - '!master'
 
 jobs:
   publish:
