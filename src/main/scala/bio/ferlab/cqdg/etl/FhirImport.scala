@@ -11,7 +11,7 @@ import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
 import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContentTSV}
-import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources}
+import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources, createStudy}
 import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.data.{NonEmptyList, Validated}
@@ -60,18 +60,18 @@ object FhirImport extends App {
     val rawResources = extractResources(clinicalBucket, prefix, studyClinDataId, study, studyClinDataVersion)
     val rawDataset = extractResource(clinicalBucket, prefix, studyClinDataId, study, studyClinDataVersion, RawDataset.FILENAME, "dataset").asInstanceOf[List[RawDataset]]
 
-    val enrichRawResources = rawResources.map {
-      case (k: String, l: Seq[RawResource]) if k == RawStudy.FILENAME => k -> l.map(r => r.asInstanceOf[RawStudy].addDataSets(rawDataset))
-      case d => d
-    }
+    val rawStudyWithDataSet = rawResources
+      .find{ case(k, _) => k == RawStudy.FILENAME }
+      .map {case (k: String, l: Seq[RawResource]) => k -> l.map(r => r.asInstanceOf[RawStudy].addDataSets(rawDataset)) }
+      .getOrElse(throw new Error("No study found"))
 
-    val allRawResources: Map[String, Map[String, RawResource]] = addIds(enrichRawResources)
-
-    val studyFhirId = allRawResources("study").keySet.headOption.getOrElse(throw new Error("No study found"))
+    val allRawResources: Map[String, Map[String, RawResource]] =
+      addIds(rawResources.filterNot{ case(k, _) => k == RawStudy.FILENAME }) +
+        ("study" -> Map(study -> rawStudyWithDataSet._2.head)) //FIXME
 
     val resources = RESOURCES.flatMap(rt => {
-      createResources(allRawResources, rt, studyClinDataVersion, studyFhirId, isRestricted.getOrElse(false))
-    }) :+ createOrganization(studyClinDataVersion, studyFhirId)
+      createResources(allRawResources, rt, studyClinDataVersion, study, isRestricted.getOrElse(false))
+    }) :+ createOrganization(studyClinDataVersion, study)
 
     val bundleList = bundleCreate(resources)
 

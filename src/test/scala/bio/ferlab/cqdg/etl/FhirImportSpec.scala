@@ -31,7 +31,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
     RawFamily.FILENAME,
     RawDataset.FILENAME
   )
-  val study = "STU0000001"
+  val study = "CAG"
   val studyClinDataVersion = "1"
   val studyClinDataId = "2"
 
@@ -174,7 +174,7 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       }
 
       //Resources should have study and revision in Tag
-      val tags = Seq(s"study:STU0000001", s"study_version:$studyClinDataVersion")
+      val tags = Seq(s"study:$study", s"study_version:$studyClinDataVersion")
       patients.getEntry.asScala.foreach{ p =>
         val resource = p.getResource.asInstanceOf[Patient]
         resource.getIdBase match {

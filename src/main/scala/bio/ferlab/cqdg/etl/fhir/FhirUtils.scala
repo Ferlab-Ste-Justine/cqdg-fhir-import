@@ -219,8 +219,8 @@ object FhirUtils {
       new Reference(IdType.of(v).toUnqualifiedVersionless)
     }
 
-    def setSimpleMeta(studyId: String, version: String, profile: Option[String], args: String*): Resource = {
-      val codes = Seq(s"study:$studyId", s"study_version:$version") ++ args
+    def setSimpleMeta(studyCode: String, version: String, profile: Option[String], args: String*): Resource = {
+      val codes = Seq(s"study:$studyCode", s"study_version:$version") ++ args
       v.setMeta(generateMeta(codes, profile))
     }
 
