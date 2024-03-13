@@ -1,5 +1,6 @@
 package bio.ferlab.cqdg.etl
 
+import bio.ferlab.cqdg.etl.FhirImport.prefix
 import bio.ferlab.cqdg.etl.clients.IIdServer
 import bio.ferlab.cqdg.etl.conf.FerloadConf
 import bio.ferlab.cqdg.etl.fhir.FhirUtils.Constants.CodingSystems.{CAUSE_OF_DEATH, CONFIDENTIALITY_CS, DATASET_CS}
@@ -110,6 +111,9 @@ class FhirImportSpec extends FlatSpec with WholeStackSuite with Matchers with Be
       researchStudy.getExtension.asScala.count(e => e.getUrl == POPULATION_URL_SD) shouldBe 1
       // is Restricted
       researchStudy.getMeta.getSecurity.asScala.count(e => e.getSystem == CONFIDENTIALITY_CS) shouldBe 1
+
+      //ResearchStudy id should be study code
+      researchStudy.getId should include(study)
 
       // ################## PHENOTYPE #######################
       val phenotypes = read(observations, classOf[Observation]).filter(p => p.getCode.getCoding.asScala.exists(c => c.getCode == "Phenotype"))

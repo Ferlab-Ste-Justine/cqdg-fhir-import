@@ -11,12 +11,12 @@ import bio.ferlab.cqdg.etl.models._
 import bio.ferlab.cqdg.etl.models.nanuq.{FileEntry, Metadata}
 import bio.ferlab.cqdg.etl.s3.S3Utils
 import bio.ferlab.cqdg.etl.s3.S3Utils.{buildS3Client, getContentTSV}
-import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources, createStudy}
+import bio.ferlab.cqdg.etl.task.SimpleBuildBundle.{createOrganization, createResources}
 import bio.ferlab.cqdg.etl.task.nanuq.{CheckS3Data, NanuqBuildBundle}
 import ca.uhn.fhir.rest.client.api.IGenericClient
 import cats.data.{NonEmptyList, Validated}
 import cats.implicits.catsSyntaxTuple2Semigroupal
-import org.hl7.fhir.r4.model.{Bundle, ResourceType}
+import org.hl7.fhir.r4.model.Bundle
 import play.api.libs.json.Json
 import software.amazon.awssdk.services.s3.S3Client
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
@@ -62,12 +62,12 @@ object FhirImport extends App {
 
     val rawStudyWithDataSet = rawResources
       .find{ case(k, _) => k == RawStudy.FILENAME }
-      .map {case (k: String, l: Seq[RawResource]) => k -> l.map(r => r.asInstanceOf[RawStudy].addDataSets(rawDataset)) }
-      .getOrElse(throw new Error("No study found"))
+      .map {case (k: String, l: Seq[RawResource]) => l.map(r => r.asInstanceOf[RawStudy].addDataSets(rawDataset)) }
+      .getOrElse(throw new Error("No study found")).head
 
     val allRawResources: Map[String, Map[String, RawResource]] =
       addIds(rawResources.filterNot{ case(k, _) => k == RawStudy.FILENAME }) +
-        ("study" -> Map(study -> rawStudyWithDataSet._2.head)) //FIXME
+        (RawStudy.FILENAME -> Map(study -> rawStudyWithDataSet))
 
     val resources = RESOURCES.flatMap(rt => {
       createResources(allRawResources, rt, studyClinDataVersion, study, isRestricted.getOrElse(false))
