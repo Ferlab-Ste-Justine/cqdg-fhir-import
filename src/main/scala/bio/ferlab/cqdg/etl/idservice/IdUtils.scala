@@ -18,7 +18,7 @@ object IdUtils {
   def mapIdToList(list: Map[String, _], hashIds: List[HashIdMap]): Map[String, Any] = {
     list.map(r => {
       val (hash, resource) = r
-      val id = hashIds.find(e => e.hash == hash).get.internal_id
+      val id = hashIds.find(e => e.hash == hash).getOrElse(throw new Error(hash)).internal_id
       id -> resource
     })
   }
