@@ -49,21 +49,21 @@ object TaskExtensionValidation {
   }
 
   private def validateRunDate(m: Metadata, experimentExt: Extension) = {
-    val runDate: Option[ValidatedNel[String, DateTimeType]] = m.experiment.runDate.map { d =>
+    val runDate: Option[ValidatedNel[String, DateType]] = m.experiment.runDate.map { d =>
 
       import java.text.SimpleDateFormat
       val patterns = Seq("dd/MM/yyyy", "yyyy-MM-dd")
-      val t: Option[DateTimeType] = patterns.toStream.map { p =>
+      val t: Option[DateType] = patterns.toStream.map { p =>
         Try {
           val simpleDateFormat = new SimpleDateFormat(p)
           val parsed = simpleDateFormat.parse(d)
-          new DateTimeType(parsed)
+          new DateType(parsed)
         }
       }.collectFirst { case Success(x) => x }
 
       t match {
         case Some(date) => date.validNel[String]
-        case _ => s"Error on experiment.rundate = $d".invalidNel[DateTimeType]
+        case _ => s"Error on experiment.rundate = $d".invalidNel[DateType]
       }
     }
 
