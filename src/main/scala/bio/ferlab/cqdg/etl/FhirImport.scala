@@ -37,6 +37,8 @@ object FhirImport extends App {
 
         val clinicalBucket = conf.aws.bucketName
         val filesBucket = conf.aws.filesBucket
+        println(s"clinicalBucket: $clinicalBucket")
+        println(s"fileBucket: $filesBucket")
 
         val metadataInputPrefixMap = getMatadataPerRuns(s"$project/$study", filesBucket)
 
