@@ -21,22 +21,21 @@ import scala.jdk.CollectionConverters._
 trait TDocumentReference extends DocumentReferenceType {
   def document: Seq[TDocumentAttachment]
 
-  def validateBaseResource(studyId: String, release: String)(implicit fhirClient: IGenericClient, ferloadConf: FerloadConf): OperationOutcome = {
-    val baseResource = buildBase(studyId, release, dataset = None, isRestricted = false)
+  def validateBaseResource(studyId: String, release: String)(implicit fhirClient: IGenericClient): OperationOutcome = {
+    val baseResource = buildBase(studyId, release, "", dataset = None, isRestricted = false)
     FhirUtils.validateResource(baseResource)
   }
 
   def buildResource(subject: Reference, related: Seq[Reference], studyId: String, release: String,
                     filesHashId: List[HashIdMap], dataset: Option[String], isRestricted: Boolean,
-                    relatesTo: Option[String] = None)
-                   (implicit ferloadConf: FerloadConf): Resource = {
+                    relatesTo: Option[String] = None): Resource = {
 
     val fileId = filesHashId.find(h => h.hash == this.id) match {
       case Some(hashId) => hashId.internal_id
       case None => throw new RuntimeException(s"Failed to retrieve id for ${this.id}")
     }
 
-    val dr = buildBase(studyId, release, dataset: Option[String], isRestricted)
+    val dr = buildBase(studyId, release, fileId, dataset, relatesTo, isRestricted)
 
     val drc = new DocumentReferenceContextComponent()
     drc.setRelated(related.asJava)
@@ -57,8 +56,8 @@ trait TDocumentReference extends DocumentReferenceType {
 
   }
 
-  private def buildBase(studyId: String, release: String, dataset: Option[String], isRestricted: Boolean)
-                       (implicit ferloadConf: FerloadConf) = {
+  private def buildBase(studyId: String, release: String, docId: String, dataset: Option[String],
+                        relatesTo: Option[String] = None, isRestricted: Boolean) = {
     val dr = new DocumentReference()
 
     val codes = Seq(s"study:$studyId", s"study_version:$release")
@@ -87,7 +86,7 @@ trait TDocumentReference extends DocumentReferenceType {
       a.setContentType(d.contentType)
       a.setUrl(d.s3Url)
       d.md5.map(md5sum => a.setHash(md5sum.getBytes()))
-      a.setTitle(d.title)
+      a.setTitle(relatesTo.map(relId => s"$relId.${d.title}").getOrElse(s"$docId.${d.title}"))
 
       val fullSize = new Extension(Extensions.FULL_SIZE_SD, new DecimalType(d.size))
       a.addExtension(fullSize)
