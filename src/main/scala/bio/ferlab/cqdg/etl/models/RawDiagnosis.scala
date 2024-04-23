@@ -37,7 +37,7 @@ object RawDiagnosis {
       line(header.indexOf("diagnosis_source_text")),
       getOptionalLineValue(line, header, "diagnosis_ICD_code"),
       getOptionalLineValue(line, header, "diagnosis_mondo_code"),
-      getOptionalLineValue(line, header, "age_at_diagnosis").map(_.toInt),
+      getOptionalLineValue(line, header, "age_at_diagnosis").map(_.toDouble.toInt),
     )
   }
 }
